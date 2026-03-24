@@ -1,4 +1,4 @@
-import { pgTable, text, serial, timestamp, integer, boolean, varchar } from "drizzle-orm/pg-core";
+import { pgTable, text, serial, timestamp, integer, boolean, varchar, index } from "drizzle-orm/pg-core";
 import { projectsTable } from "./projects";
 
 export const webhooksTable = pgTable("webhooks", {
@@ -11,6 +11,8 @@ export const webhooksTable = pgTable("webhooks", {
   lastStatus: integer("last_status"),
   lastTriggeredAt: timestamp("last_triggered_at"),
   createdAt: timestamp("created_at").defaultNow().notNull(),
-});
+}, (table) => ({
+  projectIdIdx: index("webhooks_project_id_idx").on(table.projectId),
+}));
 
 export type Webhook = typeof webhooksTable.$inferSelect;

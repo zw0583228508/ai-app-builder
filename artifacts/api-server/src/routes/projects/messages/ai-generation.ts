@@ -18,22 +18,10 @@ import type { DetectedIntent } from "../../../services/ai/intent";
 import {
   detectContextualSuggestions,
   detectNextStep,
-  getIntentSystemAddition,
 } from "../../../services/ai/intent";
-import {
-  LANDING_PAGE_DESIGN_RULES,
-  isMarketingPageRequest,
-  PROMPT_VERSION,
-} from "../../../services/ai/prompts/index";
-import {
-  COPY_BRAIN_RULES,
-  COMPONENT_VARIATION_RULES,
-  LAYOUT_INTELLIGENCE_RULES,
-  MOTION_ENGINE_RULES,
-} from "../../../services/ai/prompts/design-system";
-import { getSystemPrompt } from "../../../services/ai/system-prompt";
+import { PROMPT_VERSION } from "../../../services/ai/prompts/index";
+import { buildSystemPrompt } from "./prompt-builder";
 import { getIntegrationCapabilities } from "../../../services/integrations/vault";
-import { assertPromptSafe } from "../../../lib/prompt-sanity-check";
 import {
   withRetry,
   extractAndSaveDNA,
@@ -127,82 +115,21 @@ export async function runAiGeneration(ctx: AiGenerationCtx): Promise<void> {
     ? await getIntegrationCapabilities(project.userId)
     : {};
 
-  // ── Intent / stack helpers ────────────────────────────────────────────────
-  const isCreateIntent = detectedIntent.intent === "create";
-  const isEditOrFix =
-    detectedIntent.intent === "edit" || detectedIntent.intent === "fix";
-
-  // ── Build system prompt ───────────────────────────────────────────────────
-  const baseSystemPrompt = isEditOrFix
-    ? `You are an expert web developer making targeted edits to an existing project.
-RESPOND IN THE SAME LANGUAGE AS THE USER (Hebrew → Hebrew, English → English).
-
-EDITING RULES (MANDATORY):
-• Read the [CURRENT APP CODE] carefully before touching anything
-• Change ONLY what the user explicitly asked to change
-• Preserve ALL existing features, styles, content, and structure
-• Never remove or restructure things that were not mentioned
-• For HTML projects: use the patch format (<<<REPLACE>>>...<<<WITH>>>...<<<END>>>) for surgical changes
-• For React/multi-file projects: output ONLY the changed files
-
-VOICE RULES (MANDATORY — no exceptions):
-• NO FILLER: never say "Sure!", "Of course!", "Great!", "As requested", "Here is the updated code", "I have made the changes", "I will now"
-• NO PREAMBLE: never restate what the user asked or describe what you're about to do
-• NO TRAILING QUESTION: do NOT end with a question unless something is genuinely unclear
-• FIRST WORD: always a verb — "עדכנתי", "תיקנתי", "הוספתי", "Updated", "Fixed", "Added"
-
-RESPONSE FORMAT — BEFORE the code (1-2 lines max):
-[VERB] + [WHAT changed] + [WHERE if not obvious]
-
-Hebrew:
-✅ "עדכנתי את הכותרת הראשית — גופן גדול יותר, מרווח הדוק."
-✅ "תיקנתי את ה-overflow במובייל וכיוונתי את הכרטיסים."
-✅ "הוספתי טופס יצירת קשר עם ולידציה ואישור שליחה."
-✅ "שינתי את צבע הרקע ועדכנתי את הפלטה לאורך כל הדף."
-
-English:
-✅ "Updated the hero headline — larger font, tighter tracking."
-✅ "Fixed mobile overflow and corrected card alignment."
-✅ "Added contact form with validation and success state."
-
-❌ NEVER: "I will now..." / "Here is the updated..." / "As requested..." / "I've made the changes you asked for"
-❌ NEVER end with "What else would you like to change?" or any variant`
-    : getSystemPrompt(
-        currentMode,
-        capabilities,
-        project.type ?? undefined,
-        project.stack ?? "html",
-        detectedIntent.intent,
-      );
-
-  const isBuildIntent =
-    isCreateIntent || detectedIntent.intent === "add_feature";
-
-  const needsLandingPageFallback =
-    !isEditOrFix &&
-    !isCreateIntent &&
-    isBuildIntent &&
-    isMarketingPageRequest(body.content) &&
-    (project.stack ?? "html") === "html";
-
-  const systemPrompt =
-    baseSystemPrompt +
-    (designBriefBlock ? "\n" + designBriefBlock : "") +
-    (isBuildIntent ? "\n" + COPY_BRAIN_RULES : "") +
-    (isBuildIntent ? "\n" + COMPONENT_VARIATION_RULES : "") +
-    (isBuildIntent ? "\n" + LAYOUT_INTELLIGENCE_RULES : "") +
-    (isBuildIntent ? "\n" + MOTION_ENGINE_RULES : "") +
-    (needsLandingPageFallback ? "\n" + LANDING_PAGE_DESIGN_RULES : "") +
-    (!isEditOrFix && userDnaContext ? "\n" + userDnaContext : "") +
-    (!isEditOrFix && dnaContext ? "\n" + dnaContext : "") +
-    (!isEditOrFix ? memoryChunkContext : "") +
-    agentContext +
-    getIntentSystemAddition(detectedIntent.intent);
-
-  // Hard fail-safe: block the request if any credential pattern is detected.
-  // This should never trigger if the pipeline is correct — treat every
-  // trigger as a critical security incident.
-  assertPromptSafe(systemPrompt);
+  // ── System prompt (built by prompt-builder.ts) ───────────────────────────
+  // buildSystemPrompt assembles all prompt layers and calls assertPromptSafe.
+  const systemPrompt = buildSystemPrompt({
+    currentMode,
+    capabilities,
+    projectType: project.type,
+    stack: project.stack ?? "html",
+    detectedIntent,
+    userContent: body.content,
+    designBriefBlock,
+    userDnaContext,
+    dnaContext,
+    memoryChunkContext,
+    agentContext,
+  });
 
   // ══════════════════════════════════════════════════════════════════════════
   // AGENT FLOW — Step-by-step building

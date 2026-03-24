@@ -24,6 +24,10 @@ import { EntrepreneurPlanCard } from "./chat/EntrepreneurPlanCard";
 import { StreamingBubble } from "./chat/StreamingBubble";
 import { ChatInputBar } from "./chat/ChatInputBar";
 import { BuildProgressBar } from "./BuildProgressBar";
+import {
+  QuickReplyGroup,
+  FIRST_RESPONSE_GROUPS_HE,
+} from "./chat/QuickReplyGroup";
 
 const HE = "'Rubik', sans-serif";
 
@@ -568,6 +572,23 @@ export function ChatPanel({
           {project.messages.map((msg, idx) => (
             <MessageBubble key={msg.id || `msg-${idx}`} message={msg} />
           ))}
+
+          {/* Quick Reply — guided choices after first AI response */}
+          {!isStreaming &&
+            !pendingMessage &&
+            project.messages.filter((m) => m.role === "user").length === 1 &&
+            project.messages[project.messages.length - 1]?.role ===
+              "assistant" && (
+              <QuickReplyGroup
+                key="quick-reply-first"
+                groups={FIRST_RESPONSE_GROUPS_HE}
+                onSelect={(text) => {
+                  setPendingMessage(text);
+                  sendMessage(text);
+                }}
+                isRTL
+              />
+            )}
 
           {/* Entrepreneur plan card */}
           {entrepreneurPlan && (
