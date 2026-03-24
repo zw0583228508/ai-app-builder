@@ -90,7 +90,10 @@ export function CostPanel({ projectId }: CostPanelProps) {
 
   useEffect(() => { fetchCost(); }, [projectId]);
 
-  const formatUsd = (v: number) => v < 0.01 ? `$${(v * 100).toFixed(2)}¢` : `$${v.toFixed(2)}`;
+  const formatUsd = (v: number | undefined | null) => {
+    const n = v ?? 0;
+    return n < 0.01 ? `$${(n * 100).toFixed(2)}¢` : `$${n.toFixed(2)}`;
+  };
 
   return (
     <div className="h-full flex flex-col bg-[hsl(220,16%,6%)] overflow-hidden" dir="rtl" style={{ fontFamily: "'Rubik', sans-serif" }}>
