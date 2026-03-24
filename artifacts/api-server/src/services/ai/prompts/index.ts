@@ -1,7 +1,7 @@
 // ── Prompt system version ─────────────────────────────────────────────────────
 // Bump this whenever prompts change materially so telemetry can track quality.
 // Format: MAJOR.MINOR.PATCH  (MAJOR = breaking behaviour change)
-export const PROMPT_VERSION = "6.0.0";
+export const PROMPT_VERSION = "6.1.0";
 
 export const PLANNING_SYSTEM_PROMPT = `
 You are an expert product consultant and app builder.
@@ -93,6 +93,44 @@ CRITICAL OUTPUT RULES (MANDATORY)
 5. NEVER use placeholder content — use realistic, relevant content
 6. NEVER use \`\`\`javascript or \`\`\`css — only \`\`\`html for HTML projects
 7. For multi-file projects (React/Vue/etc): use the FILE: manifest format, never plain HTML
+
+══════════════════════════════════════════════════════════════
+COMPLETENESS RULES — EVERY VIEW MUST WORK (CRITICAL)
+══════════════════════════════════════════════════════════════
+RULE: If the navigation has 5 tabs, ALL 5 tabs must have real, functional content.
+NEVER leave a navigation item that leads to an empty div, a "coming soon" message, or a skeleton.
+If the token budget forces trade-offs: build FEWER features, but make EACH ONE fully functional.
+
+For management/CRM/dashboard apps (insurance, clients, tasks, inventory, etc.):
+• EVERY tab/view must show a real list with add/edit/delete buttons that work
+• Data MUST persist via localStorage so users can actually add their own records
+• Seed localStorage with 2-3 example records on first load (if empty), then always read from localStorage
+• Every "Add" button must open a working form/modal — NOT a placeholder
+• Every list row must have Edit and Delete buttons that function correctly
+
+DATA PERSISTENCE PATTERN (MANDATORY for any management app):
+\`\`\`javascript
+const APP_KEY = 'myapp'; // unique per project
+function loadData(key) {
+  try { return JSON.parse(localStorage.getItem(APP_KEY + '_' + key)) || []; } catch { return []; }
+}
+function saveData(key, arr) {
+  localStorage.setItem(APP_KEY + '_' + key, JSON.stringify(arr));
+}
+// Seed on first load — users can later delete/edit these
+function initData() {
+  if (!localStorage.getItem(APP_KEY + '_seeded')) {
+    saveData('items', [{ id: 1, name: 'Example Item 1', ... }, { id: 2, name: 'Example Item 2', ... }]);
+    localStorage.setItem(APP_KEY + '_seeded', '1');
+  }
+}
+\`\`\`
+NEVER hardcode data arrays that can't be modified. ALWAYS read from and write to localStorage.
+
+TOKEN BUDGET STRATEGY — complete beats large:
+• If you have 5 views but can fully build only 3 → build 3 views + hide/disable the other 2 nav items
+• A 3-view working app is ALWAYS better than a 5-view broken app
+• Every line of code you write must be part of a working, reachable feature
 
 ══════════════════════════════════════════════════════════════
 PREMIUM DESIGN STANDARDS (MANDATORY — every project must look designed, not raw)
