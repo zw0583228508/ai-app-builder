@@ -27,7 +27,9 @@ import { BuildProgressBar } from "./BuildProgressBar";
 import {
   QuickReplyGroup,
   FIRST_RESPONSE_GROUPS_HE,
+  FIRST_RESPONSE_GROUPS_EN,
 } from "./chat/QuickReplyGroup";
+import { useLang } from "@/lib/i18n";
 
 const HE = "'Rubik', sans-serif";
 
@@ -50,6 +52,8 @@ export function ChatPanel({
   selectedElement,
   onClearSelection,
 }: ChatPanelProps) {
+  const { meta } = useLang();
+  const isRTL = meta.rtl;
   const [input, setInput] = useState("");
   const [pendingMessage, setPendingMessage] = useState<string | null>(null);
   const [growWithMeSuggestion, setGrowWithMeSuggestion] = useState<
@@ -491,7 +495,7 @@ export function ChatPanel({
     : null;
 
   return (
-    <div className="flex flex-col h-full bg-[#0a0a0f] relative" dir="rtl">
+    <div className="flex flex-col h-full bg-[#0a0a0f] relative" dir={isRTL ? "rtl" : "ltr"}>
       {/* Header */}
       <ChatHeader
         projectTitle={project.title}
@@ -513,7 +517,7 @@ export function ChatPanel({
 
       {/* Build progress bar — shown when conversation has started */}
       {project.messages.length > 0 && (
-        <BuildProgressBar messageCount={project.messages.length} isRTL />
+        <BuildProgressBar messageCount={project.messages.length} isRTL={isRTL} />
       )}
 
       {/* Grow With Me Banner — hidden while streaming to keep focus on conversation */}
@@ -581,12 +585,12 @@ export function ChatPanel({
               "assistant" && (
               <QuickReplyGroup
                 key="quick-reply-first"
-                groups={FIRST_RESPONSE_GROUPS_HE}
+                groups={isRTL ? FIRST_RESPONSE_GROUPS_HE : FIRST_RESPONSE_GROUPS_EN}
                 onSelect={(text) => {
                   setPendingMessage(text);
                   sendMessage(text);
                 }}
-                isRTL
+                isRTL={isRTL}
               />
             )}
 

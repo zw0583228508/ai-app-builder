@@ -11,7 +11,11 @@ import {
   Play,
   Layers,
   ChevronDown,
+  FolderOpen,
+  LogIn,
+  User,
 } from "lucide-react";
+import { useAuth } from "@workspace/replit-auth-web";
 import { motion, AnimatePresence } from "framer-motion";
 import { TemplatesModal } from "@/components/TemplatesModal";
 import { BuildingTransition } from "@/components/BuildingTransition";
@@ -65,6 +69,7 @@ const USER_MODES = [
 export default function Home() {
   const { meta, lang } = useLang();
   const isRTL = meta.rtl;
+  const { user, isAuthenticated, login, logout } = useAuth();
 
   const [showTemplates, setShowTemplates] = useState(false);
   const [showModeDropdown, setShowModeDropdown] = useState(false);
@@ -172,7 +177,7 @@ export default function Home() {
   const recentProjects = projects?.slice(0, 4) ?? [];
 
   return (
-    <Layout>
+    <Layout hideSidebar>
       <AnimatePresence>
         {isTransitioning && <BuildingTransition isRTL={isRTL} />}
       </AnimatePresence>
@@ -185,42 +190,71 @@ export default function Home() {
       >
         {/* Ambient glow */}
         <div className="pointer-events-none fixed inset-0 z-0 overflow-hidden">
-          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[500px] bg-[hsl(191,90%,42%)]/6 rounded-full blur-[140px]" />
-          <div className="absolute top-1/3 left-1/4 w-[400px] h-[400px] bg-purple-600/4 rounded-full blur-[100px]" />
+          <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[900px] h-[500px] bg-[hsl(191,90%,42%)]/7 rounded-full blur-[150px]" />
+          <div className="absolute top-1/3 left-1/4 w-[500px] h-[400px] bg-purple-600/4 rounded-full blur-[120px]" />
         </div>
 
-        <div className="relative z-10 flex flex-col items-center min-h-full px-4 pt-10 pb-24">
-
+        {/* ── Top navbar ── */}
+        <nav className="relative z-20 flex items-center justify-between px-6 py-4 max-w-6xl mx-auto">
           {/* Logo */}
-          <motion.div
-            initial={{ opacity: 0, y: -10 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="flex items-center gap-2.5 mb-10"
-          >
-            <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-[hsl(191,90%,42%)] to-purple-500 flex items-center justify-center shadow-lg shadow-[hsl(191,90%,42%)]/30">
-              <Sparkles className="w-5 h-5 text-white" />
+          <div className="flex items-center gap-2.5">
+            <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-[hsl(191,90%,42%)] to-purple-500 flex items-center justify-center shadow-lg shadow-[hsl(191,90%,42%)]/30">
+              <Sparkles className="w-4 h-4 text-white" />
             </div>
-            <span className="text-2xl font-black text-white tracking-tight">AI Builder</span>
-          </motion.div>
+            <span className="text-lg font-black text-white tracking-tight">AI Builder</span>
+          </div>
+          {/* Nav actions */}
+          <div className={cn("flex items-center gap-2", isRTL && "flex-row-reverse")}>
+            {isAuthenticated && (
+              <button
+                onClick={() => navigate("/gallery")}
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[12px] text-white/40 hover:text-white/75 hover:bg-white/[0.05] transition-all"
+              >
+                <FolderOpen className="w-3.5 h-3.5" />
+                {isRTL ? "הפרויקטים שלי" : "My projects"}
+              </button>
+            )}
+            {isAuthenticated ? (
+              <button
+                onClick={() => logout()}
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[12px] text-white/35 hover:text-white/65 hover:bg-white/[0.05] transition-all"
+                title={isRTL ? "יציאה" : "Sign out"}
+              >
+                <User className="w-3.5 h-3.5" />
+                <span className="max-w-[100px] truncate">{user?.firstName || user?.email || (isRTL ? "חשבון" : "Account")}</span>
+              </button>
+            ) : (
+              <button
+                onClick={() => login()}
+                className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-[12px] font-medium bg-white/[0.07] border border-white/[0.1] text-white/65 hover:text-white hover:bg-white/[0.1] hover:border-white/[0.18] transition-all"
+              >
+                <LogIn className="w-3.5 h-3.5" />
+                {isRTL ? "התחבר" : "Sign in"}
+              </button>
+            )}
+          </div>
+        </nav>
+
+        <div className="relative z-10 flex flex-col items-center min-h-[calc(100%-72px)] px-4 pt-6 pb-24">
 
           {/* HERO */}
           <motion.div
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.05 }}
-            className="text-center mb-8 max-w-lg"
+            className="text-center mb-8 max-w-2xl"
           >
-            <h1 className="text-3xl sm:text-[2.6rem] font-black text-white leading-[1.15] mb-3 tracking-tight">
+            <h1 className="text-4xl sm:text-5xl md:text-[3.2rem] font-black text-white leading-[1.1] mb-4 tracking-tight">
               {isRTL ? (
                 <>בנה אפליקציה אמיתית<br /><span style={{ color: PRIMARY }}>רק בלתרמד אותה</span></>
               ) : (
-                <>Build a real app in minutes —<br /><span style={{ color: PRIMARY }}>just by describing it</span></>
+                <>Build a full app<br /><span style={{ color: PRIMARY }}>just by describing it</span></>
               )}
             </h1>
-            <p className="text-sm text-white/40 leading-relaxed">
+            <p className="text-base text-white/38 leading-relaxed">
               {isRTL
                 ? "בלי קוד. בלי הגדרות. פשוט תגיד לי מה אתה רוצה."
-                : "No coding. No setup. Just tell me what you want."}
+                : "No coding. No setup. Describe your idea and I'll turn it into a real product."}
             </p>
           </motion.div>
 
@@ -231,7 +265,7 @@ export default function Home() {
               animate={{ opacity: 1 }}
               transition={{ delay: 0.07 }}
               onClick={() => navigate(`/project/${recentProjects[0].id}`)}
-              className="w-full max-w-2xl flex items-center justify-between gap-3 px-4 py-2.5 bg-white/[0.03] border border-white/[0.06] hover:border-[hsl(191,90%,42%)]/30 hover:bg-[hsl(191,90%,42%)]/5 rounded-xl transition-all group mb-5"
+              className="w-full max-w-3xl flex items-center justify-between gap-3 px-4 py-2.5 bg-white/[0.03] border border-white/[0.06] hover:border-[hsl(191,90%,42%)]/30 hover:bg-[hsl(191,90%,42%)]/5 rounded-xl transition-all group mb-5"
               dir={isRTL ? "rtl" : "ltr"}
             >
               <div className={cn("flex items-center gap-3 min-w-0", isRTL && "flex-row-reverse")}>
@@ -252,7 +286,7 @@ export default function Home() {
             initial={{ opacity: 0, y: 14 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1 }}
-            className="w-full max-w-2xl mb-2"
+            className="w-full max-w-3xl mb-2"
           >
             <div
               className={cn(
@@ -449,7 +483,7 @@ export default function Home() {
               initial={{ opacity: 0, y: 8 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.26 }}
-              className="w-full max-w-2xl mb-8"
+              className="w-full max-w-3xl mb-8"
             >
               <div className="flex items-center justify-between mb-3">
                 <div className="flex items-center gap-2">
@@ -462,7 +496,7 @@ export default function Home() {
                   {isRTL ? "כל הגלריה" : "See all"} <ChevronRight className="w-3 h-3" />
                 </button>
               </div>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-1.5">
                 {projectsLoading
                   ? Array.from({ length: 4 }).map((_, i) => (
                       <div key={i} className="flex items-center gap-3 px-4 py-3 bg-white/[0.02] border border-white/[0.04] rounded-xl animate-pulse">
