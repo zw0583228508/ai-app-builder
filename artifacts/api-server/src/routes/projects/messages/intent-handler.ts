@@ -74,7 +74,8 @@ export async function handleIntentRouting(
 
   // ── Issue 14: Entrepreneur planning phase ─────────────────────────────────
   // Non-returning: emit a brief project plan, then continue to main AI response.
-  if (currentMode === "entrepreneur" && isFirstMessage) {
+  // Skip for greetings — no point planning "ערב טוב" as a business idea.
+  if (currentMode === "entrepreneur" && isFirstMessage && detectedIntent.intent !== "greeting") {
     sendEvent({
       type: "agent_phase",
       phase: "planning",

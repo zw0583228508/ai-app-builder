@@ -28,9 +28,10 @@ function matchesIntent(
 }
 
 // Short messages (< 6 words) that look like greetings or tests — no build intent
+// NOTE: \b does not work with Hebrew chars — use $ or (\s|$) anchors for Hebrew patterns
 const GREETING_PATTERNS = [
   /^(hi|hello|hey|shalom|good\s*(morning|evening|night|afternoon)|howdy|sup|yo|hola|bonjour|salut)\b/i,
-  /^(שלום|היי|הי|ערב\s*טוב|בוקר\s*טוב|לילה\s*טוב|מה\s*שלומך|מה\s*נשמע|צהריים\s*טובים)\b/,
+  /^(שלום|היי|הי|ערב\s*טוב|בוקר\s*טוב|לילה\s*טוב|מה\s*שלומך|מה\s*נשמע|צהריים\s*טובים)(\s|$)/,
   /^(test|testing|בדיקה|טסט|בדיקה\s*\d*|test\s*\d*)\s*$/i,
   /^(ok|okay|אוקיי|אוקי|כן|yes|no|לא|הבנתי|cool|nice)\s*[!.]*$/i,
   /^(thanks|thank\s*you|תודה|תודה\s*רבה|תנקס)\s*[!.]*$/i,
@@ -127,13 +128,14 @@ export function detectChatIntent(
   )
     return { intent: "edit", label: "עורך קוד קיים", emoji: "✏️" };
 
-  // create / rebuild
+  // create / rebuild — also fires when user explicitly asks to build something new,
+  // even if existing code exists (e.g. "אני רוצה לבנות אפליקציה לסוכן ביטוח")
   if (
     !hasExistingCode ||
     matchesIntent(
       lower,
-      /\b(new|rebuild|start.?over|from.?scratch)\b/,
-      /מאפס|בנה.?חדש|בנה.?מחדש/,
+      /\b(new|rebuild|start.?over|from.?scratch|i.?want.?to.?build|i.?want.?to.?create|build.?me|create.?me|make.?me)\b/,
+      /מאפס|בנה.?חדש|בנה.?מחדש|אני.?רוצה.?לבנות|אני.?רוצה.?ליצור|בנה.?לי|צור.?לי|עשה.?לי|תבנה.?לי|תצור.?לי|רוצה.?לבנות|רוצה.?ליצור/,
     )
   )
     return { intent: "create", label: "בונה פרויקט", emoji: "🏗️" };
