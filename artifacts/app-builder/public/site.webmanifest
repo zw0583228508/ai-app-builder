@@ -1,6 +1,6 @@
 {
-  "name": "AI App Builder",
-  "short_name": "AppBuilder",
+  "name": "Lexovo",
+  "short_name": "Lexovo",
   "description": "בנה אפליקציות עם AI",
   "start_url": "/",
   "display": "standalone",

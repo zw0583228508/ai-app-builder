@@ -146,7 +146,7 @@ export function Layout({
               className="text-sm font-bold text-white"
               style={{ fontFamily: HE }}
             >
-              AI Builder
+              Lexovo
             </span>
             <button
               onClick={() => setIsModalOpen(true)}

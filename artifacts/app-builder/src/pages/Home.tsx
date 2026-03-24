@@ -358,7 +358,7 @@ export default function Home() {
             <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-[hsl(191,90%,42%)] to-purple-500 flex items-center justify-center shadow-lg shadow-[hsl(191,90%,42%)]/30">
               <Sparkles className="w-4 h-4 text-white" />
             </div>
-            <span className="text-lg font-black text-white tracking-tight">AI Builder</span>
+            <span className="text-lg font-black text-white tracking-tight">Lexovo</span>
           </div>
           {/* Nav actions */}
           <div className={cn("flex items-center gap-2", isRTL && "flex-row-reverse")}>

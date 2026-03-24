@@ -173,7 +173,7 @@ export default function ShareView() {
                 <div className="min-w-0">
                   <div className="flex items-center gap-2">
                     <span className="text-[10px] text-white/30 uppercase tracking-wider shrink-0">
-                      נבנה עם AI Builder
+                      נבנה עם Lexovo
                     </span>
                     <span className="text-white/15 text-[10px]">·</span>
                     <span className="text-[11px] text-white/50 font-medium truncate">

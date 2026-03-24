@@ -299,7 +299,7 @@ type Translations = Record<TranslationKey, string>;
 const T: Record<LangCode, Translations> = {
   // ────────────────────────────────────────────────
   en: {
-    appName: "AI Builder",
+    appName: "Lexovo",
     tagline: "14+ active systems",
     updatedBadge: "14+ New AI Systems",
     systemsActive: "14+ systems active",
@@ -472,7 +472,7 @@ const T: Record<LangCode, Translations> = {
 
   // ────────────────────────────────────────────────
   he: {
-    appName: "בונה AI",
+    appName: "Lexovo",
     tagline: "14+ מערכות פעילות",
     updatedBadge: "14+ מערכות AI חדשות",
     systemsActive: "14+ מערכות פעילות",
@@ -643,14 +643,14 @@ const T: Record<LangCode, Translations> = {
 
   // ────────────────────────────────────────────────
   ar: {
-    appName: "بناء AI",
+    appName: "Lexovo",
     tagline: "+14 أنظمة نشطة",
     updatedBadge: "+14 أنظمة AI جديدة",
     systemsActive: "+14 أنظمة نشطة",
     heroTitle1: "ابنِ أي شيء",
     heroTitle2: "في ثوانٍ بالذكاء الاصطناعي",
     heroSubtitle:
-      "منصة AI App Builder بـ4 أوضاع مستخدم، Planner Agent، Deployment Brain، AI QA System، Cost Engine، Runtime Control، ومولّد SaaS بنقرة واحدة.",
+      "منصة Lexovo بـ4 أوضاع مستخدم، Planner Agent، Deployment Brain، AI QA System، Cost Engine، Runtime Control، ومولّد SaaS بنقرة واحدة.",
     inputPlaceholder: "مثال: ابنِ متجراً إلكترونياً للمجوهرات مع عربة تسوق...",
     buildBtn: "ابنِ",
     buildingBtn: "جارٍ البناء...",
@@ -813,14 +813,14 @@ const T: Record<LangCode, Translations> = {
 
   // ────────────────────────────────────────────────
   fr: {
-    appName: "AI Builder",
+    appName: "Lexovo",
     tagline: "+14 systèmes actifs",
     updatedBadge: "+14 nouveaux systèmes AI",
     systemsActive: "+14 systèmes actifs",
     heroTitle1: "Créez n'importe quoi",
     heroTitle2: "en secondes avec l'AI",
     heroSubtitle:
-      "Plateforme AI App Builder avec 4 modes utilisateur, Planner Agent, Deployment Brain, AI QA System, Cost Engine, Runtime Control et générateur SaaS en un clic.",
+      "Plateforme Lexovo avec 4 modes utilisateur, Planner Agent, Deployment Brain, AI QA System, Cost Engine, Runtime Control et générateur SaaS en un clic.",
     inputPlaceholder:
       "Ex: Créer une boutique de bijoux avec panier et filtre par catégorie...",
     buildBtn: "Créer",
@@ -986,14 +986,14 @@ const T: Record<LangCode, Translations> = {
 
   // ────────────────────────────────────────────────
   es: {
-    appName: "AI Builder",
+    appName: "Lexovo",
     tagline: "+14 sistemas activos",
     updatedBadge: "+14 nuevos sistemas AI",
     systemsActive: "+14 sistemas activos",
     heroTitle1: "Crea cualquier cosa",
     heroTitle2: "en segundos con IA",
     heroSubtitle:
-      "Plataforma AI App Builder con 4 modos de usuario, Planner Agent, Deployment Brain, AI QA System, Cost Engine, Runtime Control y generador SaaS en un clic.",
+      "Plataforma Lexovo con 4 modos de usuario, Planner Agent, Deployment Brain, AI QA System, Cost Engine, Runtime Control y generador SaaS en un clic.",
     inputPlaceholder:
       "Ej.: Crea una tienda de joyería con carrito de compras y filtro por categoría...",
     buildBtn: "Crear",
@@ -1160,14 +1160,14 @@ const T: Record<LangCode, Translations> = {
 
   // ────────────────────────────────────────────────
   de: {
-    appName: "AI Builder",
+    appName: "Lexovo",
     tagline: "+14 aktive Systeme",
     updatedBadge: "+14 neue AI-Systeme",
     systemsActive: "+14 Systeme aktiv",
     heroTitle1: "Erstelle alles",
     heroTitle2: "in Sekunden mit KI",
     heroSubtitle:
-      "AI App Builder Plattform mit 4 Benutzermodi, Planner Agent, Deployment Brain, AI QA System, Cost Engine, Runtime Control und One-Click SaaS-Generator.",
+      "Lexovo Plattform mit 4 Benutzermodi, Planner Agent, Deployment Brain, AI QA System, Cost Engine, Runtime Control und One-Click SaaS-Generator.",
     inputPlaceholder:
       "Z.B.: Erstelle einen Schmuckladen mit Warenkorb und Kategoriefilter...",
     buildBtn: "Erstellen",
@@ -1334,14 +1334,14 @@ const T: Record<LangCode, Translations> = {
 
   // ────────────────────────────────────────────────
   ru: {
-    appName: "AI Конструктор",
+    appName: "Lexovo",
     tagline: "+14 активных систем",
     updatedBadge: "+14 новых AI-систем",
     systemsActive: "+14 систем активно",
     heroTitle1: "Создавай что угодно",
     heroTitle2: "за секунды с ИИ",
     heroSubtitle:
-      "Платформа AI App Builder с 4 режимами пользователя, Planner Agent, Deployment Brain, AI QA System, Cost Engine, Runtime Control и одноклик. генератором SaaS.",
+      "Платформа Lexovo с 4 режимами пользователя, Planner Agent, Deployment Brain, AI QA System, Cost Engine, Runtime Control и одноклик. генератором SaaS.",
     inputPlaceholder:
       "Например: Создай ювелирный магазин с корзиной и фильтром по категориям...",
     buildBtn: "Создать",
@@ -1506,14 +1506,14 @@ const T: Record<LangCode, Translations> = {
 
   // ────────────────────────────────────────────────
   zh: {
-    appName: "AI 构建器",
+    appName: "Lexovo",
     tagline: "14+ 个活跃系统",
     updatedBadge: "14+ 个新AI系统",
     systemsActive: "14+ 个系统运行中",
     heroTitle1: "构建任何东西",
     heroTitle2: "用AI秒速完成",
     heroSubtitle:
-      "AI App Builder平台，拥有4种用户模式、Planner Agent、Deployment Brain、AI QA系统、成本引擎、运行时控制平台和一键SaaS生成器。",
+      "Lexovo平台，拥有4种用户模式、Planner Agent、Deployment Brain、AI QA系统、成本引擎、运行时控制平台和一键SaaS生成器。",
     inputPlaceholder: "例如：构建一个有购物车和分类过滤器的珠宝店...",
     buildBtn: "构建",
     buildingBtn: "构建中...",
@@ -1676,14 +1676,14 @@ const T: Record<LangCode, Translations> = {
 
   // ────────────────────────────────────────────────
   pt: {
-    appName: "AI Builder",
+    appName: "Lexovo",
     tagline: "+14 sistemas ativos",
     updatedBadge: "+14 novos sistemas AI",
     systemsActive: "+14 sistemas ativos",
     heroTitle1: "Crie qualquer coisa",
     heroTitle2: "em segundos com IA",
     heroSubtitle:
-      "Plataforma AI App Builder com 4 modos de usuário, Planner Agent, Deployment Brain, AI QA System, Cost Engine, Runtime Control e gerador SaaS com um clique.",
+      "Plataforma Lexovo com 4 modos de usuário, Planner Agent, Deployment Brain, AI QA System, Cost Engine, Runtime Control e gerador SaaS com um clique.",
     inputPlaceholder:
       "Ex.: Crie uma loja de joias com carrinho de compras e filtro por categoria...",
     buildBtn: "Criar",
@@ -1848,14 +1848,14 @@ const T: Record<LangCode, Translations> = {
 
   // ────────────────────────────────────────────────
   ja: {
-    appName: "AI ビルダー",
+    appName: "Lexovo",
     tagline: "14以上のシステム稼働中",
     updatedBadge: "14以上の新AIシステム",
     systemsActive: "14以上のシステム稼働中",
     heroTitle1: "何でも作れる",
     heroTitle2: "AIで数秒のうちに",
     heroSubtitle:
-      "4つのユーザーモード、Planner Agent、Deployment Brain、AI QAシステム、コストエンジン、ランタイムコントロール、ワンクリックSaaSジェネレーターを備えたAI App Builderプラットフォーム。",
+      "4つのユーザーモード、Planner Agent、Deployment Brain、AI QAシステム、コストエンジン、ランタイムコントロール、ワンクリックSaaSジェネレーターを備えたLexovoプラットフォーム。",
     inputPlaceholder:
       "例：ショッピングカートとカテゴリフィルター付きのジュエリーショップを作成...",
     buildBtn: "作成",
