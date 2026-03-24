@@ -157,7 +157,19 @@ router.get("/dev-login", async (req: Request, res: Response) => {
   setSessionCookie(res, sid);
 
   const returnTo = getSafeReturnTo(req.query.returnTo);
-  res.redirect(returnTo);
+
+  // In the Replit workspace the app runs inside a sandboxed iframe where
+  // cross-site cookies (SameSite=None) are blocked by modern browsers.
+  // We work around this by serving a tiny HTML page that stores the SID in
+  // localStorage, then immediately redirects to the app.  The frontend fetch
+  // interceptor (main.tsx) picks it up and sends it as an Authorization Bearer
+  // header so the server can authenticate without relying on cookies.
+  res.send(`<!DOCTYPE html><html><head><meta charset="utf-8"></head><body>
+<script>
+try { localStorage.setItem('dev_auth_sid', ${JSON.stringify(sid)}); } catch(e) {}
+window.location.replace(${JSON.stringify(returnTo)});
+</script>
+</body></html>`);
 });
 
 // ── Google OAuth 2.0 ───────────────────────────────────────────────────────

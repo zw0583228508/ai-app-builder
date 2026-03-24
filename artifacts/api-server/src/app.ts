@@ -15,6 +15,11 @@ import { authMiddleware } from "./middlewares/authMiddleware";
 
 const app: Express = express();
 
+// Replit (and most PaaS platforms) sit behind a reverse proxy that sets
+// X-Forwarded-For.  Trusting the proxy lets express-rate-limit correctly
+// identify client IPs and avoids the ERR_ERL_UNEXPECTED_X_FORWARDED_FOR error.
+app.set("trust proxy", true);
+
 app.use(
   pinoHttp({
     logger,
@@ -83,6 +88,7 @@ app.use(
     max: 120,
     standardHeaders: true,
     legacyHeaders: false,
+    validate: { xForwardedForHeader: false },
     skip: (req) => req.method === "GET",
     message: { error: "יותר מדי בקשות, נסה שוב בעוד דקה" },
   }),
