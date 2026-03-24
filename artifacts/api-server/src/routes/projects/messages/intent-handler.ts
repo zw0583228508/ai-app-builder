@@ -144,6 +144,37 @@ Return ONLY the JSON, no markdown.`;
     emoji: detectedIntent.emoji,
   });
 
+  // ── Greeting / test intent — respond conversationally, no code generated ──
+  if (detectedIntent.intent === "greeting") {
+    const greetingStream = anthropic.messages.stream({
+      model: "claude-haiku-4-5",
+      max_tokens: 300,
+      system:
+        "You are a friendly AI app builder assistant. The user is greeting you or testing the connection. Respond warmly and briefly in the same language as the user. If they write in Hebrew respond in Hebrew. Invite them to describe what app they'd like to build. Do NOT write any code.",
+      messages: [{ role: "user", content: body.content }],
+    });
+
+    let fullResponse = "";
+    for await (const chunk of greetingStream) {
+      if (
+        chunk.type === "content_block_delta" &&
+        chunk.delta.type === "text_delta"
+      ) {
+        const text = chunk.delta.text;
+        fullResponse += text;
+        sendEvent({ type: "text", content: text });
+      }
+    }
+    await db.insert(projectMessagesTable).values({
+      projectId: project.id,
+      role: "assistant",
+      content: fullResponse,
+    });
+    sendEvent({ done: true, previewUpdated: false });
+    res.end();
+    return true;
+  }
+
   // ── Deploy intent ─────────────────────────────────────────────────────────
   if (detectedIntent.intent === "deploy") {
     const ownerUserId = userId ?? project.userId ?? null;

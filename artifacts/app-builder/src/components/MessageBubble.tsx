@@ -18,7 +18,9 @@ const OUTPUT_FENCE_LANGS = ["html", "jsx", "tsx", "js", "ts", "css", "svelte", "
 
 function stripPatchMarkers(text: string): string {
   return text
+    .replace(/<<<REPLACE>>>[\s\S]*?<<<END>>>/g, "")
     .replace(/<<<REPLACE>>>/g, "")
+    .replace(/<<<WITH>>>/g, "")
     .replace(/<<<END>>>/g, "")
     .replace(/<<<FILE:[^>]*>>>/g, "")
     .replace(/\[PATCH_APPLIED\]/g, "")

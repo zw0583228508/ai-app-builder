@@ -6,6 +6,7 @@ export type ChatIntent =
   | "git_push"
   | "inspect"
   | "add_feature"
+  | "greeting"
   | "general";
 
 export interface DetectedIntent {
@@ -26,11 +27,31 @@ function matchesIntent(
   return false;
 }
 
+// Short messages (< 6 words) that look like greetings or tests — no build intent
+const GREETING_PATTERNS = [
+  /^(hi|hello|hey|shalom|good\s*(morning|evening|night|afternoon)|howdy|sup|yo|hola|bonjour|salut)\b/i,
+  /^(שלום|היי|הי|ערב\s*טוב|בוקר\s*טוב|לילה\s*טוב|מה\s*שלומך|מה\s*נשמע|צהריים\s*טובים)\b/,
+  /^(test|testing|בדיקה|טסט|בדיקה\s*\d*|test\s*\d*)\s*$/i,
+  /^(ok|okay|אוקיי|אוקי|כן|yes|no|לא|הבנתי|cool|nice)\s*[!.]*$/i,
+  /^(thanks|thank\s*you|תודה|תודה\s*רבה|תנקס)\s*[!.]*$/i,
+];
+
+function isGreeting(content: string): boolean {
+  const trimmed = content.trim();
+  const wordCount = trimmed.split(/\s+/).length;
+  if (wordCount > 8) return false;
+  return GREETING_PATTERNS.some((p) => p.test(trimmed));
+}
+
 export function detectChatIntent(
   content: string,
   hasExistingCode: boolean,
 ): DetectedIntent {
   const lower = content.toLowerCase();
+
+  // greeting / test — never triggers a build
+  if (isGreeting(content))
+    return { intent: "greeting", label: "שיחה", emoji: "💬" };
 
   // deploy
   if (

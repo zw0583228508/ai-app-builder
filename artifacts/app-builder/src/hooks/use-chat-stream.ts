@@ -104,11 +104,16 @@ export function useChatStream({
     agentFlow?: boolean;
   } | null>(null);
 
+  // Removes patch syntax markers that should never be displayed as text
+  const PATCH_MARKER_RE = /<<<(?:REPLACE|WITH|END|FILE:[^>]*)>>>/g;
+
   // Direct streaming — no typewriter buffering; chunks are rendered as they arrive
   // This eliminates "freeze then dump" behavior and gives a natural live feel
   const appendStreamedText = useCallback((chunk: string) => {
-    setStreamedText((prev) => prev + chunk);
-  }, []);
+    const clean = chunk.replace(PATCH_MARKER_RE, "");
+    if (!clean) return;
+    setStreamedText((prev) => prev + clean);
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   const isGeneratingCodeRef = useRef(false);
 

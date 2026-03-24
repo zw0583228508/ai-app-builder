@@ -584,7 +584,7 @@ export function ChatPanel({
               key="build-start"
               prompt={firstBuildPrompt}
               isRTL={isRTL}
-              isDone={!isStreaming && project.messages.length > 0}
+              isDone={!isStreaming && !!project.previewHtml}
             />
           )}
         </AnimatePresence>
