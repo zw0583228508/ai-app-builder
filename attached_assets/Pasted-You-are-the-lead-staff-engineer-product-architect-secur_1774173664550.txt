@@ -1,0 +1,768 @@
+You are the lead staff engineer, product architect, security reviewer, AI systems architect, and UX director for this repository.
+
+Your mission is to transform this repository into a world-class AI website and app builder platform with:
+- elite product UX
+- clean scalable architecture
+- strong security
+- maintainable codebase
+- excellent developer experience
+- production readiness
+- a polished frontend shell
+- a powerful adaptive AI builder engine
+
+You must work in a strict, ordered, end-to-end execution plan.
+
+CRITICAL EXECUTION RULES
+
+1. Do NOT do random improvements.
+2. Do NOT jump around.
+3. Do NOT rewrite everything blindly.
+4. Preserve working behavior whenever possible.
+5. Refactor in controlled phases.
+6. After each phase, ensure the app still builds and runs.
+7. Prefer modularization over giant rewrites.
+8. Prefer production-safe patterns over quick hacks.
+9. Remove dead code only after confirming it is unused.
+10. Keep the product vision intact: this is an AI-native platform for building websites and apps through conversation.
+
+PRIMARY PRODUCT GOAL
+
+Build a platform that beats generic AI builders by combining:
+- adaptive AI behavior by user type
+- persistent project memory
+- multi-step planning and execution
+- versioning and rollback
+- GitHub sync
+- deployment
+- collaboration
+- strong UI shell
+- trustworthy change visibility
+- modular AI orchestration
+
+==================================================
+PHASE 1 — FULL REPOSITORY AUDIT AND BASELINE
+==================================================
+
+First, perform a full repository audit and produce:
+1. architecture map
+2. dependency map
+3. runtime entrypoints
+4. package boundaries
+5. API route inventory
+6. database schema inventory
+7. WebSocket inventory
+8. build/deploy flow map
+9. auth flow map
+10. current product UX flow map
+
+Then identify:
+- critical security risks
+- oversized files
+- duplicated logic
+- dead code
+- disabled features
+- unstable flows
+- coupling hotspots
+- missing tests
+- missing documentation
+- missing frontend product shell pieces
+
+Create these deliverables first:
+- /docs/architecture/repo-map.md
+- /docs/architecture/api-map.md
+- /docs/architecture/data-model.md
+- /docs/architecture/frontend-map.md
+- /docs/architecture/security-audit.md
+- /docs/architecture/refactor-plan.md
+
+Do not skip documentation.
+These files will become the blueprint for the rest of the work.
+
+==================================================
+PHASE 2 — STABILIZE AND SECURE THE PLATFORM
+==================================================
+
+Before major product upgrades, secure the current system.
+
+You must audit and harden:
+- terminal websocket
+- collab websocket
+- auth middleware
+- preview/share endpoints
+- deploy endpoints
+- GitHub sync flows
+- proxy routes
+- secrets handling
+- CORS policy
+- session handling
+- rate limiting
+- user/project authorization checks
+- SQL execution paths
+- any path that allows code execution or external requests
+
+Security requirements:
+1. Every websocket route must require authentication and authorization.
+2. Every project-scoped route must verify ownership or access permission.
+3. Terminal access must not expose unrestricted shell execution.
+4. If terminal access cannot be made safe enough, isolate it or disable it behind a feature flag.
+5. CORS must be explicit, environment-aware, and locked down in production.
+6. Secrets must never leak to frontend responses, logs, previews, or public share pages.
+7. Share endpoints must expose only what is intended.
+8. Add consistent audit logging for risky operations.
+9. Add centralized input validation and output sanitization where needed.
+10. Add secure defaults for cookies, sessions, auth refresh, and CSRF-sensitive flows.
+
+Create:
+- /docs/security/threat-model.md
+- /docs/security/hardening-checklist.md
+
+Then implement the hardening.
+
+==================================================
+PHASE 3 — BREAK UP THE GOD FILE
+==================================================
+
+The massive projects route file must be decomposed.
+
+Refactor the giant project route system into a clean modular architecture.
+
+Target structure:
+
+artifacts/api-server/src/
+  routes/
+    projects/
+      index.ts
+      create-project.ts
+      get-project.ts
+      update-project.ts
+      delete-project.ts
+      messages.ts
+      preview.ts
+      snapshots.ts
+      share.ts
+      fork.ts
+      files.ts
+      database.ts
+      secrets.ts
+      github.ts
+      deploy.ts
+      analytics.ts
+      review.ts
+      prompt-enhance.ts
+      agent-run.ts
+  services/
+    ai/
+      orchestrator/
+      prompts/
+      routing/
+      extraction/
+      patching/
+      continuation/
+      cache/
+    memory/
+      project-dna/
+      user-dna/
+      memory-chunks/
+    projects/
+    deployments/
+    github/
+    snapshots/
+    auth/
+    analytics/
+    collaboration/
+    storage/
+    security/
+  domain/
+    project/
+    user/
+    ai/
+    deploy/
+    integrations/
+  lib/
+    validation/
+    errors/
+    logging/
+    auth/
+    env/
+    security/
+
+Move logic out of route handlers and into services.
+
+Route handlers should become thin:
+- validate request
+- call service
+- return response
+
+Do NOT change behavior unless required.
+Preserve all working flows while modularizing.
+
+==================================================
+PHASE 4 — PROMPT SYSTEM AND AI ORCHESTRATION REBUILD
+==================================================
+
+The AI system is powerful, but too hardcoded and too coupled to route logic.
+
+Rebuild it into a modular AI orchestration layer.
+
+Create:
+- prompt registry
+- prompt versioning
+- per-mode prompt packs
+- intent routing layer
+- model selection policy
+- response extraction utilities
+- patch mode strategy
+- continuation strategy
+- fallback strategy
+- structured output contracts
+- centralized AI telemetry
+
+Required structure:
+
+services/ai/
+  registry/
+  prompts/
+    entrepreneur/
+    builder/
+    developer/
+    maker/
+  routing/
+  modes/
+  intents/
+  extraction/
+  patching/
+  continuation/
+  cache/
+  telemetry/
+  structured-output/
+
+Requirements:
+1. All prompts must be stored outside route files.
+2. Each prompt must have a clear purpose, version, and expected output format.
+3. Intent detection must be testable and isolated.
+4. Mode detection must be testable and isolated.
+5. HTML generation, React file generation, patching, and extraction must be separated.
+6. Planning mode and product spec mode must be reintroduced cleanly behind explicit flags/config.
+7. Add observability: which model, which prompt, which path, which fallback, latency, tokens.
+
+Create:
+- /docs/ai/ai-architecture.md
+- /docs/ai/prompt-registry.md
+- /docs/ai/intent-routing.md
+- /docs/ai/mode-system.md
+
+==================================================
+PHASE 5 — MEMORY SYSTEM REBUILD
+==================================================
+
+The memory concept is a major differentiator. Strengthen it.
+
+Refactor and improve:
+- project DNA
+- user DNA
+- memory chunks
+- decision logs
+- grow-with-me suggestions
+
+Requirements:
+1. Separate extraction from storage.
+2. Separate storage from prompt injection.
+3. Add clear schemas for each memory type.
+4. Add ranking logic for relevant memory recall.
+5. Add TTL or compaction rules where appropriate.
+6. Prevent memory bloat.
+7. Make prompt injection deterministic and auditable.
+8. Create admin/debug visibility for memory state.
+
+Deliver:
+- /docs/ai/memory-system.md
+
+Build a clean API for:
+- extracting memory
+- updating memory
+- scoring memory
+- injecting memory into prompts
+- inspecting memory for a project/user
+
+==================================================
+PHASE 6 — FRONTEND PRODUCT SHELL
+==================================================
+
+This is one of the biggest missing pieces.
+
+Build the actual product shell so the platform feels premium and complete.
+
+Create a polished frontend experience with:
+1. onboarding flow
+2. workspace dashboard
+3. project creation flow
+4. adaptive mode selection UI
+5. chat panel
+6. code/files panel
+7. live preview panel
+8. deploy panel
+9. GitHub panel
+10. snapshots/version history panel
+11. memory/AI context panel
+12. integrations panel
+13. usage/billing panel
+14. team/collab panel
+15. settings panel
+
+The product shell should feel like a high-end mix of:
+- Replit
+- Linear
+- Vercel
+- Framer
+- Lovable
+but with its own identity.
+
+UX requirements:
+- premium, fast, modern
+- crystal clear navigation
+- obvious project state
+- visible AI actions
+- visible file changes
+- visible deploy status
+- visible history and rollback
+- visible trust layer
+- visible user mode and why it matters
+
+You must design and build:
+- layout system
+- component system
+- design tokens
+- responsive behavior
+- dark/light theme support if appropriate
+- keyboard-friendly workspace interactions
+
+Create:
+- /docs/product/workspace-ux.md
+- /docs/product/design-system.md
+- /docs/product/user-flows.md
+
+==================================================
+PHASE 7 — TRUST LAYER AND CHANGE VISIBILITY
+==================================================
+
+Users must trust the AI.
+
+Build a trust layer that shows:
+1. what the AI changed
+2. which files changed
+3. whether it used patch mode or full generation
+4. what decisions it made
+5. what was inferred from memory
+6. how to undo/revert
+7. what happened during deploy
+8. what happened during Git sync
+
+Implement:
+- file diff viewer
+- before/after summaries
+- generation summaries
+- per-step execution logs
+- rollback buttons
+- restore snapshot UI
+- confidence / decision transparency where appropriate
+
+This is not optional.
+This is a core product differentiator.
+
+==================================================
+PHASE 8 — VERSIONING, SNAPSHOTS, AND SAFE EDITING
+==================================================
+
+Rebuild versioning so it is reliable and user-friendly.
+
+Requirements:
+1. Snapshots must be consistent and restorable.
+2. Project files and preview state must stay synchronized.
+3. React projects and HTML projects must both be handled well.
+4. Rollback must be safe and visible.
+5. Add labels, timestamps, and metadata to versions.
+6. Add a diff summary per version when possible.
+
+Build:
+- version history UI
+- restore flow
+- compare versions flow
+- safe branch-like checkpoint behavior for risky AI operations
+
+==================================================
+PHASE 9 — REACT / MULTI-FILE BUILDER MATURITY
+==================================================
+
+Strengthen the React and multi-file path until it is first-class.
+
+Requirements:
+1. React file manifest parsing must be reliable.
+2. Entrypoint handling must be deterministic.
+3. Bundling must be resilient.
+4. Preview must work for common React app patterns.
+5. Errors must be surfaced cleanly to the user.
+6. File tree UX must be strong.
+7. Code updates must preserve user structure when possible.
+8. Support real multi-file editing flows, not only generated blobs.
+
+Improve:
+- bundle pipeline
+- file sync logic
+- preview fallback handling
+- React-specific prompting
+- error reporting
+- file diffing
+- build diagnostics
+
+==================================================
+PHASE 10 — DEPLOYMENT SYSTEM MATURITY
+==================================================
+
+Make deployment polished and production-ready.
+
+Requirements:
+1. Strong deploy UX
+2. Clear states: idle, building, live, failed
+3. Better logs
+4. Retry support
+5. Status polling
+6. Last deploy metadata
+7. Domain-ready architecture
+8. Deployment history
+9. Provider abstraction for future expansion
+
+Current provider can remain Netlify initially, but structure the code so future providers can be added.
+
+Create:
+- provider abstraction
+- deployment state machine
+- deployment history UI
+- richer error reporting
+
+==================================================
+PHASE 11 — GITHUB SYNC MATURITY
+==================================================
+
+Make GitHub sync first-class.
+
+Requirements:
+1. clear repo connection state
+2. initial sync flow
+3. subsequent sync flow
+4. branch support design if appropriate
+5. commit message strategy
+6. sync log visibility
+7. error handling
+8. repo metadata persistence
+9. user-facing confirmation of what was synced
+
+Design the architecture so future support for PR-based flows is possible.
+
+==================================================
+PHASE 12 — DATABASE, STORAGE, SECRETS, AND INTEGRATIONS
+==================================================
+
+Turn project infrastructure into a polished platform capability.
+
+Improve:
+- per-project database flows
+- secrets UX
+- storage UX
+- integration setup UX
+- integration validation
+- secret injection rules
+- environment separation
+- project infra visibility
+
+Requirements:
+1. user must understand what infra is connected
+2. secrets must be masked and safely managed
+3. project DB should be understandable and not scary
+4. integration state must be visible and validated
+5. no secret should ever leak into public output
+
+==================================================
+PHASE 13 — COLLABORATION SYSTEM
+==================================================
+
+Take collaboration beyond raw websockets.
+
+Improve:
+- presence
+- viewer count
+- cursors
+- project update broadcasts
+- authorization
+- resilience
+- UX polish
+
+Then design next-stage collaboration support:
+- comments
+- activity log
+- edit sessions
+- optional shared workspaces
+- eventual role-based collaboration architecture
+
+==================================================
+PHASE 14 — ANALYTICS, QA, REVIEW, AND FEEDBACK LOOPS
+==================================================
+
+Build a real quality loop.
+
+Improve and unify:
+- analytics events
+- AI review
+- QA test results
+- error reporting
+- performance review
+- suggestion engine
+
+Requirements:
+1. show useful product insights
+2. show build quality insights
+3. show runtime errors clearly
+4. connect errors back into the AI improvement flow
+5. allow the platform to learn from failures and apply better fixes
+
+Build:
+- QA dashboard
+- runtime error dashboard
+- review results UI
+- quality scoring visibility
+
+==================================================
+PHASE 15 — PRODUCT MODES THAT FEEL REAL
+==================================================
+
+The adaptive mode system must not just exist in backend logic.
+It must feel real in the product.
+
+Each mode must affect:
+- onboarding
+- question style
+- UI emphasis
+- explanations
+- generation summaries
+- suggested actions
+- defaults
+- trust language
+- follow-up flows
+
+Modes:
+- Entrepreneur
+- Builder
+- Developer
+- Maker
+
+Each mode must have:
+1. distinct positioning
+2. distinct UI hints
+3. distinct AI tone
+4. distinct prompt strategy
+5. distinct defaults
+6. distinct suggestions
+
+This is one of the strongest product differentiators. Do it thoroughly.
+
+==================================================
+PHASE 16 — ENABLE THE PLANNING AND SPEC FLOW PROPERLY
+==================================================
+
+The planning/spec flow exists but is effectively disabled.
+
+Rebuild and activate it properly.
+
+Requirements:
+1. user can choose quick build or guided build
+2. planning mode can ask targeted questions
+3. product spec can be generated and approved
+4. approved spec must feed generation
+5. spec must stay visible and editable
+6. spec must influence later edits, not only initial generation
+
+This should become a premium product feature.
+
+==================================================
+PHASE 17 — TESTING, VALIDATION, AND CI
+==================================================
+
+Raise engineering quality.
+
+Add:
+- unit tests for pure logic
+- route tests for critical endpoints
+- AI extraction/parser tests
+- intent detection tests
+- mode detection tests
+- auth tests
+- deploy/GitHub integration tests where feasible
+- snapshot/version tests
+- security regression tests
+- bundle pipeline tests for React preview flow
+
+Add CI for:
+- typecheck
+- tests
+- lint if present
+- critical validation steps
+
+Create:
+- /docs/engineering/testing-strategy.md
+
+==================================================
+PHASE 18 — PERFORMANCE AND OPERATIONS
+==================================================
+
+Optimize the system for speed and stability.
+
+Focus on:
+- route latency
+- AI orchestration latency
+- duplicate DB access
+- repeated parsing
+- hot path efficiency
+- websocket stability
+- preview performance
+- React bundle performance
+- caching strategy
+- cleanup jobs
+
+Implement:
+- performance profiling where useful
+- structured logs
+- operational visibility
+- better env validation
+- error boundaries in frontend
+- graceful degradation
+
+==================================================
+PHASE 19 — DOCUMENTATION FOR FUTURE SCALE
+==================================================
+
+Create proper docs so the project can grow.
+
+Required docs:
+- onboarding for developers
+- architecture overview
+- AI system architecture
+- memory system
+- mode system
+- deploy system
+- GitHub sync
+- security model
+- testing strategy
+- frontend workspace architecture
+- coding conventions
+- module boundaries
+- environment variables
+
+Create a top-level polished README that explains:
+- what the platform is
+- how it works
+- how to run it locally
+- how the repo is structured
+- how AI orchestration works
+- how to contribute safely
+
+==================================================
+PHASE 20 — FINAL POLISH PASS
+==================================================
+
+At the end, do a final polish pass across:
+- UX consistency
+- naming consistency
+- route consistency
+- error messages
+- loading states
+- empty states
+- docs consistency
+- component consistency
+- design consistency
+- auth edge cases
+- deploy edge cases
+- GitHub edge cases
+- memory edge cases
+- snapshot edge cases
+
+Then produce a final release report:
+- what was changed
+- what was refactored
+- what was secured
+- what was added
+- what remains intentionally deferred
+- biggest wins
+- biggest future opportunities
+
+==================================================
+IMPLEMENTATION STRATEGY RULES
+==================================================
+
+Work in this execution order:
+1. audit
+2. security
+3. modularization
+4. AI architecture
+5. memory system
+6. frontend product shell
+7. trust layer
+8. versioning
+9. React/multi-file maturity
+10. deploy maturity
+11. GitHub maturity
+12. infra/integrations
+13. collaboration
+14. QA/analytics
+15. adaptive modes UX
+16. planning/spec flow
+17. tests/CI
+18. performance
+19. docs
+20. final polish
+
+For each phase:
+- explain the goal
+- list exact files to change
+- implement
+- summarize what changed
+- note risks
+- keep the app working
+
+When a file is too large:
+- split it
+- preserve behavior
+- reduce coupling
+- add boundaries
+
+When there is disabled but valuable functionality:
+- do not delete it blindly
+- evaluate whether to revive, redesign, or remove
+
+When frontend is weak but backend is strong:
+- prioritize product UX and trust layer
+- do not just add more backend features
+
+FINAL PRODUCT STANDARD
+
+The final result must feel like:
+- a serious production-grade AI builder platform
+- trustworthy
+- premium
+- fast
+- understandable
+- modular
+- secure
+- extensible
+- clearly differentiated from generic prompt-to-HTML toys
+
+OUTPUT STYLE
+
+At every step:
+- be precise
+- be architectural
+- be practical
+- do not be vague
+- do not just suggest
+- implement
+
+Start now with PHASE 1:
+Perform the full repository audit, generate the architecture documents, then continue in order.

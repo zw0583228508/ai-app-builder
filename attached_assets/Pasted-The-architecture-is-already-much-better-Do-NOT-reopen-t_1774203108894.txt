@@ -1,0 +1,406 @@
+The architecture is already much better.
+Do NOT reopen the major refactor.
+Do NOT undo the modular cleanup.
+Do NOT re-monolith the codebase.
+
+Your mission now is to finish ALL REMAINING PRODUCT GAPS.
+
+This is now a final product-polish and chat-experience mission.
+
+The remaining critical issues are:
+
+1. Chat text streaming still arrives in bursts instead of a smooth continuous flow.
+2. The actual conversation quality is still not premium enough.
+3. Direct paste support for screenshots/images into the chat is still missing.
+4. The chat surface still feels too busy in some states.
+5. The product still does not fully feel like “everything through chat”.
+6. The visual editing UX is not good enough: the generated preview shows visible edit boxes/rectangles over sections, which feels ugly, intrusive, and uncomfortable.
+
+NON-NEGOTIABLE RULES
+1. Preserve the current modular structure.
+2. Do not break chat, preview, deploy, GitHub sync, files, share, snapshots, secrets, database, or mode switching.
+3. Do not remove current attachment upload support.
+4. Work incrementally and safely.
+5. Preserve RTL/Hebrew support.
+6. Keep the app buildable after every step.
+7. Keep advanced capabilities available.
+8. Focus on product quality, smoothness, elegance, and trust.
+9. Do not waste time on unrelated backend restructuring.
+
+PRIMARY GOAL
+Make the product feel like a premium world-class chat-led builder:
+- smooth
+- elegant
+- premium
+- lightweight
+- fast
+- attractive
+- intelligent
+- operational through chat
+
+The user should feel:
+“This chat is powerful, smooth, beautiful, and I can do almost everything through it — including pasting screenshots and editing visually without ugly overlays.”
+
+============================================================
+PHASE 1 — FULLY FIX THE BURSTY TEXT STREAMING
+============================================================
+
+Target:
+artifacts/app-builder/src/hooks/use-chat-stream.ts
+
+Current problem:
+The assistant text still appears in bursts/chapters instead of a smooth, continuous flow.
+It feels like:
+- pause
+- then a chunk appears
+- then another pause
+- then another chunk
+
+This feels artificial and low quality.
+
+Required:
+Make normal conversational text streaming feel truly live and continuous.
+
+Implementation direction:
+- eliminate the remaining bursty buffering behavior
+- do not accumulate enough text to create visible pauses
+- do not “wait and dump”
+- reduce or remove the artificial typewriter queue for normal text responses
+- if throttling is needed, make it extremely light and invisible
+- end-of-stream must not create a big final jump
+- preserve separate code preview streaming behavior
+
+Review and fix:
+- typewriterQueueRef
+- typewriterShownRef
+- typewriterTimerRef
+- startTypewriter()
+- appendStreamedText()
+- flushTypewriter()
+- pacing logic
+- end-of-stream behavior
+
+Also review:
+- whether scrollIntoView calls during streaming add jank
+- whether too many UI state updates make the stream feel uneven
+
+Success criteria:
+- text moves continuously
+- no visible pauses followed by dumps
+- no ugly final jump
+- response feels live and premium
+- code preview streaming still works correctly
+
+============================================================
+PHASE 2 — UPGRADE THE ACTUAL CONVERSATION QUALITY
+============================================================
+
+Target:
+chat response behavior and presentation
+
+Current problem:
+The assistant still sounds too generic in some cases.
+The conversation can feel too form-like, too verbose in the wrong places, and not premium enough.
+
+Problems to fix:
+- too templated
+- too many rigid questions
+- sometimes feels like a questionnaire
+- too much text too early
+- not sharp enough
+- not elegant enough
+- not operational enough
+
+Required conversation standard:
+The assistant must feel:
+- sharp
+- premium
+- natural
+- concise when needed
+- guided but not robotic
+- operational, not passive
+- business-smart
+- product-smart
+- design-aware
+
+Required improvements:
+A. Better opening replies
+- more polished
+- more confident
+- less generic
+- less boilerplate
+
+B. Better questioning style
+- ask fewer questions at once
+- ask only the highest-leverage questions
+- infer sensible defaults when possible
+- maintain momentum
+- avoid making the user fill a form through chat
+
+C. Better proposal style
+- when the request is already clear, move forward confidently
+- avoid over-explaining too early
+- show progress quickly
+- sound like a strong product operator
+
+D. Better answer structure
+- reduce fluff
+- reduce filler enthusiasm
+- improve elegance
+- improve clarity
+- improve Hebrew/RTL quality
+- improve premium tone
+
+E. Stronger “builder through chat” feel
+- responses should feel like the assistant is executing, not just describing execution
+- the user should feel momentum and trust
+
+============================================================
+PHASE 3 — ADD DIRECT PASTE SUPPORT FOR SCREENSHOTS / IMAGES
+============================================================
+
+Target:
+chat input and attachment handling
+
+This is required.
+
+Current problem:
+The user cannot simply paste a screenshot/image directly into the chat composer.
+
+Required feature:
+Support direct paste of images from clipboard into chat.
+
+Examples that must work:
+- user presses Print Screen and pastes
+- user copies a screenshot from another app and pastes
+- user copies an image and pastes
+- pasted image appears immediately as an attachment preview
+- user can send it with the message normally
+
+Required behavior:
+- handle paste events on the chat composer/input area
+- detect clipboard image items
+- convert pasted image into the same attachment structure used by file uploads
+- show preview chips just like uploaded attachments
+- preserve attachment limits
+- preserve current send flow
+- preserve typed text if text already exists
+- if both text and image are pasted, keep both if safe
+
+Required UX:
+- pasting must feel instant and native
+- user must be able to remove pasted screenshots before sending
+- do not break current upload button behavior
+
+============================================================
+PHASE 4 — FIX THE VISUAL EDITING UX (REMOVE UGLY EDIT BOXES)
+============================================================
+
+Target:
+preview / visual editing experience
+especially any code that injects or renders edit overlays in preview/edit mode
+
+Current problem:
+The generated preview shows visible rectangular edit boxes/selection boxes around sections/elements.
+This is not comfortable, not attractive, and not premium.
+It makes the generated result feel cluttered and broken.
+
+The current editing overlay behavior is too aggressive.
+
+Required:
+Redesign the visual editing interaction so it feels subtle, elegant, and non-intrusive.
+
+New required behavior:
+- do NOT show visible edit boxes on all sections by default
+- do NOT leave persistent rectangles over every block
+- do NOT make the entire generated UI look covered by editing chrome
+
+Instead:
+- editing overlays should appear only when relevant
+- show subtle highlight only on hover or on active selection
+- selected element should feel clearly selected, but elegantly
+- non-selected elements should look normal
+- the generated design itself must remain visually clean
+
+Preferred UX model:
+- normal preview mode = absolutely clean, no editing boxes
+- edit mode = very subtle hover affordance only
+- active selected element = one clean, elegant highlight
+- no permanent noisy rectangles everywhere
+
+Implementation direction:
+- reduce overlay visibility dramatically
+- avoid rendering section boxes globally
+- use lightweight hover outline or glow only when needed
+- use one active selected state at a time
+- make edit mode feel premium and comfortable
+
+Success criteria:
+- preview looks clean again
+- editing is still possible
+- selection is still understandable
+- the UI no longer looks covered in intrusive boxes
+- editing feels professional and high-end
+
+============================================================
+PHASE 5 — REDUCE CHAT SURFACE CLUTTER FURTHER
+============================================================
+
+Target:
+artifacts/app-builder/src/components/chat/*
+
+Current problem:
+Even after cleanup, the chat can still feel too busy.
+Too many helper surfaces and controls compete with the conversation.
+
+Required:
+Reduce cognitive load further.
+
+Priority order must be:
+1. current conversation
+2. current response
+3. input bar
+4. one relevant helper/context surface
+5. advanced actions
+6. internal/technical states
+
+Rules:
+- do not let multiple helper surfaces compete at once
+- suppress secondary UI when not useful
+- reduce stacking
+- reduce always-on banners/chips
+- keep the conversation emotionally dominant
+
+The chat should feel quieter and more intentional.
+
+============================================================
+PHASE 6 — MAKE THE INPUT AREA MORE ELEGANT AND POWERFUL
+============================================================
+
+Target:
+ChatInputBar
+
+Current problem:
+The input area still feels too much like a crowded toolbar.
+
+Required:
+Make the input bar feel:
+- elegant
+- calm
+- obvious
+- modern
+- premium
+- high-confidence
+- low-friction
+
+Required improvements:
+- the text field must dominate visually
+- the send action must feel clear and satisfying
+- secondary tools must be quieter
+- spacing must improve
+- entrepreneur mode should have the cleanest input version
+
+Do not remove advanced functionality.
+Reduce visual competition.
+
+============================================================
+PHASE 7 — STRENGTHEN THE “EVERYTHING THROUGH CHAT” FEEL
+============================================================
+
+Current problem:
+The product still feels partially like:
+chat + tools
+instead of:
+chat as the operating system
+
+Required:
+Strengthen the feeling that almost everything meaningful can be done through conversation.
+
+Improve:
+- discoverability of what chat can do
+- confidence that chat requests lead to real execution
+- action-oriented UX around the assistant
+- the sense that the assistant is operating the workspace
+
+The user should clearly feel that chat can drive:
+- page creation
+- redesign
+- bug fixing
+- mobile improvements
+- content updates
+- selected-element edits
+- publishing
+- GitHub actions
+- integration-related tasks
+- project-wide changes
+
+The assistant must feel operational and dependable.
+
+============================================================
+PHASE 8 — FINAL PREMIUM POLISH PASS
+============================================================
+
+After the above fixes, do one final high-end polish pass across the chat and preview experience.
+
+Review:
+- empty state
+- first impression
+- streaming state
+- active conversation state
+- entrepreneur mode
+- input bar
+- helper surfaces
+- pasted image UX
+- visual editing mode
+- perceived responsiveness
+- premium feel
+
+Target:
+This must feel like a serious premium product, not just a cleaned-up tool.
+
+============================================================
+EXECUTION ORDER
+============================================================
+
+Do the work in this order:
+
+1. Fix streaming smoothness completely
+2. Upgrade conversation quality
+3. Add direct paste support for screenshots/images
+4. Fix the ugly edit boxes / intrusive visual editing overlays
+5. reduce remaining chat clutter
+6. polish the input bar
+7. strengthen the “everything through chat” feel
+8. final premium polish pass
+
+At each step:
+- explain exactly what you are changing
+- explain why it is safe
+- preserve existing behavior
+- verify imports/references
+- run typecheck/build if possible
+- report what still remains
+
+============================================================
+SUCCESS CRITERIA
+============================================================
+
+This work is successful only if:
+
+- streaming is finally smooth and natural
+- the conversation quality feels premium and smart
+- the assistant sounds sharper and less generic
+- screenshots/images can be pasted directly into chat
+- pasted screenshots appear as normal attachments
+- the preview no longer shows ugly intrusive edit rectangles everywhere
+- visual editing still works, but feels subtle and elegant
+- the input area feels more focused and premium
+- the interface feels less cluttered
+- the product feels more like “everything through chat”
+- all existing functionality remains stable
+
+Start now with the 4 highest-priority remaining issues:
+1. use-chat-stream.ts
+2. conversation quality / chat behavior
+3. clipboard image paste support
+4. visual editing overlay cleanup

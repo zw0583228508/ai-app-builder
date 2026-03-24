@@ -1,0 +1,211 @@
+עברתי שוב על הפרויקט, והוא אכן נראה טוב יותר מקודם, אבל עדיין יש בו בעיות התנהגותיות שצריך לתקן עכשיו.
+
+אני לא רוצה כרגע redesign, לא features חדשים, ולא refactor קוסמטי.
+אני רוצה תיקון ממוקד של הזרימות והפונקציות שעדיין לא מתנהגות נכון.
+
+מה לתקן עכשיו — לפי סדר עדיפות:
+
+========================================
+עדיפות 1 — Message Flow / AI Flow
+========================================
+
+בדוק ותקן עכשיו את כל זרימת ההודעות של הפרויקט.
+
+אני רוצה שתבדוק לעומק:
+- POST /projects/:id/messages
+- SSE streaming
+- fullResponse accumulation
+- inCode detection
+- message saving to DB
+- extractedHtml logic
+- extractedReactFiles logic
+- previewHtml update
+- projectFiles sync
+- snapshots creation
+- final done event
+- usage tracking
+- growWithMeSuggestion side effects
+
+מה אני רוצה שתתקן:
+1. ודא שהזרימה לא רק "עובדת", אלא עקבית:
+   - הודעת user נשמרת תמיד
+   - תגובת AI נשמרת תמיד
+   - preview מתעדכן רק כשבאמת יש preview חדש
+   - files מתעדכנים נכון כשזה React
+   - HTML flow ו-React flow לא מתנגשים
+   - done event מחזיר מצב נכון
+   - side effects לא קורים חלקית
+
+2. חזק את parsing של תשובות AI:
+   - extraction של ```html ...``` צריך להיות קשיח יותר
+   - extraction של FILE: blocks ל-React צריך להיות יציב יותר
+   - אם התשובה חלקית או לא בפורמט מושלם, תוסיף fallback behavior
+   - אל תיתן למצב שבו נשמר message אבל preview/files לא מסתנכרנים
+
+3. בדוק consistency:
+   - אם extractedHtml קיים → index.html / previewHtml / snapshot צריכים להיות בקו אחיד
+   - אם extractedReactFiles קיימים → projectFiles צריכים להיות truth source ברור
+   - אל תיתן ערבוב מסוכן בין previewHtml לבין React files
+
+4. פצל לוגיקה אם צריך:
+   - הוצא helper functions נפרדים עבור:
+     - extractHtmlFromResponse
+     - extractReactFilesFromResponse
+     - persistHtmlOutput
+     - persistReactOutput
+     - finalizeMessageResponse
+   - אל תשאיר את כל זה inline בתוך route אחד ענק
+
+========================================
+עדיפות 2 — Preview / Files / Snapshot Sync
+========================================
+
+בדוק ותקן עכשיו את כל מה שקשור ל-preview ול-sync של state.
+
+אני רוצה שתבדוק:
+- GET /projects/:id/preview
+- save snapshot
+- restore snapshot
+- save HTML to previewHtml
+- save HTML to projectFiles/index.html
+- React file updates
+- broadcastProjectUpdate
+
+מה לתקן:
+1. ודא שיש source of truth ברור:
+   - עבור HTML projects
+   - עבור React projects
+
+2. ודא שלא נוצר מצב כזה:
+   - message שמר preview חלקי
+   - snapshot לא תואם ל-preview האחרון
+   - restore מחזיר משהו אחר ממה שנשמר
+   - React project נשמר בלי buildable files
+   - HTML project נשמר בלי preview usable
+
+3. אם צריך:
+   - כתוב helper אחד שמחליט לפי stack מה נשמר ואיך
+   - תפריד בין:
+     - persistHtmlProjectState
+     - persistReactProjectState
+
+========================================
+עדיפות 3 — Share / Deploy Flow
+========================================
+
+בדוק ותקן עכשיו את הזרימות האלו:
+
+- POST /projects/:id/share
+- PATCH /projects/:id/custom-slug
+- GET /share/:token
+- POST /projects/:id/netlify-deploy
+- POST /projects/:id/agent-run (בחלק ה-deploy אם קיים)
+
+מה אני רוצה שתבדוק ותתקן:
+1. Share flow
+- share token תמיד נוצר נכון
+- custom slug לא שובר share token flow
+- public route מחזיר את ה-preview האמיתי
+- לא קורה מצב שיש share token אבל אין output usable
+
+2. Deploy flow
+- אם אין HTML usable, deploy לא אמור להיראות כהצלחה
+- ודא שמה שנשלח ל-Netlify באמת תואם לפורמט שהוא מצפה לו
+- אם כרגע נשלח Buffer מ-HTML raw כ-zip — בדוק אם זה בכלל תקין, ואם לא תקן
+- ודא שתגובה של deploy באמת משקפת deploy usable ולא fake success
+
+3. Agent-run flow
+- ודא שה-step execution לא רק מייצר fullResponse אלא גם שומר state עקבי
+- אם autoFix משנה HTML, שמור נכון
+- אם autoDeploy רץ, ודא שהוא לא עובד על output לא תקין
+
+========================================
+עדיפות 4 — Functional Cleanup of projects/index.ts
+========================================
+
+אני רוצה תיקון פונקציונלי, לא רק אסתטי.
+
+הקובץ routes/projects/index.ts עדיין גדול מדי ועושה יותר מדי דברים.
+אני רוצה שתפצל אותו רק במקומות הקריטיים שקשורים ל-bugs ההתנהגותיים.
+
+פצל לפחות ליחידות הבאות:
+- message-flow helpers
+- output extraction helpers
+- persistence helpers
+- deploy helpers
+- share helpers
+- preview helpers
+
+מטרה:
+לא לעשות refactor ענקי,
+כן להוציא החוצה את המקומות הכי שבירים כדי שהלוגיקה תהיה יציבה וברורה.
+
+========================================
+עדיפות 5 — בדיקות Expected vs Actual
+========================================
+
+אני רוצה שתעבוד לפי הגישה הזאת:
+
+על כל flow מרכזי תכתוב לעצמך:
+- Expected behavior
+- Actual behavior from current code
+- Root cause
+- Exact fix
+
+אבל אל תעצור שם.
+אחרי שזיהית — תבצע את התיקון בפועל.
+
+========================================
+תוצרים שאני רוצה ממך
+========================================
+
+אני לא רוצה רק אבחון.
+
+אני רוצה שתחזיר לי:
+
+1. רשימת הבעיות ההתנהגותיות האמיתיות שמצאת
+2. רשימת הקבצים שאתה משנה
+3. הקבצים המתוקנים בפועל, מלאים
+4. קבצים חדשים אם יצרת helpers/modules
+5. הסבר קצר מה תוקן בכל flow:
+   - messages
+   - preview/files
+   - snapshots
+   - share
+   - deploy
+6. מה עכשיו יתנהג נכון יותר
+
+========================================
+חוקים חשובים
+========================================
+
+- אל תתעסק עכשיו בעיצוב
+- אל תוסיף פיצ'רים חדשים
+- אל תעשה rewrite לכל הפרויקט
+- תתקן רק מה שמשפיע על correctness של ההתנהגות
+- אם אתה מפצל קובץ — תעשה את זה מינימלי אבל נכון
+- אם יש parsing שביר — תקשיח אותו
+- אם יש state update חלקי — תאחד אותו
+- אם יש branch logic לא עקבי לפי stack — תסדר אותו
+- אם יש false success ב-deploy/share/preview — תבטל את זה
+- אם יש side effects שקורים לפעמים כן ולפעמים לא — תתקן
+
+========================================
+פורמט תשובה חובה
+========================================
+
+תענה כך:
+
+A. Behavioral bugs found
+B. Fix plan
+C. Full corrected files
+D. New helper files if added
+E. What now works correctly
+
+אל תיתן לי רק רשימת בעיות.
+אני רוצה תיקון בפועל.
+
+תתחיל עכשיו משלושת האזורים הכי חשובים:
+1. message flow
+2. preview/files/snapshot sync
+3. share/deploy flow

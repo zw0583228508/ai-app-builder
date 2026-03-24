@@ -1,0 +1,290 @@
+You are performing a CRITICAL SECURITY FIX PASS on an AI app-builder system.
+
+DO NOT refactor everything.
+DO NOT add new features.
+DO NOT redesign architecture broadly.
+
+Your ONLY goal:
+Eliminate the remaining critical security flaws completely and irreversibly.
+
+If even ONE of these remains, the task is considered FAILED.
+
+========================================
+CRITICAL ISSUES THAT MUST BE 100% FIXED
+========================================
+
+1. Secrets are still injected into system prompts
+2. Frontend still holds raw secrets in memory
+3. Frontend still sends secrets in chat/message payloads
+4. Ownerless projects bypass proper authorization
+
+You must remove these patterns COMPLETELY (not partially).
+
+========================================
+PHASE 1 — COMPLETE SECRET FLOW ELIMINATION
+========================================
+
+Your mission:
+Make it IMPOSSIBLE for secrets to:
+- exist in frontend runtime after save
+- be sent in chat payloads
+- be injected into prompts
+- be returned by any API
+
+----------------------------------------
+STEP 1 — FRONTEND: REMOVE SECRET STORAGE
+----------------------------------------
+
+Find:
+- use-integrations.ts
+- any integration state/hooks/components
+- any storage of keys like:
+  openaiKey, anthropicKey, groqKey, githubToken, mongodbUri, stripeSecretKey, etc.
+
+REQUIRED ACTIONS:
+
+1. After saving credentials:
+   - DO NOT store raw values in state
+   - Immediately discard them
+
+2. Integration state must only include:
+   - provider name
+   - connected: boolean
+   - status
+   - safe metadata (non-sensitive only)
+
+3. DELETE any logic that:
+   - reads secrets from local state
+   - exposes them via readIntegrations()
+   - keeps them in memory after submission
+
+4. If UI needs to show something:
+   - show "Connected"
+   - show masked indicators (never actual values)
+
+----------------------------------------
+STEP 2 — FRONTEND: REMOVE SECRETS FROM CHAT FLOW
+----------------------------------------
+
+Find:
+- use-chat-stream.ts
+- any message sending logic
+
+DELETE COMPLETELY:
+
+- readIntegrations()
+- any building of:
+  integrations: Record<string, string>
+- any inclusion of secrets in request body
+
+FINAL RULE:
+Chat request body must NOT contain ANY credentials.
+
+----------------------------------------
+STEP 3 — BACKEND: REMOVE integrations FROM MESSAGE API
+----------------------------------------
+
+Find:
+- ai-generation.ts
+- messages route handlers
+
+REMOVE:
+
+- request.body.integrations
+- any usage of integrations coming from client
+
+REPLACE WITH:
+
+- derive userId from auth
+- fetch capabilities from secure vault (server-side only)
+
+----------------------------------------
+STEP 4 — SYSTEM PROMPT: REMOVE ALL SECRETS
+----------------------------------------
+
+Find:
+- system-prompt.ts
+
+REMOVE ALL occurrences of:
+
+- API keys
+- tokens
+- URIs
+- secrets
+- credentials
+
+INCLUDING patterns like:
+
+- "API Key: ${...}"
+- "Token: ${...}"
+- "URI: ${...}"
+
+REPLACE WITH capability-based statements ONLY.
+
+VALID EXAMPLES:
+
+- "Stripe is connected and available via secure backend"
+- "Supabase is available through server-managed integration"
+- "GitHub access is available via backend adapter"
+
+INVALID (must not exist anywhere):
+
+- actual keys
+- actual tokens
+- actual URIs
+- anything that can authenticate a service
+
+----------------------------------------
+STEP 5 — ENFORCE PROMPT SANITY CHECK
+----------------------------------------
+
+Add a validation layer before sending prompt to model:
+
+- scan prompt string for:
+  - "sk_"
+  - "api_key"
+  - "token"
+  - "Bearer"
+  - "mongodb://"
+  - "postgres://"
+  - "http://169.254"
+- if found → THROW ERROR and block request
+
+This is a hard fail-safe.
+
+========================================
+PHASE 2 — OWNERLESS PROJECT SECURITY FIX
+========================================
+
+Find:
+- routes/projects/index.ts
+- router.param("id", ...)
+
+REMOVE THIS LOGIC:
+
+if (row.userId === null) return next();
+
+This is NOT allowed anymore.
+
+----------------------------------------
+STEP 6 — ENFORCE STRICT ACCESS RULES
+----------------------------------------
+
+Define clearly:
+
+IF project.userId is null:
+  → it must NOT be accessible unless:
+     - it is explicitly a guest project
+     - AND request includes valid guest session token
+
+IMPLEMENT ONE OF THESE:
+
+OPTION A (simpler, safer):
+- Disallow ownerless projects entirely
+- On creation, require authenticated user
+
+OPTION B (advanced):
+- Introduce guestSessionId
+- Bind project to guest session
+- Require signed token to access
+- Reject all other access
+
+----------------------------------------
+STEP 7 — APPLY AUTHORIZATION TO ALL ROUTES
+----------------------------------------
+
+For ALL project routes:
+
+- read routes → require read access
+- write routes → require owner access
+
+NO exceptions.
+
+----------------------------------------
+STEP 8 — TEST AUTH FIX
+----------------------------------------
+
+Add tests:
+
+- cannot access project by ID alone
+- ownerless project cannot be accessed anonymously
+- non-owner cannot modify project
+- guest access only works with valid token (if implemented)
+
+========================================
+PHASE 3 — REMOVE LEGACY PATHS
+========================================
+
+You must eliminate ALL old unsafe flows.
+
+----------------------------------------
+STEP 9 — DELETE DUPLICATE INTEGRATION SYSTEMS
+----------------------------------------
+
+If both exist:
+
+- routes/integrations.ts
+- routes/user-integrations.ts
+
+Then:
+
+- KEEP ONLY the secure vault-based system
+- DELETE the legacy one completely
+
+----------------------------------------
+STEP 10 — VERIFY NO SECRET LEAKS
+----------------------------------------
+
+Search entire codebase for:
+
+- openaiKey
+- anthropicKey
+- groqKey
+- stripeSecretKey
+- mongodbUri
+- twilioAuthToken
+- "Token:"
+- "API Key:"
+
+VERIFY:
+
+- none appear in:
+  - prompts
+  - responses
+  - logs
+  - frontend state
+  - chat payloads
+
+========================================
+FINAL VALIDATION (MANDATORY)
+========================================
+
+Before finishing, confirm ALL:
+
+1. No secrets are stored in frontend after save
+2. No secrets are sent in any API request body
+3. No secrets appear in system prompt
+4. No secrets appear in logs or telemetry
+5. Message API does not accept integrations payload
+6. Only server-side vault accesses credentials
+7. Ownerless projects are either:
+   - disallowed
+   OR
+   - securely bound to guest sessions
+8. All project routes enforce authorization properly
+
+If ANY of the above fails → DO NOT finish.
+
+========================================
+OUTPUT REQUIREMENTS
+========================================
+
+Provide:
+
+1. List of ALL files modified
+2. Exact explanation per file (what was removed/replaced)
+3. Confirmation checklist of all 8 validation rules
+4. Any breaking changes introduced
+5. Any follow-up recommendations
+
+DO NOT CLAIM SUCCESS WITHOUT REAL CODE CHANGES.

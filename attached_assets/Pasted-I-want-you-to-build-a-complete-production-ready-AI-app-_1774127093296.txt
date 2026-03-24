@@ -1,0 +1,420 @@
+I want you to build a complete, production-ready AI app builder platform, much more advanced than a simple website generator.
+
+The platform should allow users to create full websites, web apps, internal tools, SaaS products, dashboards, landing pages, client portals, marketplaces, and e-commerce stores by chatting with AI.
+
+You must design the product as a serious, scalable platform with a premium user experience, clear architecture, and modular components.
+
+Build the platform with the following exact structure and capabilities:
+
+1. CORE PRODUCT IDEA
+Create an AI-powered app builder where a user describes what they want in chat, and the system guides them, understands the business idea, generates the full project, and allows ongoing editing, deployment, and scaling.
+
+This is not only a UI generator.
+It must include:
+- product discovery
+- planning
+- page generation
+- component generation
+- data model generation
+- backend/API generation
+- admin panel generation
+- editing workflows
+- deployment support
+- team collaboration
+- analytics
+- monitoring
+- business memory
+
+2. USER EXPERIENCE FLOW
+The product must support the following flow:
+
+Step 1:
+User enters the platform and chooses one of 4 modes:
+- Entrepreneur
+- Builder
+- Developer
+- Maker
+
+Step 2:
+The AI enters discovery mode and asks the user smart questions based on the selected mode.
+
+Step 3:
+The AI creates a structured Product Spec including:
+- product name
+- target audience
+- business goal
+- core features
+- pages/screens
+- user roles
+- data entities
+- integrations
+- design direction
+- monetization model
+
+Step 4:
+The user confirms the plan.
+
+Step 5:
+The AI generates the project:
+- frontend pages
+- reusable components
+- backend structure
+- database schema
+- auth flows
+- dashboard/admin
+- settings pages
+- integrations
+- responsive layout
+
+Step 6:
+The user can continue editing the app through chat, visual controls, and direct code editing.
+
+3. ADAPTIVE AI SYSTEM
+Build an Adaptive AI System with 4 user modes:
+
+A. Entrepreneur Mode
+- tone: business advisor
+- ask more onboarding questions
+- simplify technical decisions
+- focus on business model, audience, monetization, growth
+
+B. Builder Mode
+- tone: product manager / technical lead
+- medium depth
+- focus on product flows, features, UX, launch readiness
+
+C. Developer Mode
+- tone: senior engineer peer
+- more technical depth
+- allow architecture choices, API structure, database decisions, stack control
+
+D. Maker Mode
+- tone: creative co-builder
+- light, fast, inspiring
+- minimal friction
+
+Each mode should dynamically affect:
+- prompt strategy
+- number of questions
+- wording
+- UI hints
+- suggestions
+- default templates
+
+4. DISCOVERY ENGINE
+Before building anything, the AI must collect product requirements.
+
+The discovery system should ask targeted questions about:
+- what the user wants to build
+- who the users are
+- what problem the product solves
+- core actions users need to perform
+- required pages
+- required roles and permissions
+- auth needs
+- payment needs
+- data storage needs
+- design preferences
+- integrations
+- mobile vs desktop priority
+- multilingual support
+- analytics requirements
+
+The AI should ask one question at a time and adapt based on answers.
+
+After discovery, generate a clean Product Spec.
+
+5. BUSINESS MEMORY LAYER
+Build a memory layer that persists project context across sessions.
+
+For every project, remember:
+- project name
+- description
+- business model
+- target audience
+- tone and brand style
+- preferred stack
+- required features
+- prior decisions
+- rejected ideas
+- deployment targets
+- integrations
+- design system choices
+
+The memory layer should help the AI continue the project without losing context.
+
+6. PROJECT TYPES THE PLATFORM MUST SUPPORT
+The builder must support:
+- landing pages
+- SaaS products
+- dashboards
+- CRMs
+- marketplaces
+- social apps
+- AI tools
+- internal admin tools
+- booking systems
+- directory websites
+- e-commerce stores
+- course platforms
+- membership apps
+- client portals
+- content sites
+
+7. GENERATION OUTPUTS
+For each project, the platform should be able to generate:
+
+Frontend:
+- pages
+- reusable UI components
+- layouts
+- forms
+- tables
+- charts
+- modals
+- navigation
+- responsive design
+- empty states
+- loading states
+- error states
+
+Backend:
+- API routes
+- database schema
+- auth logic
+- permissions
+- file storage setup
+- integrations
+- webhook handlers
+
+Business/Admin:
+- admin dashboard
+- analytics dashboard
+- user management
+- billing screens
+- settings
+- notifications
+- audit logs
+
+8. VISUAL EDITOR + CHAT EDITOR
+The user must be able to modify the app in multiple ways:
+- natural language chat
+- component-level editing
+- page-level editing
+- style editing
+- code editing
+- structure editing
+- AI suggestions
+
+Support commands like:
+- add a pricing section
+- make the hero more modern
+- add dark mode
+- create an admin page for invoices
+- connect this form to the database
+- make the onboarding flow shorter
+
+9. MULTI-FILE PROJECT SYSTEM
+The platform must generate structured multi-file projects, not one giant file.
+
+Support:
+- page files
+- component files
+- layout files
+- API files
+- config files
+- database files
+- utility files
+- theme files
+
+The AI should understand project structure and edit the correct files safely.
+
+10. CODE EDITOR
+Include a Monaco-style code editor with:
+- syntax highlighting
+- file tree
+- diff view
+- AI inline edits
+- error highlighting
+- preview support
+- rollback/version history
+
+11. DATABASE + STORAGE
+Each project should support:
+- its own database
+- tables/entities
+- file storage
+- media uploads
+- user data
+- settings data
+- analytics data
+
+Allow the AI to generate data models automatically from product requirements.
+
+12. AUTHENTICATION SYSTEM
+Support:
+- email/password
+- Google login
+- optional social logins
+- magic links
+- role-based access control
+- protected pages
+- admin roles
+- team roles
+
+13. BILLING / PAYMENTS
+Support payment-ready apps with:
+- one-time payments
+- subscriptions
+- pricing tables
+- checkout pages
+- billing portal
+- invoices
+- plan restrictions
+- trial logic
+
+14. DEPLOYMENT
+Include one-click or guided deployment support for platforms like:
+- Vercel
+- Netlify
+- Render
+- Docker-based deploys
+
+Allow environment variable management, build settings, and deployment status.
+
+15. TEAM FEATURES
+Build collaboration features:
+- multiple makers per project
+- comments
+- live cursors
+- edit history
+- roles
+- permissions
+- shared workspaces
+
+16. ANALYTICS + MONITORING
+Add:
+- basic product analytics
+- event tracking
+- error monitoring
+- performance monitoring
+- user funnel insights
+
+17. TEMPLATE SYSTEM
+Provide a template gallery with categories such as:
+- SaaS
+- e-commerce
+- creator business
+- marketplace
+- internal tools
+- agency sites
+- AI startup
+- booking system
+- dashboard
+- portfolio
+
+Allow the user to start from:
+- blank
+- template
+- AI-generated from prompt
+
+18. PUBLIC GALLERY
+Build a public gallery where users can publish projects/templates.
+Each item should include:
+- title
+- description
+- screenshots
+- tags
+- clone button
+- maker attribution
+
+19. UI/UX REQUIREMENTS
+Design the platform with a world-class premium interface.
+Use a modern, clean, futuristic style.
+The UI should feel advanced, polished, and high-conviction.
+
+Include:
+- sidebar
+- chat panel
+- live preview panel
+- file tree
+- settings panel
+- top bar
+- deploy panel
+- analytics panel
+
+The interface should feel like a mix of:
+- premium AI workspace
+- modern product studio
+- pro developer tool
+- no-code builder
+
+20. DESIGN SYSTEM
+Create a consistent design system including:
+- typography scale
+- spacing system
+- color tokens
+- button system
+- card system
+- form system
+- modal system
+- table system
+- empty/loading/error states
+
+Support:
+- light mode
+- dark mode
+- brand customization
+
+21. FIRST VERSION PRIORITIES
+For the first high-quality version, prioritize:
+- onboarding flow
+- mode selection
+- discovery chat
+- product spec generation
+- project generation
+- page/component generation
+- file structure
+- preview
+- editing through chat
+- deployment basics
+
+22. TECHNICAL EXPECTATION
+Generate the project as a scalable production-grade architecture, not as a demo.
+Use clean modular code, reusable components, clear folder structure, and room for future expansion.
+
+23. OUTPUT FORMAT
+I want you to work in this order:
+
+Phase 1:
+Write the full product architecture.
+
+Phase 2:
+Write the user flow.
+
+Phase 3:
+Write the database/entities.
+
+Phase 4:
+Write the screens/pages.
+
+Phase 5:
+Write the component system.
+
+Phase 6:
+Write the AI orchestration logic.
+
+Phase 7:
+Write the file/folder structure.
+
+Phase 8:
+Write the MVP plan.
+
+Phase 9:
+Write the implementation roadmap.
+
+Phase 10:
+Start generating the actual app structure and code.
+
+Do not keep this high-level only.
+Be concrete, structured, and implementation-oriented.

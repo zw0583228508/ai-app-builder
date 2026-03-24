@@ -1,0 +1,1331 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>החברה המובילה בישראל | פתרונות עסקיים מתקדמים</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;900&family=Assistant:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="https://unpkg.com/aos@2.3.1/dist/aos.css">
+    <style>
+        :root {
+            --bg: #0a0e1a;
+            --surface: #0f1419;
+            --surface-2: #161d2a;
+            --border: rgba(255,255,255,0.08);
+            --text: #f0f4ff;
+            --muted: #8892a4;
+            --primary: #1F3A93;
+            --primary-glow: rgba(31,58,147,0.4);
+            --accent: #f59e0b;
+            --accent-glow: rgba(245,158,11,0.25);
+            --gradient: linear-gradient(135deg, #1F3A93 0%, #2e5bb8 50%, #4a7ed9 100%);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        html { scroll-behavior: smooth; }
+        
+        body {
+            font-family: 'Assistant', 'Inter', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.7;
+            overflow-x: hidden;
+        }
+
+        .page {
+            display: none;
+            opacity: 0;
+            transition: opacity 0.3s ease, transform 0.3s ease;
+            transform: translateY(20px);
+        }
+
+        .container {
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 0 clamp(1rem, 5vw, 3rem);
+        }
+
+        /* Navigation */
+        nav {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            z-index: 1000;
+            background: rgba(10,14,26,0.7);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            border-bottom: 1px solid var(--border);
+            transition: all 0.3s ease;
+        }
+
+        nav.scrolled {
+            background: rgba(10,14,26,0.95);
+            box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+        }
+
+        .nav-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1.2rem clamp(1rem, 5vw, 3rem);
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 800;
+            background: var(--gradient);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: -0.02em;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            list-style: none;
+            align-items: center;
+        }
+
+        .nav-link {
+            color: var(--muted);
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            position: relative;
+            cursor: pointer;
+        }
+
+        .nav-link::after {
+            content: '';
+            position: absolute;
+            bottom: -4px;
+            right: 0;
+            width: 0;
+            height: 2px;
+            background: var(--gradient);
+            transition: width 0.3s ease;
+        }
+
+        .nav-link:hover, .nav-link.active {
+            color: var(--text);
+        }
+
+        .nav-link:hover::after, .nav-link.active::after {
+            width: 100%;
+        }
+
+        .nav-cta {
+            padding: 0.7rem 1.5rem;
+            background: var(--gradient);
+            border-radius: 8px;
+            color: white;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+        }
+
+        .nav-cta:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px var(--primary-glow);
+        }
+
+        .hamburger {
+            display: none;
+            flex-direction: column;
+            gap: 5px;
+            cursor: pointer;
+        }
+
+        .hamburger span {
+            width: 25px;
+            height: 3px;
+            background: var(--text);
+            border-radius: 3px;
+            transition: all 0.3s ease;
+        }
+
+        /* Hero Section */
+        .hero {
+            min-height: 100vh;
+            display: grid;
+            place-items: center;
+            position: relative;
+            overflow: hidden;
+            padding-top: 80px;
+        }
+
+        .hero-blob {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(80px);
+            opacity: 0.4;
+            animation: float 6s ease-in-out infinite;
+        }
+
+        .blob-1 { width: 500px; height: 500px; background: var(--primary); top: 10%; right: -10%; }
+        .blob-2 { width: 400px; height: 400px; background: var(--accent); bottom: 10%; left: -10%; animation-delay: 2s; }
+
+        .hero-content {
+            text-align: center;
+            z-index: 1;
+            max-width: 900px;
+        }
+
+        .hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid var(--border);
+            border-radius: 50px;
+            font-size: 0.875rem;
+            margin-bottom: 2rem;
+            backdrop-filter: blur(10px);
+        }
+
+        .hero h1 {
+            font-size: clamp(2.5rem, 6vw, 5rem);
+            font-weight: 900;
+            line-height: 1.1;
+            letter-spacing: -0.03em;
+            margin-bottom: 1.5rem;
+        }
+
+        .gradient-text {
+            background: var(--gradient);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .hero p {
+            font-size: 1.25rem;
+            color: var(--muted);
+            max-width: 600px;
+            margin: 0 auto 2.5rem;
+        }
+
+        .hero-buttons {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .btn-primary {
+            padding: 1rem 2.5rem;
+            background: var(--gradient);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-3px) scale(1.02);
+            box-shadow: 0 12px 40px var(--primary-glow);
+        }
+
+        .btn-secondary {
+            padding: 1rem 2.5rem;
+            background: transparent;
+            color: var(--text);
+            border: 2px solid var(--border);
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn-secondary:hover {
+            border-color: var(--primary);
+            background: rgba(31,58,147,0.1);
+            transform: translateY(-2px);
+        }
+
+        .social-proof {
+            margin-top: 3rem;
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .avatar-stack {
+            display: flex;
+            margin-left: -10px;
+        }
+
+        .avatar-stack img {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            border: 2px solid var(--bg);
+            margin-left: -10px;
+        }
+
+        .social-proof-text {
+            color: var(--muted);
+            font-size: 0.95rem;
+        }
+
+        .stars {
+            color: var(--accent);
+            font-size: 1.2rem;
+        }
+
+        /* Section Styles */
+        section {
+            padding: clamp(5rem, 10vw, 8rem) 0;
+        }
+
+        .section-header {
+            text-align: center;
+            margin-bottom: 4rem;
+        }
+
+        .section-badge {
+            display: inline-block;
+            padding: 0.5rem 1rem;
+            background: rgba(31,58,147,0.15);
+            border: 1px solid rgba(31,58,147,0.3);
+            border-radius: 50px;
+            color: var(--primary);
+            font-size: 0.875rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+        }
+
+        .section-title {
+            font-size: clamp(2rem, 4vw, 3.5rem);
+            font-weight: 900;
+            letter-spacing: -0.02em;
+            margin-bottom: 1rem;
+        }
+
+        .section-desc {
+            font-size: 1.1rem;
+            color: var(--muted);
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        /* About Section */
+        .about-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-bottom: 4rem;
+        }
+
+        .about-card {
+            background: rgba(255,255,255,0.03);
+            backdrop-filter: blur(24px);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 2.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .about-card:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 12px 40px rgba(0,0,0,0.3);
+            border-color: rgba(31,58,147,0.3);
+        }
+
+        .about-icon {
+            width: 60px;
+            height: 60px;
+            background: var(--gradient);
+            border-radius: 12px;
+            display: grid;
+            place-items: center;
+            font-size: 1.8rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .about-card h3 {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .about-card p {
+            color: var(--muted);
+            line-height: 1.8;
+        }
+
+        .team-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+        }
+
+        .team-member {
+            text-align: center;
+            background: rgba(255,255,255,0.03);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 2rem;
+            transition: all 0.3s ease;
+        }
+
+        .team-member:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 12px 32px rgba(0,0,0,0.3);
+        }
+
+        .team-avatar {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            margin: 0 auto 1rem;
+            border: 3px solid var(--primary);
+        }
+
+        .team-name {
+            font-size: 1.3rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .team-role {
+            color: var(--primary);
+            font-size: 0.95rem;
+            margin-bottom: 1rem;
+        }
+
+        .team-bio {
+            color: var(--muted);
+            font-size: 0.9rem;
+        }
+
+        /* Services Section */
+        .services-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 2rem;
+        }
+
+        .service-card {
+            background: rgba(255,255,255,0.03);
+            backdrop-filter: blur(24px);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 2.5rem;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .service-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: var(--gradient);
+            transform: scaleX(0);
+            transition: transform 0.3s ease;
+        }
+
+        .service-card:hover::before {
+            transform: scaleX(1);
+        }
+
+        .service-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 0 40px var(--primary-glow);
+        }
+
+        .service-icon {
+            width: 70px;
+            height: 70px;
+            background: linear-gradient(135deg, rgba(31,58,147,0.2), rgba(74,126,217,0.2));
+            border-radius: 14px;
+            display: grid;
+            place-items: center;
+            font-size: 2rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .service-card h3 {
+            font-size: 1.6rem;
+            margin-bottom: 1rem;
+        }
+
+        .service-card p {
+            color: var(--muted);
+            margin-bottom: 1.5rem;
+            line-height: 1.8;
+        }
+
+        .service-features {
+            list-style: none;
+            margin-bottom: 1.5rem;
+        }
+
+        .service-features li {
+            padding: 0.5rem 0;
+            color: var(--muted);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .service-features li i {
+            color: var(--accent);
+        }
+
+        .service-price {
+            font-size: 2rem;
+            font-weight: 800;
+            color: var(--primary);
+            margin-bottom: 1rem;
+        }
+
+        .service-price span {
+            font-size: 1rem;
+            color: var(--muted);
+            font-weight: 400;
+        }
+
+        /* Reviews Section */
+        .reviews-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 2rem;
+        }
+
+        .review-card {
+            background: rgba(255,255,255,0.03);
+            backdrop-filter: blur(24px);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 2rem;
+            transition: all 0.3s ease;
+        }
+
+        .review-card:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 12px 32px rgba(0,0,0,0.3);
+        }
+
+        .review-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .review-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+        }
+
+        .review-author h4 {
+            font-size: 1.1rem;
+            margin-bottom: 0.2rem;
+        }
+
+        .review-author p {
+            font-size: 0.875rem;
+            color: var(--muted);
+        }
+
+        .review-stars {
+            color: var(--accent);
+            font-size: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .review-text {
+            color: var(--muted);
+            line-height: 1.8;
+            font-style: italic;
+        }
+
+        .review-date {
+            font-size: 0.8rem;
+            color: var(--muted);
+            margin-top: 1rem;
+        }
+
+        /* Contact Section */
+        .contact-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 4rem;
+            align-items: start;
+        }
+
+        .contact-info h3 {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+        }
+
+        .contact-info p {
+            color: var(--muted);
+            margin-bottom: 2rem;
+        }
+
+        .contact-details {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .contact-item {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .contact-item-icon {
+            width: 50px;
+            height: 50px;
+            background: var(--gradient);
+            border-radius: 12px;
+            display: grid;
+            place-items: center;
+            font-size: 1.3rem;
+        }
+
+        .contact-item-text h4 {
+            font-size: 1rem;
+            margin-bottom: 0.3rem;
+            color: var(--muted);
+        }
+
+        .contact-item-text p {
+            font-size: 1.1rem;
+            color: var(--text);
+            margin: 0;
+        }
+
+        .contact-form {
+            background: rgba(255,255,255,0.03);
+            backdrop-filter: blur(24px);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 2.5rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+        }
+
+        .form-group input,
+        .form-group textarea {
+            width: 100%;
+            padding: 1rem;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            color: var(--text);
+            font-family: inherit;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(31,58,147,0.2);
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 150px;
+        }
+
+        .submit-btn {
+            width: 100%;
+            padding: 1.2rem;
+            background: var(--gradient);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px var(--primary-glow);
+        }
+
+        /* Stats Bar */
+        .stats-bar {
+            background: var(--surface-2);
+            padding: 3rem 0;
+            border-top: 1px solid var(--border);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 3rem;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 3rem;
+            font-weight: 900;
+            background: var(--gradient);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-label {
+            color: var(--muted);
+            font-size: 1rem;
+        }
+
+        /* Footer */
+        footer {
+            background: #000;
+            padding: 4rem 0 2rem;
+            border-top: 1px solid var(--border);
+        }
+
+        .footer-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr 1fr;
+            gap: 3rem;
+            margin-bottom: 3rem;
+        }
+
+        .footer-brand h3 {
+            font-size: 1.8rem;
+            background: var(--gradient);
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 1rem;
+        }
+
+        .footer-brand p {
+            color: var(--muted);
+            margin-bottom: 1.5rem;
+        }
+
+        .social-links {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .social-link {
+            width: 40px;
+            height: 40px;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            display: grid;
+            place-items: center;
+            color: var(--text);
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+
+        .social-link:hover {
+            background: var(--primary);
+            border-color: var(--primary);
+            transform: translateY(-3px);
+        }
+
+        .footer-column h4 {
+            font-size: 1.1rem;
+            margin-bottom: 1rem;
+        }
+
+        .footer-links {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 0.7rem;
+        }
+
+        .footer-links a {
+            color: var(--muted);
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .footer-links a:hover {
+            color: var(--text);
+        }
+
+        .footer-bottom {
+            padding-top: 2rem;
+            border-top: 1px solid var(--border);
+            text-align: center;
+            color: var(--muted);
+            font-size: 0.9rem;
+        }
+
+        /* Animations */
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-20px); }
+        }
+
+        @keyframes fade-up {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Mobile Responsive */
+        @media (max-width: 768px) {
+            .nav-links {
+                position: fixed;
+                top: 70px;
+                right: -100%;
+                width: 100%;
+                height: calc(100vh - 70px);
+                background: rgba(10,14,26,0.98);
+                backdrop-filter: blur(24px);
+                flex-direction: column;
+                padding: 2rem;
+                transition: right 0.3s ease;
+            }
+
+            .nav-links.active {
+                right: 0;
+            }
+
+            .hamburger {
+                display: flex;
+            }
+
+            .contact-container,
+            .footer-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .hero h1 {
+                font-size: 2.5rem;
+            }
+
+            .hero-buttons {
+                flex-direction: column;
+            }
+        }
+    </style>
+  <!-- auto-cdn-injected -->
+  <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav id="navbar">
+        <div class="nav-container">
+            <div class="logo">⚡ הפתרון המושלם</div>
+            <ul class="nav-links" id="navLinks">
+                <li><a class="nav-link active" data-page="home" onclick="Router.navigate('home');closeMenu();return false;" href="#">ראשי</a></li>
+                <li><a class="nav-link" data-page="about" onclick="Router.navigate('about');closeMenu();return false;" href="#">אודות</a></li>
+                <li><a class="nav-link" data-page="services" onclick="Router.navigate('services');closeMenu();return false;" href="#">שירותים</a></li>
+                <li><a class="nav-link" data-page="reviews" onclick="Router.navigate('reviews');closeMenu();return false;" href="#">ביקורות</a></li>
+                <li><button class="nav-cta" onclick="Router.navigate('contact');closeMenu();return false;">צור קשר</button></li>
+            </ul>
+            <div class="hamburger" onclick="toggleMenu()">
+                <span></span>
+                <span></span>
+                <span></span>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Home Page -->
+    <div id="page-home" class="page">
+        <section class="hero">
+            <div class="hero-blob blob-1"></div>
+            <div class="hero-blob blob-2"></div>
+            <div class="hero-content container">
+                <div class="hero-badge" data-aos="fade-up">
+                    <i class="fas fa-sparkles"></i>
+                    <span>הפתרון המוביל בישראל</span>
+                </div>
+                <h1 data-aos="fade-up" data-aos-delay="100">
+                    נעזור לך לקחת את העסק<br>
+                    <span class="gradient-text">לשלב הבא</span>
+                </h1>
+                <p data-aos="fade-up" data-aos-delay="200">
+                    פתרונות מתקדמים ושירות מקצועי שיעזרו לך להגדיל את ההכנסות, לחסוך זמן ולהשיג את היעדים העסקיים שלך
+                </p>
+                <div class="hero-buttons" data-aos="fade-up" data-aos-delay="300">
+                    <button class="btn-primary" onclick="Router.navigate('contact')">התחל עכשיו</button>
+                    <button class="btn-secondary" onclick="Router.navigate('services')">גלה עוד</button>
+                </div>
+                <div class="social-proof" data-aos="fade-up" data-aos-delay="400">
+                    <div class="avatar-stack">
+                        <img src="https://api.dicebear.com/9.x/avataaars/svg?seed=Sarah&backgroundColor=b6e3f4" alt="לקוח">
+                        <img src="https://api.dicebear.com/9.x/avataaars/svg?seed=David&backgroundColor=c0aede" alt="לקוח">
+                        <img src="https://api.dicebear.com/9.x/avataaars/svg?seed=Maya&backgroundColor=ffdfbf" alt="לקוח">
+                        <img src="https://api.dicebear.com/9.x/avataaars/svg?seed=Tom&backgroundColor=d1d4f9" alt="לקוח">
+                    </div>
+                    <div>
+                        <div class="stars">★★★★★</div>
+                        <div class="social-proof-text">2,500+ לקוחות מרוצים בכל הארץ</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <div class="stats-bar">
+            <div class="container">
+                <div class="stats-grid">
+                    <div class="stat-item" data-aos="fade-up">
+                        <div class="stat-number" data-count="2500">0</div>
+                        <div class="stat-label">לקוחות מרוצים</div>
+                    </div>
+                    <div class="stat-item" data-aos="fade-up" data-aos-delay="100">
+                        <div class="stat-number" data-count="98">0</div>
+                        <div class="stat-label">אחוז הצלחה</div>
+                    </div>
+                    <div class="stat-item" data-aos="fade-up" data-aos-delay="200">
+                        <div class="stat-number" data-count="15">0</div>
+                        <div class="stat-label">שנות ניסיון</div>
+                    </div>
+                    <div class="stat-item" data-aos="fade-up" data-aos-delay="300">
+                        <div class="stat-number" data-count="24">0</div>
+                        <div class="stat-label">שעות תמיכה</div>
+                    </div>
+                </div>
+            </div>
+        ```html
+</div>
+    </div>
+
+    <!-- About Page -->
+    <div id="page-about" class="page">
+        <section class="container">
+            <div class="section-header" data-aos="fade-up">
+                <span class="section-badge">אודותינו</span>
+                <h2 class="section-title">מי אנחנו ומה אנחנו עושים</h2>
+                <p class="section-desc">אנחנו צוות של מומחים מנוסים שמאמינים בכוח של פתרונות חכמים ושירות אישי</p>
+            </div>
+
+            <div class="about-grid">
+                <div class="about-card" data-aos="fade-up">
+                    <div class="about-icon">
+                        <i class="fas fa-bullseye"></i>
+                    </div>
+                    <h3>המשימה שלנו</h3>
+                    <p>אנחנו כאן כדי לעזור לעסקים קטנים ובינוניים להשיג את מלוא הפוטנציאל שלהם. אנחנו מאמינים שכל עסק ראוי לפתרונות מקצועיים ברמה הגבוהה ביותר, ללא קשר לגודל או תקציב.</p>
+                </div>
+                <div class="about-card" data-aos="fade-up" data-aos-delay="100">
+                    <div class="about-icon">
+                        <i class="fas fa-eye"></i>
+                    </div>
+                    <h3>החזון שלנו</h3>
+                    <p>להיות השותף העסקי המהימן ביותר עבור עסקים בישראל. אנחנו שואפים ליצור עתיד שבו כל בעל עסק יכול להתמקד במה שהוא עושה הכי טוב, בזמן שאנחנו דואגים לשאר.</p>
+                </div>
+                <div class="about-card" data-aos="fade-up" data-aos-delay="200">
+                    <div class="about-icon">
+                        <i class="fas fa-heart"></i>
+                    </div>
+                    <h3>הערכים שלנו</h3>
+                    <p>אמינות, שקיפות, מקצוענות ושירות ברמה הגבוהה ביותר. אנחנו מתייחסים לכל לקוח כמו שותף לטווח ארוך, ולא רק כפרויקט חד-פעמי.</p>
+                </div>
+            </div>
+
+            <div class="section-header" data-aos="fade-up" style="margin-top: 5rem;">
+                <h2 class="section-title">הצוות שלנו</h2>
+                <p class="section-desc">הכירו את האנשים שעושים את הקסם</p>
+            </div>
+
+            <div class="team-grid">
+                <div class="team-member" data-aos="fade-up">
+                    <img src="https://api.dicebear.com/9.x/avataaars/svg?seed=Yaron&backgroundColor=b6e3f4" alt="ירון כהן" class="team-avatar">
+                    <h3 class="team-name">ירון כהן</h3>
+                    <p class="team-role">מנכ״ל ומייסד</p>
+                    <p class="team-bio">15 שנות ניסיון בייעוץ עסקי ופיתוח אסטרטגיות צמיחה. בוגר תואר שני בניהול עסקים מאוניברסיטת תל אביב.</p>
+                </div>
+                <div class="team-member" data-aos="fade-up" data-aos-delay="100">
+                    <img src="https://api.dicebear.com/9.x/avataaars/svg?seed=Maya&backgroundColor=ffdfbf" alt="מאיה לוי" class="team-avatar">
+                    <h3 class="team-name">מאיה לוי</h3>
+                    <p class="team-role">סמנכ״לית פיתוח עסקי</p>
+                    <p class="team-bio">מומחית בשיווק דיגיטלי ואסטרטגיות מכירה. עזרה למעלה מ-500 עסקים להכפיל את ההכנסות שלהם.</p>
+                </div>
+                <div class="team-member" data-aos="fade-up" data-aos-delay="200">
+                    <img src="https://api.dicebear.com/9.x/avataaars/svg?seed=David&backgroundColor=c0aede" alt="דוד מזרחי" class="team-avatar">
+                    <h3 class="team-name">דוד מזרחי</h3>
+                    <p class="team-role">מנהל תפעול</p>
+                    <p class="team-bio">אחראי על הטמעת מערכות ושיפור תהליכים. התמחות באוטומציה וייעול עסקי.</p>
+                </div>
+                <div class="team-member" data-aos="fade-up" data-aos-delay="300">
+                    <img src="https://api.dicebear.com/9.x/avataaars/svg?seed=Noa&backgroundColor=d1d4f9" alt="נועה שפירא" class="team-avatar">
+                    <h3 class="team-name">נועה שפירא</h3>
+                    <p class="team-role">מנהלת שירות לקוחות</p>
+                    <p class="team-bio">דואגת שכל לקוח יקבל את השירות הטוב ביותר. מאמינה שתקשורת טובה היא המפתח להצלחה.</p>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- Services Page -->
+    <div id="page-services" class="page">
+        <section class="container">
+            <div class="section-header" data-aos="fade-up">
+                <span class="section-badge">השירותים שלנו</span>
+                <h2 class="section-title">פתרונות מקיפים לכל עסק</h2>
+                <p class="section-desc">בחר את החבילה המתאימה לך והתחל לצמוח עוד היום</p>
+            </div>
+
+            <div class="services-grid">
+                <div class="service-card" data-aos="fade-up">
+                    <div class="service-icon">
+                        <i class="fas fa-rocket"></i>
+                    </div>
+                    <h3>ייעוץ עסקי אסטרטגי</h3>
+                    <p>נעזור לך לבנות אסטרטגיה ברורה להצלחה עסקית. ניתוח מעמיק של השוק, המתחרים והזדמנויות צמיחה.</p>
+                    <ul class="service-features">
+                        <li><i class="fas fa-check"></i> ניתוח מקיף של המצב העסקי הנוכחי</li>
+                        <li><i class="fas fa-check"></i> בניית תוכנית אסטרטגית לשנה</li>
+                        <li><i class="fas fa-check"></i> זיהוי הזדמנויות צמיחה חדשות</li>
+                        <li><i class="fas fa-check"></i> ליווי צמוד במהלך כל התהליך</li>
+                    </ul>
+                    <div class="service-price">₪4,999 <span>/ חודש</span></div>
+                    <button class="btn-primary" onclick="Router.navigate('contact')" style="width: 100%;">התחל עכשיו</button>
+                </div>
+
+                <div class="service-card" data-aos="fade-up" data-aos-delay="100">
+                    <div class="service-icon">
+                        <i class="fas fa-chart-line"></i>
+                    </div>
+                    <h3>שיווק דיגיטלי ומכירות</h3>
+                    <p>קמפיינים ממומנים, קידום אורגני, ניהול רשתות חברתיות וכל מה שצריך כדי להביא לקוחות חדשים.</p>
+                    <ul class="service-features">
+                        <li><i class="fas fa-check"></i> ניהול קמפיינים בגוגל ופייסבוק</li>
+                        <li><i class="fas fa-check"></i> קידום אורגני (SEO) באתרי החיפוש</li>
+                        <li><i class="fas fa-check"></i> יצירת תוכן מקצועי ואיכותי</li>
+                        <li><i class="fas fa-check"></i> מעקב ודוחות ביצועים חודשיים</li>
+                    </ul>
+                    <div class="service-price">₪6,999 <span>/ חודש</span></div>
+                    <button class="btn-primary" onclick="Router.navigate('contact')" style="width: 100%;">התחל עכשיו</button>
+                </div>
+
+                <div class="service-card" data-aos="fade-up" data-aos-delay="200">
+                    <div class="service-icon">
+                        <i class="fas fa-cog"></i>
+                    </div>
+                    <h3>אוטומציה ושיפור תהליכים</h3>
+                    <p>חסוך זמן יקר עם מערכות אוטומטיות שמטפלות בעבודה השגרתית במקומך.</p>
+                    <ul class="service-features">
+                        <li><i class="fas fa-check"></i> אוטומציה של תהליכי מכירה</li>
+                        <li><i class="fas fa-check"></i> מערכות CRM מתקדמות</li>
+                        <li><i class="fas fa-check"></i> אינטגרציה בין מערכות</li>
+                        <li><i class="fas fa-check"></i> הדרכה והטמעה מלאה</li>
+                    </ul>
+                    <div class="service-price">₪8,999 <span>/ פרויקט</span></div>
+                    <button class="btn-primary" onclick="Router.navigate('contact')" style="width: 100%;">התחל עכשיו</button>
+                </div>
+
+                <div class="service-card" data-aos="fade-up" data-aos-delay="300">
+                    <div class="service-icon">
+                        <i class="fas fa-users"></i>
+                    </div>
+                    <h3>ליווי ופיתוח צוות</h3>
+                    <p>בניית צוות עובדים חזק ויעיל שיקח את העסק שלך קדימה.</p>
+                    <ul class="service-features">
+                        <li><i class="fas fa-check"></i> הדרכות מקצועיות לצוות</li>
+                        <li><i class="fas fa-check"></i> בניית תרבות ארגונית חיובית</li>
+                        <li><i class="fas fa-check"></i> תהליכי גיוס ובחירת עובדים</li>
+                        <li><i class="fas fa-check"></i> ליווי מנהלים ומנהלות</li>
+                    </ul>
+                    <div class="service-price">₪3,999 <span>/ חודש</span></div>
+                    <button class="btn-primary" onclick="Router.navigate('contact')" style="width: 100%;">התחל עכשיו</button>
+                </div>
+
+                <div class="service-card" data-aos="fade-up" data-aos-delay="400">
+                    <div class="service-icon">
+                        <i class="fas fa-file-invoice-dollar"></i>
+                    </div>
+                    <h3>ייעוץ פיננסי ותכנון</h3>
+                    <p>ניהול תזרים מזומנים, תכנון תקציב ואסטרטגיות להגדלת הרווחיות.</p>
+                    <ul class="service-features">
+                        <li><i class="fas fa-check"></i> ניתוח פיננסי מעמיק</li>
+                        <li><i class="fas fa-check"></i> תכנון תקציב שנתי</li>
+                        <li><i class="fas fa-check"></i> זיהוי דרכים לחיסכון</li>
+                        <li><i class="fas fa-check"></i> תחזיות והקרנות עתידיות</li>
+                    </ul>
+                    <div class="service-price">₪5,499 <span>/ חודש</span></div>
+                    <button class="btn-primary" onclick="Router.navigate('contact')" style="width: 100%;">התחל עכשיו</button>
+                </div>
+
+                <div class="service-card" data-aos="fade-up" data-aos-delay="500">
+                    <div class="service-icon">
+                        <i class="fas fa-star"></i>
+                    </div>
+                    <h3>חבילה מלאה - VIP</h3>
+                    <p>הכל ביחד - פתרון מקיף שכולל את כל השירותים שלנו עם עדיפות מקסימלית.</p>
+                    <ul class="service-features">
+                        <li><i class="fas fa-check"></i> כל השירותים שלנו במחיר אחד</li>
+                        <li><i class="fas fa-check"></i> עדיפות מירבית בשירות</li>
+                        <li><i class="fas fa-check"></i> פגישות אסטרטגיה שבועיות</li>
+                        <li><i class="fas fa-check"></i> גישה ישירה למנכ״ל 24/7</li>
+                    </ul>
+                    <div class="service-price">₪19,999 <span>/ חודש</span></div>
+                    <button class="btn-primary" onclick="Router.navigate('contact')" style="width: 100%;">התחל עכשיו</button>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- Reviews Page -->
+    <div id="page-reviews" class="page">
+        <section class="container">
+            <div class="section-header" data-aos="fade-up">
+                <span class="section-badge">ביקורות לקוחות</span>
+                <h2 class="section-title">מה הלקוחות שלנו אומרים</h2>
+                <p class="section-desc">שמענו שבחו של אחרים - קראו מה לקוחות אמיתיים מספרים על העבודה איתנו</p>
+            </div>
+
+            <div class="reviews-grid">
+                <div class="review-card" data-aos="fade-up">
+                    <div class="review-header">
+                        <img src="https://api.dicebear.com/9.x/avataaars/svg?seed=Ron&backgroundColor=b6e3f4" alt="רון שלום" class="review-avatar">
+                        <div class="review-author">
+                            <h4>רון שלום</h4>
+                            <p>מנכ״ל חברת הייטק</p>
+                        </div>
+                    </div>
+                    <div class="review-stars">★★★★★</div>
+                    <p class="review-text">"עבדתי עם הרבה חברות ייעוץ, אבל הצוות הזה באמת יוצא מן הכלל. הם לא רק נתנו לנו ייעוץ - הם היו שותפים אמיתיים בצמיחה שלנו. ההכנסות שלנו גדלו ב-240% תוך שנה!"</p>
+                    <p class="review-date">לפני 3 שבועות</p>
+                </div>
+
+                <div class="review-card" data-aos="fade-up" data-aos-delay="100">
+                    <div class="review-header">
+                        <img src="https://api.dicebear.com/9.x/avataaars/svg?seed=Shira&backgroundColor=ffdfbf" alt="שירה אברהם" class="review-avatar">
+                        <div class="review-author">
+                            <h4>שירה אברהם</h4>
+                            <p>בעלת חנות אופנה</p>
+                        </div>
+                    </div>
+                    <div class="review-stars">★★★★★</div>
+                    <p class="review-text">"הייתי מתלבטת אם להשקיע בשירותי ייעוץ, אבל זו הייתה ההחלטה הכי טובה שעשיתי. הצוות עזר לי להקים חנות אונליין, לנהל קמפיינים, והיום אני מוכרת פי 3 מכפי שמכרתי בעבר. ממליצה בחום!"</p>
+                    <p class="review-date">לפני חודש</p>
+                </div>
+
+                <div class="review-card" data-aos="fade-up" data-aos-delay="200">
+                    <div class="review-header">
+                        <img src="https://api.dicebear.com/9.x/avataaars/svg?seed=Amit&backgroundColor=c0aede" alt="עמית ברנע" class="review-avatar">
+                        <div class="review-author">
+                            <h4>עמית ברנע</h4>
+                            <p>יזם ומשקיע</p>
+                        </div>
+                    </div>
+                    <div class="review-stars">★★★★★</div>
+                    <p class="review-text">"אחרי 10 שנים בעסק, הרגשתי שאני תקוע. הצוות כאן עזר לי לראות את העסק מזווית חדשה לגמרי ולזהות הזדמנויות שפספסתי. המקצוענות והמחויבות שלהם מרשימות."</p>
+                    <p class="review-date">לפני חודשיים</p>
+                </div>
+
+                <div class="review-card" data-aos="fade-up" data-aos-delay="300">
+                    <div class="review-header">
+                        <img src="https://api.dicebear.com/9.x/avataaars/svg?seed=Tamar&backgroundColor=d1d4f9" alt="תמר גולן" class="review-avatar">
+                        <div class="review-author">
+                            <h4>תמר גולן</h4>
+                            <p>מנהלת סטודיו עיצוב</p>
+                        </div>
+                    </div>
+                    <div class="review-stars">★★★★★</div>
+                    <p class="review-text">"השירות כאן מדהים. תמיד זמינים, תמיד עם פתרונות יצירתיים. הם עזרו לי לבנות מותג חזק ולמשוך לקוחות איכותיים. הסטודיו שלי גדל פי 2 בפחות משנה!"</p>
+                    <p class="review-date">לפני 3 חודשים</p>
+                </div>
+
+                <div class="review-card" data-aos="fade-up" data-aos-delay="400">
+                    <div class="review-header">
+                        <img src="https://api.dicebear.com/9.x/avataaars/svg?seed=Yossi&backgroundColor=b6e3f4" alt="יוסי כהן" class="review-avatar">
+                        <div class="review-author">
+                            <h4>יוסי כהן</h4>
+                            <p>בעל רשת מסעדות</p>
+                        </div>
+                    </div>
+                    <div class="review-stars">★★★★★</div>
+                    <p class="review-text">"אחרי שהתחלתי לעבוד איתם, הבנתי כמה דברים עשיתי לא נכון. הם עזרו לי לייעל את התהליכים, לשפר את השירות וכתוצאה מכך - להגדיל את הרווחים משמעותית. שירות ברמה אחרת!"</p>
+                    <p class="review-date">לפני 4 חודשים</p>
+                </div>
+
+                <div class="review-card" data-aos="fade-up" data-aos-delay="500">
+                    <div class="review-header">
+                        <img src="https://api.dicebear.com/9.x/avataaars/svg?seed=Liat&backgroundColor=ffdfbf" alt="ליאת מזרחי" class="review-avatar">
+                        <div class="review-author">
+                            <h4>ליאת מזרחי</h4>
+                            <p>מנהלת משאבי אנוש</p>
+                        </div>
+                    </div>
+                    <div class="review-stars">★★★★★</div>
+                    <p class="review-text">"הצוות עזר לנו לבנות תרבות ארגונית בריאה ומתפקדת. ההדרכות שהם נתנו למנהלים שינו את כל הדינמיקה בחברה. ממליצה לכל ארגון שרוצה לצמוח!"</p>
+                    <p class="review-date">לפני 5 חודשים</p>
+                </div>
+            </div>
+
+            <div style="text-align: center; margin-top: 4rem;" data-aos="fade-up">
+                <h3 style="font-size: 2rem; margin-bottom: 1rem;">רוצה להצטרף ללקוחות המרוצים שלנו?</h3>
+                <button class="btn-primary" onclick="Router.navigate('contact')" style="padding: 1.2rem 3rem; font-size: 1.2rem;">בוא נדבר</button>
+            </div>
+        </section>
+    </div>
+
+    <!-- Contact Page -->
+    <div id="page-contact" class="page">
+        <section class="container">
+            <div class="section-header" data-aos="fade-up">
+                <span class="section-badge">צור קשר</span>
+                <h2 class="section-title">בוא נתחיל לעבוד ביחד</h2>
+                <p class="section-desc">מלא את הפרטים ונחזור אליך תוך 24 שעות</p>
+            </div>
+
+            <div class="contact-container">
+                <div class="contact-info" data-aos="fade-up">
+                    <h3>נשמח לשמוע ממך</h3>
+                    <p>יש לך שאלה? רוצה להתייעץ? מחפש פתרון לאתגר עסקי? אנחנו כאן בשבילך.</p>
+                    
+                    <div class="contact-details">
+                        <div class="contact-item">
+                            <div class="contact-item-icon">
+                                <i class="fas fa-phone"></i>
+                            </div>
+                            <div class="contact-item-text">
+                                <h4>טלפון</h4>
+                                <p>03-1234567</p>
+                            </div>
+                        </div>
+
+                        <div class="contact-item">
+                            <div class="contact-item-icon">
+                                <i class="fas fa-envelope"></i>
+                            </div>
+                            <div class="contact-item-text">
+                                <h4>אימייל</h4>
+                                <p>info@example.co.il</p>
+                            </div>
+                        </div>
+
+                        <div class="contact-item">
+                            <div class="contact-item-icon">
+                                <i class="fas fa-map-marker-alt"></i>
+                            </div>
+                            <div class="contact-item-text">
+                                <h4>כתובת</h4>
+                                <p>רחוב הרצל 123, תל אביב</p>
+                            </div>
+                        </div>
+
+                        <div class="contact-item">
+                            <div class="contact-item-icon">
+                                <i class="fas fa-clock"></i>
+                            </div>
+                            <div class="contact-item-text">
+                                <h4>שעות פעילות</h4>
+                                <p>א׳-ה׳: 9:00-18:00<br>ו׳: 9:00-14:00</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <form class="contact-form" id="contact-form" data-aos="fade-up" data-aos-delay="200">
+                    <div class="form-group">
+                        <label for="name">שם מלא *</label>
+                        <input type="text" id="name" name="name" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="email">אימייל *</label>
+                        <input type="email" id="email" name="email" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="phone">טלפון *</label>
+                        <input type="tel" id="phone" name="phone" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="service">איזה שירות מעניין אותך?</label>
+                        <select id="service" name="service" style="width: 100%; padding: 1rem; background: rgba(255,255,255,0.05); border: 1px solid var(--border); border-radius: 12px; color: var(--text); font-family: inherit; font-size: 1rem;">
+                            <option value="">בחר שירות</option>
+                            <option value="consulting">ייעוץ עסקי אסטרטגי</option>
+                            <option value="marketing">שיווק דיגיטלי ומכירות</option>
+                            <option value="automation">אוטומציה ושיפור תהליכים</option>
+                            <option value="team">ליווי ופיתוח צוות</option>
+                            <option value="financial">ייעוץ פיננסי ותכנון</option>
+                            <option value="vip">חבילה מלאה VIP</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="message">ספר לנו על העסק שלך *</label>
+                        <textarea id="message" name="message" required></textarea>
+                    </div>
+
+                    <button type="submit" class="submit-btn">שלח הודעה</button>
+                </form>
+            </div>
+        </section>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        <div class="container">
+            <div class="footer-grid">
+                <div class="footer-brand">
+                    <h3>⚡ הפתרון המושלם</h3>
+                    <p>אנחנו כאן כדי לעזור לך לקחת את העסק שלך לשלב הבא. פתרונות מקצועיים, שירות אישי, תוצאות מדידות.</p>
+                    <div class="social-links">
+                        <a href="#" class="social-link"><i class="fab fa-facebook-f"></i></a>
+                        <a href="#" class="social-link"><i class="fab fa-instagram"></i></a>
+                        <a href="#" class="social-link"><i class="fab fa-linkedin-in"></i></a>
+                        <a href="#" class="social-link"><i class="fab fa-twitter"></i></a>
+                    </div>
+                </div>
+
+                <div class="footer-column">
+                    <h4>קישורים מהירים</h4>
+                    <ul class="footer-links">
+                        <li><a href="#" onclick="Router.navigate('home');return false;">ראשי</a></li>
+                        <li><a href="#" onclick="Router.navigate('about');return false;">אודות</a></li>
+                        <li><a href="#" onclick="Router.navigate('services');return false;">שירותים</a></li>
+                        <li><a href="#" onclick="Router.navigate('reviews');return false;">ביקורות</a></li>
+                    </ul>
+                </div>
+
+                <div class="footer-column">
+                    <h4>שירותים</h4>
+                    <ul class="footer-links">
+                        <li><a href="#">ייעוץ עסקי</a></li>
+                        <li><a href="#">שיוו
+</body>
+</html>

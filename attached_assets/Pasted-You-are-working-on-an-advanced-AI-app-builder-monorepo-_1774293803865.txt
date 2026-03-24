@@ -1,0 +1,629 @@
+You are working on an advanced AI app-builder monorepo. Your task is to harden, refactor, and upgrade the entire system to a much higher production standard without breaking existing functionality.
+
+IMPORTANT RULES
+1. Do not do superficial cleanup. Perform deep, real fixes.
+2. Do not only rename things. Improve architecture, security, reliability, maintainability, and test coverage.
+3. Preserve all existing core product capabilities unless a capability is explicitly insecure or broken.
+4. Prefer safe, production-grade patterns over quick hacks.
+5. Every major change must be accompanied by code updates, validation, and tests.
+6. Do not embed secrets in prompts, client code, generated code, logs, or telemetry.
+7. At the end, provide a clear change summary grouped by category and file.
+
+PRIMARY OBJECTIVE
+Upgrade the project from a strong beta-stage architecture into a much more production-ready system by fixing:
+- secrets handling
+- integrations architecture
+- project authorization model
+- large-file / mixed-responsibility architecture
+- fragile route logic
+- missing test coverage
+- runtime safety
+- rate limiting and resilience
+- frontend state and maintainability
+- database modeling weaknesses
+
+==================================================
+PHASE 1 — FULL AUDIT BEFORE CHANGING ANYTHING
+==================================================
+
+First, scan the full repository and map the following:
+
+A. SECURITY SURFACE
+- All places where secrets, API keys, tokens, credentials, connection strings, or sensitive config are:
+  - accepted
+  - stored
+  - transmitted
+  - logged
+  - injected into prompts
+  - passed to the frontend
+  - passed to generated code
+  - exposed through APIs
+
+B. AUTHORIZATION SURFACE
+- All routes that access a project
+- All routes that mutate project state
+- All routes that allow anonymous access
+- All routes that rely on shared middleware
+- All routes with manual ownership checks
+- Any inconsistency in owner / guest / public / share logic
+
+C. AI PIPELINE
+- All files involved in prompt construction
+- Intent handling
+- Tool / integrations injection
+- Memory and project DNA usage
+- Message streaming and save flow
+- Generated code parsing / extraction / patching
+
+D. FRONTEND COMPLEXITY
+- Largest components
+- Hooks with too many responsibilities
+- State flows around chat / preview / files / integrations
+- Direct API coupling
+- Any unsafe rendering paths
+
+E. DATABASE
+- Tables or schema objects storing too much mixed data
+- Sensitive JSON blobs
+- Missing constraints
+- Missing normalization where needed
+- Any tables that should be split
+
+F. TESTS
+- Existing backend tests
+- Missing coverage in security-critical flows
+- Missing authorization tests
+- Missing integration-secret tests
+- Missing frontend behavior tests
+
+After the audit, implement the fixes below.
+
+==================================================
+PHASE 2 — SECRETS AND INTEGRATIONS REBUILD
+==================================================
+
+This is the highest priority. Fix this first.
+
+CURRENT PROBLEM TO ELIMINATE
+- Secrets must never travel through the client unnecessarily.
+- Secrets must never be inserted into system prompts.
+- Secrets must never be sent to the LLM as raw values.
+- Secrets must never be returned to the frontend after save.
+- Secrets must never be stored unencrypted in general-purpose JSON fields.
+
+TARGET ARCHITECTURE
+Replace the current integrations flow with a secure server-side vault pattern.
+
+REQUIRED CHANGES
+
+1. CREATE A SECURE INTEGRATIONS STORAGE MODEL
+- Create a dedicated server-side storage model for user/provider credentials.
+- Do not store raw provider secrets in generic user profile JSON or DNA blobs.
+- Store each integration as a separate record with fields like:
+  - id
+  - userId
+  - provider
+  - encryptedSecretPayload
+  - metadata (safe non-secret fields only)
+  - createdAt
+  - updatedAt
+  - lastValidatedAt
+  - status
+- Encrypt secret payloads before database storage using application-level encryption.
+- Ensure encryption utilities are consistently used.
+
+2. SEPARATE SAFE METADATA FROM SECRETS
+- Safe metadata may include:
+  - provider name
+  - connected / not connected
+  - partial identifier if needed
+  - validation status
+  - capabilities supported by provider
+- Never expose secret values to the client.
+
+3. CHANGE API CONTRACTS
+- Frontend endpoints for integrations must only receive and render safe metadata.
+- Saving credentials should be write-only from the client perspective.
+- Reading integrations must return only safe metadata and capability flags.
+- Remove any endpoint behavior that returns raw keys after save.
+
+4. REMOVE SECRETS FROM PROMPT GENERATION
+- Refactor system prompt generation so the model only receives capability-level information.
+- Example of allowed prompt content:
+  - “The user has Stripe connected”
+  - “The project can use OpenAI via server-side integration”
+  - “Firebase is available through secure backend configuration”
+- Example of forbidden prompt content:
+  - actual API keys
+  - tokens
+  - URIs
+  - auth secrets
+  - service account credentials
+
+5. REMOVE SECRETS FROM MESSAGE PAYLOADS
+- Chat/message requests from frontend must not include raw integration secrets.
+- Replace this with capability references or integration IDs where appropriate.
+
+6. SERVER-SIDE TOOL EXECUTION ONLY
+- If the model needs to use a connected service, route it through secure backend tools/adapters.
+- Never generate code that requires embedding server secrets in frontend runtime.
+- Prefer server proxy patterns where applicable.
+
+7. LOGGING REDACTION
+- Add or improve redaction so logs, errors, and telemetry never expose:
+  - API keys
+  - bearer tokens
+  - DB URLs
+  - webhook secrets
+  - auth headers
+  - provider secrets
+- Redact before writing logs, telemetry, traces, or prompt history.
+
+8. TESTS FOR THIS PHASE
+Add tests for:
+- saving integrations encrypts values
+- reading integrations never returns raw secrets
+- prompts never contain secret strings
+- message APIs reject raw secret transport patterns
+- logs redact known secret patterns
+
+==================================================
+PHASE 3 — AUTHORIZATION AND PROJECT ACCESS MODEL
+==================================================
+
+This is also critical.
+
+CURRENT PROBLEM TO ELIMINATE
+- Anonymous / ownerless projects must not become effectively unprotected.
+- Authorization logic must be unified and enforceable everywhere.
+
+TARGET AUTH MODEL
+Introduce explicit access modes:
+- private owner project
+- guest session project
+- public read-only share
+- team/shared project if applicable
+
+REQUIRED CHANGES
+
+1. UNIFY PROJECT ACCESS MIDDLEWARE
+Implement clear middleware or service layers such as:
+- requireAuth
+- loadProject
+- requireProjectReadAccess
+- requireProjectWriteAccess
+- requireProjectOwner
+- requireProjectAdminAccess if needed
+
+Do not rely on scattered ad hoc checks across many routes.
+
+2. FIX OWNERLESS / ANONYMOUS PROJECT LOGIC
+If guest projects are allowed:
+- bind them to a signed guest session token or durable guest identity
+- explicitly track access scope
+- do not allow arbitrary access based only on project id
+- define expiration / upgrade flow
+- define transfer flow if guest becomes registered user
+
+If guest projects are not needed:
+- remove ownerless project write flows entirely
+
+3. DEFINE SHARE / PUBLIC ACCESS EXPLICITLY
+Public access must be intentional and scoped.
+- read-only public share should never imply write access
+- write endpoints must reject public/share tokens unless explicitly allowed
+- share permissions should be modeled, not guessed
+
+4. ROUTE-BY-ROUTE HARDENING
+For every route under project scope:
+- verify required access level
+- verify read vs write distinction
+- verify share/public behavior
+- verify anonymous access is either safely allowed or denied
+
+5. TESTS FOR THIS PHASE
+Add an authorization matrix test suite covering:
+- owner can read/write/delete
+- non-owner cannot mutate
+- guest can access only own guest project if applicable
+- public share can read only if intended
+- ownerless project ids alone do not grant access
+- route coverage for all project mutation endpoints
+
+==================================================
+PHASE 4 — AI ORCHESTRATION REFACTOR
+==================================================
+
+The AI pipeline is powerful but too concentrated in large mixed files. Refactor it into smaller composable units.
+
+TARGET
+Make the AI pipeline modular, testable, and predictable.
+
+REQUIRED CHANGES
+
+1. SPLIT LARGE FILES
+Refactor large AI-related files into smaller modules with clear single responsibility.
+
+Recommended module boundaries:
+- prompt assembly
+- capability injection
+- safety policy / guardrails
+- memory / project DNA assembly
+- intent detection
+- generation strategy selection
+- streaming response handling
+- output extraction/parsing
+- persistence of assistant actions
+- telemetry and metrics
+- retry/fallback logic
+
+2. KEEP ROUTES THIN
+Routes should only do:
+- input validation
+- access check
+- call application service
+- map service result to HTTP response
+
+Move orchestration/business logic into application services.
+
+3. STANDARDIZE AI CONTEXT BUILDING
+Create a deterministic context builder that explicitly assembles:
+- project metadata
+- selected mode
+- safe integrations capabilities
+- relevant files
+- memory/project DNA
+- UI state if appropriate
+- user instruction
+
+Make each input explicit and testable.
+
+4. STANDARDIZE MODEL OUTPUT HANDLING
+Create a robust layer for:
+- extracting code blocks
+- parsing structured responses
+- detecting html/react/multi-file output
+- patch generation
+- invalid output recovery
+- user-facing fallback behavior
+
+5. REMOVE MAGIC / HIDDEN SIDE EFFECTS
+Avoid implicit behavior where one module silently mutates state used by another.
+Make state transitions explicit.
+
+6. TESTS FOR THIS PHASE
+Add tests for:
+- prompt builder output structure
+- prompt exclusion of secrets
+- intent routing
+- code extraction
+- invalid model output handling
+- stream completion behavior
+- persistence after successful generation
+- no persistence on rejected/failed generation where appropriate
+
+==================================================
+PHASE 5 — BACKEND ARCHITECTURE HARDENING
+==================================================
+
+TARGET
+Routes become thinner, services become clearer, failure behavior becomes safer.
+
+REQUIRED CHANGES
+
+1. MOVE BUSINESS LOGIC OUT OF ROUTES
+Create application/service layers for:
+- project messaging/generation
+- integrations
+- deploy
+- github sync
+- project file operations
+- project sharing/access
+- planner/review/QA flows
+- usage and limits
+- storage operations
+
+2. VALIDATION EVERYWHERE
+Standardize runtime validation using existing schema tools.
+All external input must be validated at the boundary.
+
+3. IMPROVE ERROR HANDLING
+- Convert fragile best-effort flows into explicit success/failure handling
+- Use typed/structured app errors where possible
+- Avoid silent passes for critical failures
+- Improve error mapping to client-safe messages
+
+4. MAKE SIDE EFFECTS EXPLICIT
+For operations like deploy, sync, publish, save snapshot, analytics, usage accounting:
+- define clear transactional boundaries
+- ensure partial failures do not leave inconsistent state
+- add compensating logic where needed
+
+5. RATE LIMITING UPGRADE
+Replace in-memory-only production rate limiting with a shared backend store such as Redis/Upstash.
+Support:
+- per-user limits
+- per-IP fallback
+- endpoint-specific controls
+- burst + sustained rules
+- safe behavior across multiple instances
+
+6. AUDIT LOGGING
+Introduce structured audit logging for sensitive actions:
+- integration saved/updated/deleted
+- share/public access changes
+- deploy operations
+- destructive project actions
+- auth-sensitive events
+
+Ensure logs remain redacted.
+
+==================================================
+PHASE 6 — DATABASE IMPROVEMENTS
+==================================================
+
+TARGET
+Reduce god-objects, isolate secrets, tighten data model.
+
+REQUIRED CHANGES
+
+1. REMOVE SENSITIVE CREDENTIALS FROM GENERAL USER DNA / JSON BLOBS
+- user_dna or equivalent should not hold raw integration credentials
+- move them to dedicated encrypted credential storage
+
+2. SPLIT OVERLOADED DATA OBJECTS WHERE NEEDED
+If a table contains unrelated concerns, separate them.
+Keep long-term profile/preferences separate from operational credentials and execution state.
+
+3. ADD CONSTRAINTS AND INDEXES
+Review and add:
+- unique constraints where logically required
+- foreign keys
+- not-null where appropriate
+- indexes for hot query paths
+- share/access lookup indexes if needed
+
+4. LIFECYCLE FIELDS
+Ensure important operational entities have:
+- createdAt
+- updatedAt
+- status
+- lastUsedAt / lastValidatedAt where useful
+
+5. MIGRATIONS
+Implement proper database migrations for all schema changes.
+No manual schema drift.
+
+==================================================
+PHASE 7 — FRONTEND REFACTOR AND STABILITY
+==================================================
+
+TARGET
+Reduce component bloat, improve maintainability, remove insecure coupling.
+
+REQUIRED CHANGES
+
+1. BREAK DOWN LARGE COMPONENTS
+Refactor oversized frontend components into:
+- container components
+- pure presentational components
+- feature hooks
+- action hooks
+- helpers/utils
+
+Apply especially to:
+- preview area
+- chat area
+- project files panel
+- integrations UI
+- any giant i18n or state-heavy files
+
+2. REMOVE SECRET AWARENESS FROM CLIENT
+Frontend should know:
+- provider connected status
+- available capabilities
+- validation errors
+- reconnect actions
+It should not know raw secret values after save.
+
+3. TIGHTEN STATE FLOWS
+Review state around:
+- streaming chat
+- preview refresh
+- generated file updates
+- active file selection
+- deploy status
+- integration status
+- planner/review suggestions
+
+Avoid duplicated state and race-prone ad hoc syncing.
+
+4. SAFE RENDERING
+Review all use of:
+- dangerouslySetInnerHTML
+- markdown/html rendering
+- code highlighting helpers
+Ensure sanitization/escaping is explicit and verified.
+
+5. I18N CLEANUP
+If translations or locale configuration are too centralized in giant files, split them into maintainable modules.
+
+6. FRONTEND TESTS
+Add tests for:
+- integrations UI never exposes stored secrets
+- project access failure behavior
+- chat stream rendering
+- preview update flows
+- file panel state transitions
+- key UI feature regressions
+
+==================================================
+PHASE 8 — RUNTIME SAFETY, TERMINAL, PROXY, AND SANDBOX
+==================================================
+
+TARGET
+Reduce operational risk from powerful runtime features.
+
+REQUIRED CHANGES
+
+1. TERMINAL SAFETY HARDENING
+If terminal access exists:
+- restrict to explicitly enabled environments only
+- prefer isolated per-project container/runtime where possible
+- do not rely only on command blacklists
+- add allowlist-oriented controls where possible
+- disable in shared production environments unless fully isolated
+
+2. PROXY SAFETY
+Review proxy/network fetch features for:
+- SSRF
+- internal IP access
+- metadata service access
+- redirect bypass
+- protocol restrictions
+- header forwarding risks
+
+3. SANDBOX / PREVIEW BOUNDARIES
+Review preview iframe and sandbox flags.
+Minimize permissions to what is actually required.
+
+4. FILE HANDLING HARDENING
+Review uploads / parsing / processing for:
+- file type validation
+- size limits
+- archive extraction safety if any
+- path traversal
+- content sniffing risks
+
+==================================================
+PHASE 9 — TEST SUITE EXPANSION
+==================================================
+
+TARGET
+Tests should cover the real risk areas of the system, not just happy paths.
+
+ADD TESTS FOR:
+
+A. SECURITY
+- secret encryption
+- secret redaction
+- prompt secret exclusion
+- unauthorized access denial
+- share/public scope rules
+- proxy SSRF protections
+- terminal access restrictions
+
+B. AI PIPELINE
+- prompt builder correctness
+- capability injection
+- structured output parsing
+- failed generation handling
+- streaming lifecycle
+- patch application behavior
+
+C. ROUTES / AUTHORIZATION
+- every project mutation route
+- owner / non-owner / guest / public access matrix
+- invalid tokens/session cases
+
+D. INTEGRATIONS
+- save
+- validate
+- read metadata only
+- delete/revoke
+- never echo secret values back
+
+E. FRONTEND
+- key feature flows
+- integration UI safety
+- preview/chat sync
+- file editing interactions
+
+==================================================
+PHASE 10 — CLEANUP, DX, AND FINAL HARDENING
+==================================================
+
+TARGET
+Make the codebase easier to maintain and safer to evolve.
+
+REQUIRED CHANGES
+
+1. CONSISTENT NAMING AND FOLDER STRUCTURE
+After architectural refactors, normalize naming and grouping.
+
+2. REMOVE DEAD CODE
+Delete obsolete integration flow code, deprecated secret handling, old helper paths, and unused branches.
+
+3. ADD INTERNAL DOCUMENTATION
+Create concise technical docs for:
+- project access model
+- integrations architecture
+- prompt assembly rules
+- secret handling guarantees
+- runtime safety model
+
+4. ADD INVARIANTS / GUARANTEES
+Document and enforce key rules such as:
+- no raw secrets in client responses
+- no raw secrets in prompts
+- no project write access without explicit authorization
+- public share is read-only unless explicitly designed otherwise
+
+==================================================
+DELIVERABLE FORMAT
+==================================================
+
+While implementing, work in this order:
+1. secrets/integrations
+2. auth/project access
+3. AI pipeline modularization
+4. backend route/service refactor
+5. DB migrations/model cleanup
+6. frontend refactor
+7. runtime safety
+8. tests
+9. docs and final cleanup
+
+At the end, provide:
+
+A. A detailed summary of every major change
+Group by:
+- Security
+- Authorization
+- AI pipeline
+- Backend
+- Database
+- Frontend
+- Runtime safety
+- Tests
+
+B. A file-by-file summary
+For each changed file, explain in 1–3 lines what was changed and why.
+
+C. A risk report
+State:
+- what security risks were eliminated
+- what risks remain
+- any follow-up recommendations
+
+D. A validation checklist
+Include:
+- secrets never returned to client
+- secrets never inserted into prompts
+- unauthorized project access blocked
+- guest/public access behaves correctly
+- tests added and passing
+- existing core features preserved
+
+FINAL QUALITY BAR
+Do not stop at partial cleanup.
+Keep improving until the codebase reflects:
+- safer secrets architecture
+- explicit authorization model
+- thinner routes
+- modular AI orchestration
+- better database separation
+- more maintainable frontend
+- stronger runtime safety
+- materially better test coverage
+- no regression in core product behavior

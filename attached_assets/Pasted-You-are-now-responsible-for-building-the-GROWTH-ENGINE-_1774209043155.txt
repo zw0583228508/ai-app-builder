@@ -1,0 +1,207 @@
+You are now responsible for building the GROWTH ENGINE of the product.
+
+Do NOT focus on backend refactors.
+Do NOT add random features.
+Do NOT increase complexity.
+
+Your mission is:
+Make the product grow through usage, sharing, and return behavior.
+
+============================================================
+PRIMARY GOAL
+============================================================
+
+Turn the product into a system that:
+
+- encourages sharing
+- creates return behavior
+- increases session depth
+- builds user attachment
+- generates organic growth
+
+The user should feel:
+
+“I want to show this.”
+“I want to come back.”
+“I want to keep building.”
+
+============================================================
+NON-NEGOTIABLE RULES
+============================================================
+
+1. Do NOT add heavy UI.
+2. Do NOT break chat-first flow.
+3. Do NOT create clutter.
+4. Do NOT add spammy growth tactics.
+5. Growth must feel natural and product-driven.
+6. Preserve simplicity and premium feel.
+
+============================================================
+PHASE 1 — MAKE SHARING NATURAL AND ATTRACTIVE
+============================================================
+
+Users must be able to easily share what they built.
+
+Add or improve:
+
+- clean public share links
+- visually impressive preview pages
+- clear “Share” action at the right moments
+- good default share titles/descriptions
+- simple copy/share actions
+
+Timing:
+- after something impressive is built
+- after a milestone
+- after publish
+
+The user should feel:
+“This is worth sharing.”
+
+============================================================
+PHASE 2 — CREATE SHOWCASE MOMENTS
+============================================================
+
+Highlight the user’s output.
+
+Add:
+- “Your project is ready” moments
+- polished preview states
+- visual emphasis on success
+
+The result should look:
+- impressive
+- clean
+- professional
+- shareable
+
+============================================================
+PHASE 3 — ADD RETURN TRIGGERS
+============================================================
+
+Give users reasons to come back.
+
+Examples:
+- unfinished progress
+- suggested improvements
+- next steps waiting
+- “continue building” flow
+
+After session ends:
+User should feel:
+“I want to continue later.”
+
+============================================================
+PHASE 4 — BUILD A PROGRESS LOOP
+============================================================
+
+Every session should feel like progress.
+
+Ensure:
+- each action leads to another
+- no dead ends
+- always a next step
+
+The system should guide:
+- build → refine → improve → publish → enhance
+
+============================================================
+PHASE 5 — ADD LIGHT IDENTITY / OWNERSHIP FEEL
+============================================================
+
+Users should feel:
+
+“This is MY project.”
+
+Add or improve:
+- project naming
+- small personalization touches
+- project ownership clarity
+
+Do NOT overbuild profiles or social systems.
+Keep it simple and emotional.
+
+============================================================
+PHASE 6 — CREATE VIRAL LOOP ENTRY POINTS
+============================================================
+
+When someone sees a shared project:
+
+Make it easy to:
+- try building themselves
+- start from that idea
+- remix conceptually
+
+Do NOT copy full projects automatically.
+Encourage inspiration-based entry.
+
+============================================================
+PHASE 7 — REDUCE FRICTION TO CONTINUE
+============================================================
+
+Make it extremely easy to:
+
+- continue where the user left off
+- resume work instantly
+- re-enter the chat flow
+
+No confusion.
+No extra steps.
+
+============================================================
+PHASE 8 — IMPROVE FIRST-TIME USER FLOW
+============================================================
+
+First-time users must quickly:
+
+- understand what the product does
+- get a good first result
+- feel success fast
+
+Reduce:
+- confusion
+- empty states
+- hesitation
+
+============================================================
+PHASE 9 — ADD LIGHT SOCIAL PROOF (OPTIONAL, SIMPLE)
+============================================================
+
+If safe and clean:
+
+Add:
+- subtle usage indicators
+- example projects
+- inspiration prompts
+
+Do NOT create noisy feeds or dashboards.
+
+============================================================
+PHASE 10 — TRACK GROWTH SIGNALS
+============================================================
+
+Track:
+- share rate
+- return rate
+- session length
+- steps per session
+- drop-off points
+
+Use this to iterate.
+
+============================================================
+SUCCESS CRITERIA
+============================================================
+
+This system is successful if:
+
+- users share what they build
+- users return to continue
+- session depth increases
+- users feel ownership
+- new users arrive through shared content
+- the product grows organically
+
+The product should feel like:
+
+“I build → I improve → I share → I come back → I build more”

@@ -1,0 +1,308 @@
+# הוראות לשיפור AI App Builder — v22
+
+שלושה פריטים שנשארו פתוחים מהרשימה הקודמת.
+אחרי כל שינוי: `pnpm tsc --noEmit && pnpm --filter @workspace/api-server run test`
+
+---
+
+## תיקון 1 — חבר את sanitizeImageUrls לpipeline האמיתי
+
+### 1א — הוסף import בai-generation.ts
+
+**קובץ:** `artifacts/api-server/src/routes/projects/messages/ai-generation.ts`
+
+בשורה 18 יש כבר:
+```ts
+import { autoCdnInject } from "../../../services/ai/preview";
+```
+
+**שנה אותה ל:**
+```ts
+import { autoCdnInject, sanitizeImageUrls } from "../../../services/ai/preview";
+```
+
+### 1ב — קרא לפונקציה אחרי חילוץ ה-HTML
+
+**באותו קובץ**, שורה 604–610 נראית כך:
+```ts
+  // ── Extract HTML preview + React manifest ────────────────────────────────
+  const extractedHtml = extractHtml(fullResponse, {
+    isReactStack,
+    previewHtml: project.previewHtml,
+    intent: detectedIntent.intent,
+  });
+```
+
+**שנה ל:**
+```ts
+  // ── Extract HTML preview + React manifest ────────────────────────────────
+  let extractedHtml = extractHtml(fullResponse, {
+    isReactStack,
+    previewHtml: project.previewHtml,
+    intent: detectedIntent.intent,
+  });
+
+  // Sanitize image URLs before saving — blocks javascript:, data:, http: sources
+  if (extractedHtml) {
+    extractedHtml = sanitizeImageUrls(extractedHtml);
+  }
+```
+
+שים לב: השינוי הוא גם מ-`const` ל-`let` כדי שאפשר יהיה להציב מחדש.
+
+---
+
+## תיקון 2 — הוסף unit test לsanitizeImageUrls
+
+**קובץ חדש:** `artifacts/api-server/src/__tests__/preview-sanitize.test.ts`
+
+```ts
+import { describe, it, expect } from "vitest";
+import { sanitizeImageUrls } from "../services/ai/preview";
+
+describe("sanitizeImageUrls", () => {
+  it("passes through https images unchanged", () => {
+    const html = `<img src="https://example.com/img.png" alt="test">`;
+    expect(sanitizeImageUrls(html)).toBe(html);
+  });
+
+  it("passes through absolute paths unchanged", () => {
+    const html = `<img src="/images/logo.png">`;
+    expect(sanitizeImageUrls(html)).toBe(html);
+  });
+
+  it("passes through relative paths unchanged", () => {
+    const html = `<img src="./assets/photo.jpg">`;
+    expect(sanitizeImageUrls(html)).toBe(html);
+  });
+
+  it("blocks javascript: protocol — XSS vector", () => {
+    const html = `<img src="javascript:alert(document.cookie)">`;
+    expect(sanitizeImageUrls(html)).toContain(`src=""`);
+    expect(sanitizeImageUrls(html)).not.toContain("javascript:");
+  });
+
+  it("blocks data: URI — content injection vector", () => {
+    const html = `<img src="data:image/png;base64,abc123">`;
+    expect(sanitizeImageUrls(html)).toContain(`src=""`);
+    expect(sanitizeImageUrls(html)).not.toContain("data:");
+  });
+
+  it("blocks http: (non-secure) images", () => {
+    const html = `<img src="http://malicious.com/track.gif">`;
+    expect(sanitizeImageUrls(html)).toContain(`src=""`);
+  });
+
+  it("handles multiple images — blocks bad, keeps good", () => {
+    const html = `
+      <img src="https://good.com/a.png">
+      <img src="javascript:evil()">
+      <img src="/relative/path.jpg">
+    `;
+    const result = sanitizeImageUrls(html);
+    expect(result).toContain(`src="https://good.com/a.png"`);
+    expect(result).toContain(`src="/relative/path.jpg"`);
+    expect(result).not.toContain("javascript:");
+  });
+
+  it("returns unchanged string when no img tags present", () => {
+    const html = `<div><p>no images here</p></div>`;
+    expect(sanitizeImageUrls(html)).toBe(html);
+  });
+});
+```
+
+---
+
+## תיקון 3 — הוסף תיעוד ו-script לrotation של secrets
+
+### 3א — מסמך תיעוד
+
+**קובץ חדש:** `docs/security/secret-rotation.md`
+
+```markdown
+# Secret Rotation Guide
+
+## ENCRYPTION_KEY
+
+ה-ENCRYPTION_KEY מצפין את כל ה-GitHub tokens, Netlify tokens, ו-Vercel tokens של המשתמשים.
+
+### מתי לעשות rotation:
+- כל 90 ימים (best practice)
+- מיד אם יש חשד לחשיפה
+- לאחר עזיבת עובד עם גישה ל-env vars
+
+### שלבי rotation:
+
+**שלב 1** — צור מפתח חדש:
+```bash
+node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
+```
+
+**שלב 2** — הרץ את script ההגירה לפני שינוי ה-env:
+```bash
+OLD_KEY=<current_hex_key> NEW_KEY=<new_hex_key> \
+  pnpm --filter @workspace/scripts run rotate-encryption-key
+```
+
+**שלב 3** — וודא שהscript סיים בהצלחה (0 failures).
+
+**שלב 4** — עדכן את ENCRYPTION_KEY בסביבת הפרודקשן.
+
+**שלב 5** — בדוק שאינטגרציה אחת לפחות (GitHub/Netlify) עדיין עובדת.
+
+### חירום — מפתח נחשף:
+1. בטל מיידית את כל ה-GitHub PATs, Netlify tokens, Vercel tokens בפלטפורמות אלו.
+2. עדכן ENCRYPTION_KEY למפתח חדש (ללא rotation — הנתונים כבר לא שמישים).
+3. בקש מכל המשתמשים לחבר מחדש את האינטגרציות שלהם.
+
+---
+
+## SESSION_SECRET
+
+ה-SESSION_SECRET חותם על session cookies.
+**Rotation מנתק את כל המשתמשים הפעילים** — כולם יצטרכו להתחבר מחדש.
+
+```bash
+node -e "console.log(require('crypto').randomBytes(64).toString('hex'))"
+```
+
+שנה ב-env ו-restart השרת. אין צורך ב-migration script.
+
+---
+
+## ANTHROPIC_API_KEY
+
+אין rotation script — עדכן ישירות ב-Anthropic Console ואז בenv.
+שינוי מיידי ללא downtime (הkey מופעל ב-runtime לכל בקשה).
+```
+
+### 3ב — script הגירה
+
+**קובץ חדש:** `scripts/src/rotate-encryption-key.ts`
+
+```ts
+/**
+ * Secret rotation script — re-encrypts all stored tokens with a new key.
+ *
+ * Usage:
+ *   OLD_KEY=<hex32> NEW_KEY=<hex32> pnpm --filter @workspace/scripts run rotate-encryption-key
+ *
+ * The script is idempotent — safe to re-run if interrupted.
+ * Run BEFORE updating ENCRYPTION_KEY in the environment.
+ */
+
+import { createCipheriv, createDecipheriv, randomBytes } from "node:crypto";
+
+const OLD_KEY = process.env["OLD_KEY"];
+const NEW_KEY = process.env["NEW_KEY"];
+
+if (!OLD_KEY || !NEW_KEY) {
+  console.error("❌  Usage: OLD_KEY=<hex32> NEW_KEY=<hex32> pnpm run rotate-encryption-key");
+  process.exit(1);
+}
+if (Buffer.from(OLD_KEY, "hex").length !== 32 || Buffer.from(NEW_KEY, "hex").length !== 32) {
+  console.error("❌  Both OLD_KEY and NEW_KEY must be 32-byte hex strings (64 hex chars).");
+  process.exit(1);
+}
+if (OLD_KEY === NEW_KEY) {
+  console.error("❌  OLD_KEY and NEW_KEY must be different.");
+  process.exit(1);
+}
+
+function decrypt(encryptedHex: string, keyHex: string): string {
+  const buf = Buffer.from(encryptedHex, "hex");
+  const iv = buf.subarray(0, 16);
+  const tag = buf.subarray(16, 32);
+  const ciphertext = buf.subarray(32);
+  const decipher = createDecipheriv("aes-256-gcm", Buffer.from(keyHex, "hex"), iv);
+  decipher.setAuthTag(tag);
+  return decipher.update(ciphertext, undefined, "utf8") + decipher.final("utf8");
+}
+
+function encrypt(plaintext: string, keyHex: string): string {
+  const iv = randomBytes(16);
+  const cipher = createCipheriv("aes-256-gcm", Buffer.from(keyHex, "hex"), iv);
+  const encrypted = Buffer.concat([cipher.update(plaintext, "utf8"), cipher.final()]);
+  const tag = cipher.getAuthTag();
+  return Buffer.concat([iv, tag, encrypted]).toString("hex");
+}
+
+async function main() {
+  // Dynamic import so the script can be run before full monorepo build
+  const { db } = await import("@workspace/db");
+  const { projectSecretsTable } = await import("@workspace/db");
+  const { eq } = await import("drizzle-orm");
+
+  const allSecrets = await db.select().from(projectSecretsTable);
+  console.log(`🔑  Found ${allSecrets.length} encrypted secrets to rotate.`);
+
+  let success = 0;
+  let failed = 0;
+  const failedIds: number[] = [];
+
+  for (const secret of allSecrets) {
+    try {
+      // Decrypt with old key
+      const plaintext = decrypt(secret.encryptedValue, OLD_KEY!);
+      // Re-encrypt with new key
+      const newEncrypted = encrypt(plaintext, NEW_KEY!);
+      // Write back
+      await db
+        .update(projectSecretsTable)
+        .set({ encryptedValue: newEncrypted })
+        .where(eq(projectSecretsTable.id, secret.id));
+      success++;
+    } catch (err) {
+      console.error(`  ⚠️  Failed to rotate secret id=${secret.id}:`, (err as Error).message);
+      failedIds.push(secret.id);
+      failed++;
+    }
+  }
+
+  console.log(`\n✅  Rotated: ${success}`);
+  if (failed > 0) {
+    console.error(`❌  Failed:  ${failed} (IDs: ${failedIds.join(", ")})`);
+    console.error("   These secrets could not be decrypted with OLD_KEY.");
+    console.error("   They may already be encrypted with the new key (re-run is safe).");
+    process.exit(1);
+  } else {
+    console.log("✅  All secrets rotated successfully. You may now update ENCRYPTION_KEY.");
+  }
+}
+
+main().catch((err) => {
+  console.error("Fatal error:", err);
+  process.exit(1);
+});
+```
+
+### 3ג — הוסף script לpackage.json של scripts
+
+**קובץ:** `scripts/package.json`
+
+הוסף לתוך `"scripts"`:
+```json
+"rotate-encryption-key": "tsx src/rotate-encryption-key.ts"
+```
+
+---
+
+## סדר ביצוע
+
+```
+תיקון 1א  →  שנה import בai-generation.ts (שורה 18)
+תיקון 1ב  →  הוסף let + sanitizeImageUrls (שורה ~604)
+תיקון 2   →  צור artifacts/api-server/src/__tests__/preview-sanitize.test.ts
+תיקון 3א  →  צור docs/security/secret-rotation.md
+תיקון 3ב  →  צור scripts/src/rotate-encryption-key.ts
+תיקון 3ג  →  הוסף "rotate-encryption-key" לscripts/package.json
+```
+
+**בדיקה סופית:**
+```bash
+pnpm tsc --noEmit
+pnpm --filter @workspace/api-server run test
+```
+
+כל הבדיקות צריכות לעבור — כולל preview-sanitize.test.ts החדש.

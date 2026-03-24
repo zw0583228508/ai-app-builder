@@ -1,0 +1,147 @@
+הבעיה המרכזית שלי היא לא שהפרויקט לא עולה, אלא שהפונקציות והיכולות לא מתנהגות כמו שאני מצפה מהן.
+
+אני לא רוצה ממך כרגע טיפול ברמת "איך לגרום לאפליקציה לעלות".
+אני רוצה ממך טיפול ברמת "למה הפיצ'רים עצמם לא עובדים נכון, לא משלימים את הזרימה, או מחזירים תוצאה לא נכונה".
+
+המטרה:
+לבדוק את ההתנהגות בפועל של הפונקציות המרכזיות בפרויקט, למצוא למה הן לא עושות את מה שהן אמורות לעשות, ולתקן אותן בפועל.
+
+מה לעשות עכשיו:
+
+1. זהה את כל הפונקציות / היכולות המרכזיות של המוצר
+אני רוצה מיפוי של כל הפיצ'רים העיקריים, למשל:
+- יצירת פרויקט
+- עדכון פרויקט
+- שליחת הודעה ל-AI
+- יצירת preview
+- snapshots
+- sharing
+- deploy
+- secrets
+- database per project
+- auth
+- websocket / collab
+- analytics
+- prompt enhancement
+- AI review
+- autonomous agent
+- file management
+- כל פיצ'ר אחר שקיים בפועל
+
+2. עבור פיצ'ר-פיצ'ר ובדוק:
+- מה ההתנהגות שהקוד מתכוון לבצע
+- מה בפועל קורה
+- איפה יש פער בין הכוונה למימוש
+- איפה יש לוגיקה שבורה
+- איפה יש זרימה חלקית
+- איפה יש edge cases לא מטופלים
+- איפה יש return values לא נכונים
+- איפה יש state שלא נשמר נכון
+- איפה יש parsing שגוי
+- איפה יש תלות בין פונקציות ששוברת את ההתנהגות
+- איפה פונקציה אחת מחזירה תוצאה שלא מתאימה למה שהפונקציה הבאה מצפה לקבל
+
+3. אל תתמקד רק ב-crash
+אני רוצה שתבדוק גם בעיות כמו:
+- הפונקציה מחזירה משהו אבל לא את מה שצריך
+- preview נוצר אבל לא נכון
+- message flow עובד אבל נשמר לא נכון
+- auth עובר אבל המשתמש לא נטען כמו שצריך
+- deploy מחזיר הצלחה אבל בפועל לא שימושי
+- share token נוצר אבל ה-flow לא שלם
+- AI response נשמר אבל ה-preview או files לא מתעדכנים נכון
+- React / HTML flows לא מטופלים עקבי
+- sandbox / app / preview מתבלבלים ביניהם
+- יש branch logic לא נכון לפי stack
+- יש parsing שביר של output מ-Claude
+- extraction של HTML / files לא יציב
+- stream עובד אבל הסוף לא מעדכן את המצב נכון
+- DB writes קורים חלקית
+- data model אחד לא תואם לאחר
+
+4. בדוק במיוחד את המקומות הרגישים הבאים
+בדוק לעומק:
+- routes/projects/index.ts
+- message flow
+- SSE streaming
+- HTML extraction
+- React files extraction
+- save to projectFiles
+- previewHtml updates
+- snapshots restore/save
+- grow-with-me logic
+- authMiddleware
+- auth routes
+- preview routes
+- share routes
+- Netlify deploy flow
+- database provisioning flow
+- secrets flow
+- analytics event flow
+- AI review flow
+- agent-run flow
+- file CRUD
+- כל מקום שיש בו branch logic לפי project.stack / userMode / current state
+
+5. בדיקה לפי Expected vs Actual
+על כל פיצ'ר תכתוב:
+- Expected behavior
+- Actual behavior from current code
+- Root cause
+- Exact fix
+
+6. אחרי שזיהית את הבעיות — תעבור מיד לתיקון
+אני לא רוצה רק אבחון.
+אני רוצה:
+- תיקון בפועל
+- קבצים מתוקנים
+- לוגיקה מתוקנת
+- functions מפוצלות אם צריך
+- guards / validation / fallback behavior אם צריך
+- תיקון parsing
+- תיקון state updates
+- תיקון DB update flow
+- תיקון branching logic
+- תיקון return contracts בין חלקים
+
+7. צורת העבודה שלך
+- קודם תן רשימת behavioral bugs אמיתיים
+- אחר כך תתקן אותם
+- תעדף לפי חומרה:
+  1. פיצ'רים שלא מממשים את הייעוד שלהם
+  2. פיצ'רים שמחזירים תוצאה לא נכונה
+  3. פיצ'רים שעובדים חלקית
+  4. פיצ'רים שה-flow שלהם לא עקבי
+- אל תבזבז זמן על styling או ניקוי קוסמטי לפני שהפונקציות עצמן נכונות
+
+8. תוצרים שאני רוצה
+אני רוצה ממך בסוף:
+A. רשימת הפונקציות/פיצ'רים שנבדקו
+B. רשימת behavioral bugs שנמצאו
+C. root cause לכל bug
+D. הקבצים שצריך לשנות
+E. הקוד המתוקן בפועל
+F. מה תוקן בכל פיצ'ר
+G. אילו flows עדיין דורשים טיפול עתידי
+
+9. חשוב מאוד
+- אם פונקציה אחת גדולה מדי, תפצל אותה
+- אם route אחד עושה יותר מדי, תפרק אותו
+- אם יש parsing לא יציב של תשובות AI, תתקן אותו בצורה קשיחה יותר
+- אם יש מצב שבו HTML flow ו-React flow מתנגשים, תפריד אותם ברור
+- אם preview, files, messages, snapshots לא נשמרים באותו קו לוגי — תסדר את זה
+- אם יש side effects שלא מתבצעים תמיד — תתקן
+- אם יש race conditions אפשריים — תציין ותתקן אם אפשר
+- אם יש חוסר התאמה בין DB schema לבין הלוגיקה — תציין ותתקן
+
+10. פורמט חובה
+אל תסתפק בדיבורים.
+אני רוצה ממך:
+- bug list
+- exact fix plan
+- full corrected files
+- final explanation of what now behaves correctly
+
+תעבוד עכשיו כמו senior engineer שעושה functional rescue לפרויקט:
+לא רק שהקוד ירוץ —
+אלא שהפיצ'רים עצמם יתנהגו נכון.

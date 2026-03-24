@@ -1,0 +1,427 @@
+You are working inside an existing large monorepo called ai-app-builder.
+
+Your mission:
+Do NOT add new features.
+Do NOT redesign the product.
+Do NOT change the product direction.
+Your only mission is to perform a careful production-grade refactor, cleanup, and architectural hardening of the existing codebase without breaking current behavior.
+
+NON-NEGOTIABLE RULES
+1. Preserve all existing features.
+2. Preserve all existing user flows.
+3. Do not remove functionality.
+4. Do not rewrite the system from scratch.
+5. Do not make broad speculative changes.
+6. Prefer safe, incremental refactors.
+7. Keep all public behavior stable unless a fix is absolutely necessary.
+8. Before each major change, analyze dependencies and side effects.
+9. Every step must keep the project buildable.
+10. Use pnpm only.
+11. After each refactor step, run typecheck/build validation if available.
+12. Optimize for maintainability, separation of concerns, readability, and safety.
+
+PRIMARY GOAL
+Turn this codebase into a more modular, maintainable, production-ready system while preserving the current product behavior.
+
+TOP PRIORITIES
+Your work must focus on these areas first, in this exact order:
+
+----------------------------------------------------------------
+PHASE 1 — BREAK UP THE MAJOR GOD FILES
+----------------------------------------------------------------
+
+The following files are too large and currently hold too many responsibilities:
+
+1. artifacts/api-server/src/routes/projects/index.ts
+2. artifacts/app-builder/src/components/ChatPanel.tsx
+3. artifacts/app-builder/src/components/PreviewPanel.tsx
+
+These files must be refactored first.
+
+A. Refactor artifacts/api-server/src/routes/projects/index.ts
+
+Current problem:
+This file contains too many mixed responsibilities:
+- route definitions
+- AI message flow
+- system prompt construction
+- user mode detection
+- intent detection
+- memory/DNA logic
+- HTML extraction
+- patch application
+- React file manifest extraction
+- deploy logic
+- GitHub sync logic
+- share logic
+- snapshots
+- secrets
+- database provisioning
+- analytics/event ingestion
+- helper utilities
+- AI agent flow
+
+Required fix:
+Split this file into focused modules.
+
+Create clear internal layers such as:
+
+- routes/projects/index.ts
+  Keep this file thin. It should mostly register subroutes and handlers.
+
+- routes/projects/messages.ts
+  Contains message endpoints and streaming orchestration only.
+
+- routes/projects/share.ts
+  Contains share/custom slug/public preview endpoints only.
+
+- routes/projects/snapshots.ts
+  Contains snapshot list/restore/preview endpoints only.
+
+- routes/projects/files.ts
+  Contains project file CRUD endpoints only.
+
+- routes/projects/database.ts
+  Contains project DB provisioning/query endpoints only.
+
+- routes/projects/secrets.ts
+  Contains secrets CRUD endpoints only.
+
+- routes/projects/deploy.ts
+  Contains deploy-related endpoints only.
+
+- routes/projects/fork.ts
+  Contains forking logic only.
+
+Create service modules such as:
+- services/project-message-service.ts
+- services/project-intent-service.ts
+- services/project-memory-service.ts
+- services/project-preview-service.ts
+- services/project-deploy-service.ts
+- services/project-share-service.ts
+- services/project-file-service.ts
+- services/project-db-service.ts
+- services/project-secret-service.ts
+
+Create utility/prompt modules such as:
+- ai/prompts/system-prompts.ts
+- ai/prompts/mode-prompts.ts
+- ai/prompts/shared-rules.ts
+- ai/prompts/stack-rules.ts
+- ai/intent/detect-chat-intent.ts
+- ai/mode/detect-user-mode.ts
+- ai/extraction/html-extractor.ts
+- ai/extraction/react-files-extractor.ts
+- ai/extraction/patch-applier.ts
+
+Rules for this refactor:
+- Keep route paths unchanged.
+- Keep request/response behavior unchanged.
+- Keep DB schema usage unchanged unless absolutely necessary.
+- Move logic out, do not redesign everything.
+- Eliminate huge inline constant blocks from route files when possible.
+- Prefer pure functions and explicit service calls.
+
+Expected result:
+projects/index.ts becomes small and readable.
+Business logic moves into services/utilities.
+AI logic becomes isolated and testable.
+
+----------------------------------------------------------------
+B. Refactor artifacts/app-builder/src/components/ChatPanel.tsx
+----------------------------------------------------------------
+
+Current problem:
+This component is too large and mixes:
+- chat layout
+- input handling
+- file attachments
+- voice input
+- prompt library
+- component library
+- quick actions
+- grow-with-me UI
+- agent mode UI
+- message rendering
+- product spec rendering
+- queue handling
+- export
+- rename logic
+- mode selector integration
+
+Required fix:
+Split this component into smaller focused components and hooks.
+
+Suggested component split:
+- components/chat/ChatPanel.tsx
+- components/chat/ChatHeader.tsx
+- components/chat/ChatInputBar.tsx
+- components/chat/ChatMessageList.tsx
+- components/chat/MessageBubble.tsx
+- components/chat/ProductSpecCard.tsx
+- components/chat/QuickIdeasGrid.tsx
+- components/chat/PromptLibraryPopover.tsx
+- components/chat/ComponentLibraryPopover.tsx
+- components/chat/AttachmentChips.tsx
+- components/chat/MessageQueuePanel.tsx
+- components/chat/StreamingStatus.tsx
+- components/chat/AgentProgressPanel.tsx
+- components/chat/GrowWithMeBanner.tsx
+
+Suggested hook split:
+- hooks/chat/use-chat-input.ts
+- hooks/chat/use-chat-attachments.ts
+- hooks/chat/use-chat-queue.ts
+- hooks/chat/use-voice-input.ts
+- hooks/chat/use-prompt-library.ts
+
+Rules:
+- Keep UI behavior unchanged.
+- Keep message sending behavior unchanged.
+- Keep keyboard shortcuts unchanged.
+- Keep agent mode behavior unchanged.
+- Keep file upload behavior unchanged.
+- Do not remove any existing UX elements.
+- Extract logic first, simplify second.
+
+Expected result:
+ChatPanel becomes mostly composition.
+Message rendering and input logic become maintainable and independently testable.
+
+----------------------------------------------------------------
+C. Refactor artifacts/app-builder/src/components/PreviewPanel.tsx
+----------------------------------------------------------------
+
+Current problem:
+This file mixes:
+- preview iframe handling
+- file tree/editor behavior
+- live streaming preview
+- snapshots/history
+- sharing dialog
+- device preview controls
+- export actions
+- deploy helpers
+- visual editing
+- runtime tool switching
+- advanced panel navigation
+- preview error handling
+
+Required fix:
+Split it into focused UI modules.
+
+Suggested split:
+- components/preview/PreviewPanel.tsx
+- components/preview/PreviewToolbar.tsx
+- components/preview/PreviewFrame.tsx
+- components/preview/DeviceSwitcher.tsx
+- components/preview/ShareDialog.tsx
+- components/preview/HistoryPopover.tsx
+- components/preview/ExportMenu.tsx
+- components/preview/EditModeBanner.tsx
+- components/preview/SelectedElementBar.tsx
+- components/preview/PreviewErrorBar.tsx
+- components/preview/CodeWorkspace.tsx
+- components/preview/ToolsMenu.tsx
+
+Suggested hooks/services:
+- hooks/preview/use-preview-stream.ts
+- hooks/preview/use-preview-history.ts
+- hooks/preview/use-preview-share.ts
+- hooks/preview/use-preview-export.ts
+- hooks/preview/use-edit-mode.ts
+
+Rules:
+- Preserve current preview behavior.
+- Preserve current export/share behavior.
+- Preserve iframe loading/refresh behavior.
+- Preserve snapshot behavior.
+- Preserve visual edit mode behavior.
+- Keep route usage unchanged.
+- Reduce component size and improve readability.
+
+Expected result:
+PreviewPanel becomes an orchestrator, not a monolith.
+
+----------------------------------------------------------------
+PHASE 2 — CREATE A REAL SERVICE LAYER
+----------------------------------------------------------------
+
+Current problem:
+Too much domain/business logic is sitting directly in routes and giant UI components.
+
+Required fix:
+Move domain logic into dedicated services.
+
+Backend service categories:
+- message orchestration
+- AI prompt composition
+- intent classification
+- memory/DNA extraction
+- deployment
+- GitHub sync
+- share/public URL generation
+- snapshot management
+- files
+- secrets
+- per-project DB
+- analytics ingestion
+
+Frontend service/hook categories:
+- chat state handling
+- preview state handling
+- export/share flows
+- file editing state
+- visual editing state
+
+Rules:
+- Services should be cohesive.
+- Route handlers should be thin.
+- UI components should delegate logic to hooks/services.
+- Prefer explicit inputs/outputs.
+- Avoid hidden global coupling.
+
+----------------------------------------------------------------
+PHASE 3 — EXTRACT PROMPTS AND AI RULES OUT OF RUNTIME FILES
+----------------------------------------------------------------
+
+Current problem:
+Large prompt blocks and AI system rules are embedded directly inside runtime route files.
+
+Required fix:
+Move all prompt text and related AI policy blocks into dedicated prompt files.
+
+Examples:
+- ai/prompts/base.ts
+- ai/prompts/modes/entrepreneur.ts
+- ai/prompts/modes/builder.ts
+- ai/prompts/modes/developer.ts
+- ai/prompts/modes/maker.ts
+- ai/prompts/shared-output-rules.ts
+- ai/prompts/react-stack-rules.ts
+- ai/prompts/vue-stack-rules.ts
+- ai/prompts/svelte-stack-rules.ts
+- ai/prompts/django-stack-rules.ts
+
+Rules:
+- Preserve exact behavior unless cleanup is harmless.
+- Keep prompt composition deterministic and readable.
+- Reduce giant inline strings in route files.
+
+----------------------------------------------------------------
+PHASE 4 — ADD TEST COVERAGE FOR THE MOST DANGEROUS LOGIC
+----------------------------------------------------------------
+
+Current problem:
+The codebase is too complex for its current test coverage.
+
+Required fix:
+Add tests for the most failure-prone core logic first.
+
+Highest-priority test targets:
+1. intent detection
+2. user mode detection
+3. HTML extraction from AI responses
+4. patch application logic
+5. React file manifest extraction
+6. share/custom slug logic
+7. snapshot restore logic
+8. deploy helper logic
+9. message sanitization
+10. DB/service helper pure functions
+
+Rules:
+- Start with pure functions/utilities first.
+- Add tests only where they provide real protection.
+- Do not create fake coverage.
+- Prefer stable unit tests over fragile UI tests.
+
+Expected result:
+Critical parsing/orchestration logic is protected against regressions.
+
+----------------------------------------------------------------
+PHASE 5 — CLEAN UP REPOSITORY NOISE
+----------------------------------------------------------------
+
+Current problem:
+The repository contains unnecessary noise and heavy non-core artifacts.
+
+Required fix:
+Review and clean the repo structure.
+
+Focus on:
+- attached_assets
+- mockup-sandbox
+- duplicated or stale files
+- legacy unused helpers
+- outdated docs that no longer match reality
+
+Rules:
+- Do not delete anything still in use.
+- Identify dead code before removing it.
+- Move non-core artifacts to clearer locations if needed.
+- Keep the main product repository focused.
+
+Expected result:
+Cleaner repo, easier navigation, lower cognitive load.
+
+----------------------------------------------------------------
+PHASE 6 — IMPROVE INTERNAL CONSISTENCY
+----------------------------------------------------------------
+
+Required improvements:
+1. Standardize naming conventions across services/hooks/components.
+2. Reduce duplicated utility logic.
+3. Reduce inline anonymous helpers inside giant files.
+4. Use clearer file ownership boundaries.
+5. Make imports cleaner and more intentional.
+6. Keep each file single-purpose where possible.
+
+----------------------------------------------------------------
+EXECUTION RULES
+----------------------------------------------------------------
+
+You must work in small safe steps.
+
+For each step:
+1. Explain exactly what you are changing.
+2. State why this change is safe.
+3. Make the change.
+4. Verify imports and references.
+5. Run typecheck/build if possible.
+6. Report remaining follow-up work.
+
+Do NOT do all refactors in one giant uncontrolled pass.
+
+Preferred execution order:
+Step 1: extract pure utilities from projects/index.ts
+Step 2: extract services from projects/index.ts
+Step 3: split projects routes into submodules
+Step 4: split ChatPanel into smaller components/hooks
+Step 5: split PreviewPanel into smaller components/hooks
+Step 6: extract AI prompt files
+Step 7: add tests for extracted pure logic
+Step 8: repo cleanup and dead-code removal
+Step 9: final consistency pass
+
+----------------------------------------------------------------
+SUCCESS CRITERIA
+----------------------------------------------------------------
+
+The refactor is successful only if all of the following are true:
+- Existing product behavior still works
+- Route behavior remains stable
+- Chat streaming still works
+- Preview still works
+- Deploy still works
+- GitHub sync still works
+- Share/snapshots/files/secrets/database still work
+- The giant monolithic files are significantly reduced
+- Core logic is easier to understand and maintain
+- Critical parsing/orchestration logic has tests
+- The repo becomes meaningfully cleaner
+
+Start with Phase 1A:
+Refactor artifacts/api-server/src/routes/projects/index.ts first.
+Do it incrementally and safely.

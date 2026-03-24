@@ -1,0 +1,294 @@
+I want to stop all summaries, intentions, and claims about what was “fixed”.
+
+I am no longer looking for descriptions of changes.
+I am not looking for what “should be true”.
+I am not looking for what you “intended to update”.
+
+I am looking for one thing only:
+actual code changes in the repository, fully implemented, with no gaps, no misses, and no mismatch between what you say and what is actually in GitHub.
+
+Right now there is a clear gap between your descriptions and the code that is actually present.
+That is not acceptable.
+
+I want you to go through the system now and implement all required fixes properly, completely, and precisely.
+
+Here is what you must fix now:
+
+1. Remove the landing-page bias from the generation path
+I do not want a system that forces most projects toward:
+- hero sections
+- stats bars
+- testimonials
+- marketing footer
+- flashy gradients/glow
+- landing-page sections by default
+
+Remove these forcing instructions from the main generation path.
+If design guidance exists, it must be conditional based on the actual request.
+Not global forcing.
+Not “ALWAYS”.
+Not template bias.
+
+2. Simplify the prompt architecture for real
+Go through all prompt layers and reduce them sharply in actual code.
+
+Review and remove / reduce / constrain:
+- shared output rules
+- premium design engine
+- giant design blocks
+- unnecessary stack additions
+- memory overload
+- DNA overload
+- multi-agent context overload
+- planning/spec layers when not needed
+- extra instructions that are not directly relevant to the current request
+
+Goal:
+a shorter, more focused, more relevant prompt architecture.
+
+3. Fix cache correctness for real
+I do not want any situation where two different projects, or two different project states, can receive the same cached response.
+
+Fix the cache key in actual code so it includes at least:
+- projectId
+- intent
+- stack
+- mode
+- current project state hash
+- whether the request is create/edit/fix
+- relevant file or preview state hash
+
+If you cannot guarantee correctness immediately:
+disable the cache completely.
+
+I prefer no cache over incorrect cache.
+
+4. Restrict the multi-agent pipeline for real
+I do not want the full multi-agent pipeline to run on every complex request.
+
+Implement this in actual code:
+- full pipeline for create only
+- not for small edits
+- not for fix requests
+- not for local changes
+- not for small feature additions unless explicitly justified
+
+edit/fix flows must stay lightweight, focused, and fast.
+
+5. Fix the edit/fix flow for real
+The system must work correctly on existing code.
+
+That means:
+- read current state
+- understand what already exists
+- change only what was requested
+- do not rebuild everything
+- do not delete working parts
+- do not override structure unnecessarily
+- preserve consistency
+
+If the user asked for a fix or local change,
+the system must enter a true targeted edit mode.
+
+6. Improve intent detection for real
+I do not want weak or overly coarse intent routing.
+
+Fix actual logic for distinguishing between:
+- create
+- edit
+- fix
+- add feature
+- inspect
+- deploy
+- git sync
+- continue existing work
+
+If intent confidence is low:
+- choose a conservative fallback
+- do not choose an aggressive flow
+- do not regenerate everything
+- do not allow destructive behavior
+
+7. Reduce context overload for real
+I do not want edit/fix requests to receive:
+- too many files
+- too much HTML
+- too many rules
+- too many layers
+- too much history
+
+I want focused context only.
+
+Implement this in actual code:
+- send only relevant files or relevant sections
+- send only the state needed for the task
+- do not overload every generation with everything
+
+8. Fix HTML vs React separation for real
+I want a clear source of truth.
+No mixed persistence.
+No partial state.
+No ambiguous preview behavior.
+
+Implement in actual code:
+- HTML project → clear source of truth
+- React/files project → clear source of truth
+- consistent persistence
+- consistent preview update
+- consistent save flow
+- consistent done-event payload
+- no partial state
+- no mixed state
+
+9. Harden output extraction for real
+I want far more reliable and tolerant parsing.
+
+Fix in actual code:
+- html extraction
+- file manifest extraction
+- patch extraction
+- fallback behavior
+- truncated output handling
+- validation before save
+
+Do not save broken output as if it were success.
+
+10. Add real validation before persistence
+Before saving generated output, actually validate:
+- is the HTML usable
+- is there a body tag
+- is html properly closed
+- is the output truncated
+- is the file manifest usable
+- is there an entrypoint
+- can the preview actually be built
+
+If not:
+- do not save it
+- do not claim success
+- trigger fallback / retry / safe failure behavior
+
+11. Fix project state consistency for real
+I want full consistency between:
+- preview
+- projectFiles
+- snapshots
+- git
+- deploy
+- assistant response
+
+It must never happen that a message says everything succeeded,
+while preview/files/state are inconsistent.
+
+12. Fix the GitHub flow for real
+I do not want only a button or partial sync.
+I want a real, consistent, usable flow.
+
+The system must correctly handle:
+- connect GitHub
+- create or reuse repository
+- update files correctly
+- commit
+- push
+- preserve repo continuity
+- show correct status
+- never fake success
+
+13. Fix the deploy flow for real
+I do not want a publish button without real correctness behind it.
+
+The system must:
+- deploy only if output is actually usable
+- build a proper deploy payload
+- return a real live URL
+- persist deploy state
+- show real status
+- avoid false success
+- not deploy broken or truncated output
+
+14. Fix generation quality for real
+I want the system optimized for:
+- correctness over flashiness
+- relevance over generic beauty
+- task fit over forced premium style
+- accurate edits over full regeneration
+- stable output over overcomplicated orchestration
+
+The system must generate:
+- less generic output
+- less template-like output
+- less default marketing-page behavior
+- more task-appropriate output
+- more usable output
+- more consistent output
+
+15. Stop giving me summaries instead of implementation
+I do not want:
+- “I fixed it”
+- “I improved it”
+- “I updated it”
+if the repository does not actually contain the change.
+
+I want:
+- real code changes
+- real diffs
+- updated files
+- actual implementation
+- no mismatch between description and repo
+
+16. Work by this rule from now on
+Do not tell me what you intend to do.
+Do not tell me what should be true.
+Do not tell me what you think you fixed.
+
+Implement first.
+Then show me:
+
+A. which files you changed
+B. what exactly you removed
+C. what exactly you simplified
+D. how cache key correctness was fixed in code
+E. how intent detection was improved in code
+F. how the multi-agent pipeline was restricted in code
+G. how extraction / validation / persistence were hardened in code
+H. why generation quality should now be better
+
+17. I want code-level proof
+I want:
+- full updated files or a clear diff
+- not just descriptions
+- not just bullet points
+- not just summaries
+
+18. If something is not fixed yet, say so clearly
+Do not claim it was fixed if it is still pending.
+Do not mix “implemented” with “planned”.
+
+19. The goal
+I want a system that actually generates good results.
+Less garbage.
+Less forced templates.
+Less wrong behavior.
+Less cross-project contamination.
+Less unnecessary rebuilds.
+More precision.
+More quality.
+More task fit.
+More consistency.
+
+20. Start real implementation now
+No more analysis.
+No more promises.
+No more summaries.
+
+I want real implementation, fully closed, clean, and complete.
+No gaps.
+No misses.
+No mismatch between what you say and what is actually in GitHub.
+
+Important:
+From this point on, do not report intentions.
+Report only implemented code changes.
+
+If it is not actually changed in the repository, do not claim it was fixed.
+Close every gap completely.

@@ -1,0 +1,568 @@
+אני רוצה עכשיו לעצור את כל שיפורי ה-UI הקטנים, כל התיקונים הקוסמטיים, וכל התוספות המקומיות.
+
+אני רוצה למחוק את כל שפת העיצוב הנוכחית ולהתחיל מחדש מאפס.
+
+כן — ממש כך:
+תתייחס לעיצוב הנוכחי כאילו הוא לא קיים.
+אל תנסה “לשפר” אותו.
+אל תנסה “לעדן” אותו.
+אל תנסה “לעשות polish” על הקיים.
+
+אני רוצה redesign מלא של כל המערכת מ-0, עד לעיצוב מושלם, אחיד, יוקרתי, ברור, ומדויק.
+
+המטרה:
+שהמוצר ירגיש כמו פלטפורמת builder ברמה עולמית,
+עם UX פשוט מאוד למשתמש,
+ועם תחושת כוח, חוכמה, בהירות, ואמינות.
+
+==================================================
+1. עיקרון העל של העיצוב
+==================================================
+
+העיצוב חייב להיות מבוסס על העקרונות הבאים:
+
+- Ultra clean
+- Premium
+- Product-focused
+- Chat-centered
+- Builder-grade
+- Minimal but powerful
+- Elegant, not noisy
+- Modern, not template-like
+- Confident, not playful
+- Sharp, not cluttered
+
+אני לא רוצה אתר צבעוני מדי, ילדותי, עמוס מדי, או “AI toy”.
+אני רוצה תחושה של:
+מערכת עבודה אמיתית, חזקה, חכמה, מתקדמת, יוקרתית, ופשוטה לשימוש.
+
+==================================================
+2. הוראה מפורשת לביצוע
+==================================================
+
+מחק את כל שפת העיצוב הקיימת.
+מחק את כל ההחלטות הויזואליות הקיימות.
+מחק את כל המבנים הויזואליים הקיימים.
+מחק את כל ה-layoutים הקיימים.
+מחק את כל רכיבי ה-UI הקיימים שלא מתאימים לשפה החדשה.
+
+אל תנסה לשמר את המראה הישן.
+תשמור רק על הלוגיקה, היכולות, והפיצ'רים שצריך.
+אבל מבחינת design system, layout, hierarchy, spacing, structure, visual language, and experience —
+תתחיל הכל מחדש מאפס.
+
+==================================================
+3. מה המוצר צריך לשדר ויזואלית
+==================================================
+
+המוצר צריך לשדר במבט ראשון:
+
+- זהו כלי עבודה רציני
+- זהו builder מתקדם
+- אפשר לבנות כאן מוצר אמיתי
+- אפשר לתקן, לערוך, ולפרוס מכאן
+- הכול מרוכז במקום אחד חכם
+- הצ'אט הוא הלב של המערכת
+- יש חיבור אמיתי בין שיחה לתוצאה
+- יש תחושת בהירות ושליטה
+- יש תחושת מערכת premium
+- יש תחושת platform ולא toy
+
+==================================================
+4. עקרון מבני בסיסי
+==================================================
+
+האתר כולו צריך להיות בנוי סביב 3 שכבות בלבד:
+
+1. Chat — שכבת האינטראקציה הראשית
+2. Project / Preview — שכבת התוצאה והעבודה
+3. Status / Actions — שכבת התמיכה (GitHub, Deploy, Build state, Errors)
+
+לא צריך יותר מדי שכבות.
+לא צריך בלגן של panels.
+לא צריך תפריטים שמפזרים את המשתמש.
+לא צריך “עולם של tools”.
+צריך מערכת אחת מרוכזת, ברורה, ומדויקת.
+
+==================================================
+5. מבנה כללי של המסך הראשי
+==================================================
+
+אני רוצה מבנה מסך ראשי חדש, ברור, ומושלם.
+
+ה-layout הכללי צריך להיות Desktop-first but fully responsive.
+
+מבנה המסך הראשי:
+
+A. Top Header
+B. Left Main Chat Column
+C. Right Main Preview/Project Column
+D. Thin status/action layer integrated above or around preview
+E. Contextual panels only when needed, not always visible
+
+==================================================
+6. Header עליון — איך צריך להיראות
+==================================================
+
+Header עליון דק, אלגנטי, יוקרתי, נקי מאוד.
+
+הוא צריך לכלול:
+
+בצד שמאל:
+- לוגו/שם המוצר
+- project name
+- small project state indicator (Draft / Building / Synced / Published)
+
+במרכז:
+- project context summary קטן
+  לדוגמה:
+  “Building a React SaaS dashboard”
+  או
+  “Fixing auth flow in existing project”
+
+בצד ימין:
+- GitHub status button
+- Deploy / Publish primary CTA
+- User avatar / settings
+
+ה־header צריך להיות:
+- sticky
+- blur glass subtle
+- premium shadow
+- clean borders
+- לא גבוה מדי
+- לא עמוס מדי
+
+==================================================
+7. האזור השמאלי — Chat Column
+==================================================
+
+הצ'אט הוא הלב של המערכת.
+זה צריך להיות ברור ויזואלית מייד.
+
+העמודה השמאלית צריכה לכלול:
+
+1. Chat title area
+- title ברור כמו:
+  “Build with AI”
+  או
+  “Project Assistant”
+- subtitle קטן:
+  “Describe what you want to build, fix, or improve”
+
+2. Conversation stream
+- bubbles ברורות ונקיות
+- user messages עם style שקט ונקי
+- assistant messages עם hierarchy חזקה יותר
+- code-related messages / actions / suggestions צריכים להיות מוצגים בצורה structured
+- לא צ'אט מבולגן
+- כל message block צריך להיות נעים, readable, spaced היטב
+
+3. Contextual suggestion cards
+- אם צריך DB / Secrets / Auth / Deploy / GitHub
+- כרטיסים קטנים, יוקרתיים, חכמים
+- לא מציקים
+- actionable
+
+4. Composer area
+- input box גדול, יפה, מאוד ברור
+- attach button
+- send button
+- quick actions קטנים:
+  Build / Fix / Improve / Deploy / Sync
+- composer צריך להרגיש חזק ויקר, לא כמו textarea פשוט
+
+5. Streaming experience
+- בזמן streaming צריך להיות feedback מושלם:
+  intent badge
+  tiny progress language
+  clean animated thinking state
+  clean code generation state
+
+==================================================
+8. האזור הימני — Project / Preview Column
+==================================================
+
+זהו אזור התוצאה.
+הוא חייב להרגיש כמו מקום העבודה של המשתמש.
+
+הוא צריך לכלול:
+
+1. Preview header
+- title:
+  Preview
+- environment indicator
+- live status indicator
+- open in new tab
+- refresh
+- version indicator
+
+2. Main preview surface
+- גדול
+- נקי
+- frame יפה
+- לא iframe מכוער
+- תחושת מוצר יוקרתי
+- background נכון
+- empty states מושקעים
+
+3. Project meta strip
+מעל או מתחת ל-preview:
+- stack
+- last update
+- files changed
+- build status
+- git status
+- deploy status
+
+4. contextual action row
+- View code
+- Versions
+- Fix errors
+- Publish
+- Git sync
+- Share
+
+לא כתפריט נסתר.
+לא מאחורי 3 קליקים.
+ברור, נגיש, אלגנטי.
+
+==================================================
+9. איך צריך להיראות ממשק הקוד / הקבצים
+==================================================
+
+קוד וקבצים לא צריכים להיות תמיד גלויים.
+הם צריכים להופיע כשצריך, בצורה יוקרתית וברורה.
+
+כשפותחים file/code mode:
+- split view איכותי
+- file tree דק ונקי
+- editor area רחב
+- actions ברורות
+- save/sync status
+- לא להרגיש IDE כבד מדי
+- כן להרגיש builder-grade editor
+
+הוא צריך להיות:
+- secondary workspace
+- לא main visual chaos
+
+==================================================
+10. איך צריך להיראות אזור GitHub
+==================================================
+
+GitHub הוא חלק מה-flow הראשי.
+הוא צריך להיות visible, אך לא משתלט.
+
+צריך להיות:
+- GitHub button/status ב-header
+- מצב חיבור ברור:
+  Not connected / Connected / Synced / Changes pending
+- אפשרות quick connect
+- אפשרות quick sync / push
+- אפשרות לראות repo name
+- אפשרות לפתוח repo
+
+אם GitHub לא מחובר:
+- CTA קטן וברור להתחברות
+- לא מסך עמוס
+- לא panel מסורבל
+
+==================================================
+11. איך צריך להיראות אזור Deploy / Publish
+==================================================
+
+Deploy / Publish הוא action מרכזי, ולכן:
+- חייב להיות CTA ראשי
+- ברור מאוד
+- יוקרתי
+- תמיד visible
+
+כפתור ראשי:
+🚀 Publish / Deploy
+
+כשלוחצים:
+- modal / drawer מושלם
+- target ברור
+- status ברור
+- progress ברור
+- success state ברור
+- link live ברור
+- no fake complexity
+
+אחרי publish:
+- האתר צריך להראות published status
+- link live בולט
+- last deploy time
+- update available when changes exist
+
+==================================================
+12. איך צריך להיראות error / bug fixing UX
+==================================================
+
+זה קריטי מאוד.
+
+אם יש error:
+- הוא לא אמור להתחבא בתפריט
+- הוא אמור להופיע בצורה עדינה אבל ברורה
+
+אני רוצה:
+- subtle error banner
+- “I found an issue in preview”
+- action button: Fix it
+- action button: Inspect
+- action button: Ignore
+
+זה צריך להיות חלק טבעי מה-flow.
+לא feature מבודד.
+
+==================================================
+13. איך צריך להיראות suggestions UX
+==================================================
+
+המערכת צריכה להציע דברים חכמים בזמן הנכון.
+
+אם project needs DB:
+- suggestion card
+
+אם project needs secrets:
+- suggestion card
+
+אם project needs auth:
+- suggestion card
+
+אם preview has errors:
+- suggestion card
+
+אם project not synced:
+- suggestion card
+
+אם project ready to publish:
+- suggestion card
+
+כל הכרטיסים האלו צריכים להיות:
+- compact
+- premium
+- dismissible
+- contextual
+- integrated into chat flow
+
+==================================================
+14. Design System מלא
+==================================================
+
+תבנה design system חדש מאפס.
+
+הוא חייב לכלול:
+
+Colors:
+- dark premium base
+- soft neutral surfaces
+- crisp text hierarchy
+- one main primary color
+- one accent color
+- success/warning/error states elegant, not loud
+
+Typography:
+- modern geometric / clean sans
+- strong hierarchy
+- large confident headings
+- compact readable body
+- code font clean and sharp
+
+Spacing:
+- הרבה אוויר
+- consistent spacing system
+- clean section rhythm
+- no cramped UI
+
+Radius:
+- medium-large rounded corners
+- modern but not bubbly
+
+Borders:
+- subtle
+- premium
+- no heavy outlines
+
+Shadows:
+- soft, layered, premium
+- no cheap glow overload
+
+Icons:
+- consistent icon set
+- modern
+- simple
+- no emoji-heavy design except in tiny assistant indicators if needed
+
+Animations:
+- subtle
+- premium
+- micro-interactions only
+- smooth transitions
+- no noisy motion
+
+==================================================
+15. צבעוניות מדויקת
+==================================================
+
+אני רוצה palette כהה, premium, calm, modern.
+
+בסיס:
+- deep charcoal / midnight background
+- layered dark surfaces
+- near-white text
+- muted gray secondary text
+- primary: electric blue / indigo / modern violet
+- accent: teal or cyan subtle
+- success: rich green
+- warning: amber refined
+- error: muted red
+
+הכול צריך להרגיש:
+- precise
+- premium
+- modern product UI
+- not generic tailwind dashboard
+
+==================================================
+16. סגנון הויזואליה
+==================================================
+
+הסגנון חייב להיות:
+- cinematic but minimal
+- premium SaaS
+- AI-native
+- tool-for-builders
+- elegant command center
+- not consumer-app toy
+- not colorful startup landing page
+- not messy dashboard
+- not retro
+- not glass overload
+- not neon chaos
+
+==================================================
+17. Responsive design
+==================================================
+
+במובייל:
+- chat הופך למרכז
+- preview נגיש במעבר ברור
+- header קומפקטי
+- actions נגישים
+- composer נשאר מצוין
+- deploy/github/status נגישים בלי עומס
+
+בטאבלט:
+- split חכם
+- לא cramped
+
+בדסקטופ:
+- split layout מושלם
+- maximum clarity
+- premium workspace feeling
+
+==================================================
+18. מה למחוק מהעיצוב הישן
+==================================================
+
+מחק:
+- כל layout ישן
+- כל panel hierarchy ישן
+- כל spacing ישן
+- כל navigation ישן
+- כל CTA ישן
+- כל visual language ישן
+- כל card style ישן
+- כל modal style ישן
+- כל typography ישנה
+- כל color decisions ישנות
+- כל “tools-heavy dashboard feel”
+- כל clutter
+- כל UX שלא משרת את ה-flow הראשי
+
+תשמור:
+- היכולות
+- הלוגיקה
+- הפיצ'רים
+- וה-flowים שצריך
+
+אבל לא את העיצוב.
+
+==================================================
+19. מה לבנות מחדש
+==================================================
+
+תבנה מחדש מאפס:
+- app shell
+- header
+- main layout
+- chat experience
+- message design
+- composer
+- contextual cards
+- preview surface
+- project status row
+- action buttons
+- GitHub status
+- deploy flow UI
+- code/files workspace
+- error handling UI
+- version/history UI
+- modal system
+- drawer system
+- empty states
+- loading states
+- success states
+
+==================================================
+20. מה אני רוצה ממך עכשיו
+==================================================
+
+אני רוצה שתעשה עכשיו execution מלא של redesign.
+
+תבצע בפועל:
+
+1. מחיקה של כל שפת העיצוב הקיימת
+2. בניית design system חדש מאפס
+3. בניית app shell חדש
+4. בניית layout חדש לכל המסך הראשי
+5. בניית chat-centered experience חדש
+6. בניית preview/project experience חדש
+7. בניית status/action system חדש
+8. בניית GitHub + Deploy UX ברור ויוקרתי
+9. בניית contextual smart suggestions UX
+10. בניית code/files/workspace UX חדש
+11. התאמה מלאה למובייל/טאבלט/דסקטופ
+
+==================================================
+21. פורמט העבודה שלך
+==================================================
+
+אני לא רוצה ממך רק תיאור.
+אני רוצה implementation.
+
+תעשה:
+- redesign מלא
+- קבצים מתוקנים
+- קומפוננטות חדשות אם צריך
+- מחיקה/החלפה של עיצוב ישן
+- design tokens מסודרים
+- layout חדש
+- component architecture חדשה אם צריך
+
+==================================================
+22. תוצאה שאני מצפה לה
+==================================================
+
+אני רוצה שבסוף המוצר ירגיש כמו:
+מערכת builder premium עולמית,
+שבה המשתמש מדבר עם AI,
+בונה, מתקן, מסנכרן, ופורס פרויקט —
+בממשק אחד, יפהפה, ברור, מדויק, ופשוט.
+
+תעבוד עכשיו על redesign מלא מאפס עד לתוצאה מושלמת.
+אל תעצור ב-polish.
+אל תעצור בשינויים קטנים.
+תבנה מחדש את כל העיצוב.

@@ -1,0 +1,168 @@
+You are now optimizing the product for USER ENGAGEMENT, MOMENTUM, and STICKINESS.
+
+Stop focusing on structure, features, or refactors.
+
+Your mission now is:
+Make users stay longer, do more, and feel constant progress.
+
+============================================================
+PRIMARY GOAL
+============================================================
+
+Turn the product into a system that:
+
+- keeps users engaged
+- guides them forward
+- creates momentum
+- reduces drop-off
+- makes progress feel natural and continuous
+
+The user should feel:
+
+“I’m moving forward constantly.”
+“This is easy.”
+“I want to keep going.”
+“I’m actually building something real.”
+
+============================================================
+NON-NEGOTIABLE RULES
+============================================================
+
+1. Do not add complex new systems.
+2. Do not increase UI clutter.
+3. Do not add overwhelming options.
+4. Keep everything simple, focused, and guided.
+5. Preserve current functionality.
+6. Focus on flow, not features.
+
+============================================================
+PHASE 1 — ADD A CONTINUOUS PROGRESS FEEL
+============================================================
+
+After every assistant response:
+
+- make it clear that progress happened
+- show forward movement
+- avoid static feeling
+
+The chat should NEVER feel like:
+just talking
+
+It should feel like:
+things are being built step by step
+
+============================================================
+PHASE 2 — ADD A SMART “NEXT STEP” SYSTEM
+============================================================
+
+After each meaningful response:
+
+Provide ONE strong suggested next action.
+
+NOT multiple options.
+NOT a list.
+NOT noise.
+
+Just ONE.
+
+Examples:
+- “Let’s now improve the homepage layout”
+- “Next, I’ll optimize the mobile version”
+- “Let’s refine the dashboard structure”
+- “Next step: improve typography and spacing”
+
+The next step should:
+- feel natural
+- feel helpful
+- feel like progress
+
+============================================================
+PHASE 3 — MAINTAIN MOMENTUM
+============================================================
+
+Never leave the user without direction.
+
+If the user pauses or gives a vague input:
+- gently guide forward
+- suggest a meaningful continuation
+
+Avoid:
+- dead ends
+- static responses
+- “what do you want to do?” loops
+
+============================================================
+PHASE 4 — ADD SUCCESS FEEDBACK
+============================================================
+
+After actions:
+
+Clearly show success.
+
+Short format:
+- what improved
+- what changed
+- what is better now
+
+Make the user feel:
+“I’m doing it right”
+
+============================================================
+PHASE 5 — REDUCE DROP-OFF MOMENTS
+============================================================
+
+Identify moments where users might stop:
+- after first response
+- after first generation
+- after confusion
+- after long text
+
+Fix them by:
+- simplifying responses
+- keeping flow moving
+- guiding next steps
+- reducing cognitive load
+
+============================================================
+PHASE 6 — KEEP RESPONSES TIGHT AND FOCUSED
+============================================================
+
+- avoid long explanations
+- avoid overload
+- keep things clear
+- keep answers sharp
+- prioritize action over explanation
+
+============================================================
+PHASE 7 — IMPROVE SESSION DEPTH
+============================================================
+
+Goal:
+Keep users engaged longer in a single session.
+
+Do this by:
+- chaining meaningful steps
+- guiding progress
+- avoiding friction
+- making each step feel rewarding
+
+============================================================
+SUCCESS CRITERIA
+============================================================
+
+This work is successful if:
+
+- users keep interacting longer
+- users take more steps in one session
+- users feel continuous progress
+- users are guided naturally forward
+- users do not feel lost
+- users do not stop after one response
+
+The product should feel like:
+a guided building journey, not just a tool.
+
+Start now with:
+1. adding smart next-step suggestions
+2. improving momentum
+3. improving progress feedback

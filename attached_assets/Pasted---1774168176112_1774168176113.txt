@@ -1,0 +1,290 @@
+אני רוצה לעצור עכשיו את כל הסיכומים, הכוונות, וההצהרות על מה "תוקן".
+
+אני לא מחפש יותר תיאור של שינויים.
+אני לא מחפש מה "אמור להיות".
+אני לא מחפש מה "כנראה" עודכן.
+
+אני מחפש דבר אחד בלבד:
+שהקוד בפועל יתוקן כמו שצריך, עד הסוף, בלי חורים, בלי פספוסים, ובלי פער בין מה שאתה אומר לבין מה שבאמת נמצא בגיטהאב.
+
+כרגע יש פער ברור בין מה שתיארת לי לבין מה שנמצא בפועל בקוד.
+זה לא מקובל.
+
+אני רוצה שתעבור עכשיו על המערכת ותבצע את כל התיקונים בפועל, בצורה מלאה, מדויקת, וסגורה.
+
+מה אתה צריך לתקן עכשיו:
+
+1. להסיר באמת את ה-landing-page bias מה-generation path
+אני לא רוצה יותר מערכת שכופה כמעט על כל פרויקט:
+- hero sections
+- stats bars
+- testimonials
+- footer marketing
+- flashy gradients/glow
+- landing-page sections by default
+
+אני רוצה שתמחוק בפועל את ההנחיות שכופות את זה מתוך generation path הראשי.
+אם יש design guidance — הוא צריך להיות conditional לפי סוג הבקשה.
+לא global forcing.
+לא “ALWAYS”.
+לא template bias.
+
+2. לפשט באמת את prompt architecture
+אני רוצה שתעבור על כל שכבות ה-prompt ותצמצם אותן בפועל.
+לא להסביר לי שצמצמת — אלא לצמצם באמת.
+
+תבדוק ותסיר/תקטין/תתחום:
+- shared output rules
+- premium design engine
+- giant design blocks
+- unnecessary stack additions
+- memory overload
+- DNA overload
+- multi-agent context overload
+- planning/spec layers when not needed
+- extra instructions that are not directly relevant to the current request
+
+המטרה:
+prompt קצר יותר, ממוקד יותר, נכון יותר, ורלוונטי יותר.
+
+3. לתקן באמת את cache correctness
+כרגע אני לא רוצה שום מצב שבו שני פרויקטים שונים, או שני states שונים, עלולים לקבל אותה תשובה מה-cache.
+
+תתקן בפועל את cache key כך שיכלול לפחות:
+- projectId
+- intent
+- stack
+- mode
+- current project state hash
+- whether request is create/edit/fix
+- relevant file/preview state hash
+
+אם אתה לא יכול להבטיח correctness מלאה עכשיו:
+תכבה את ה-cache.
+לגמרי.
+אני מעדיף בלי cache מאשר cache שגוי.
+
+4. להגביל באמת את multi-agent pipeline
+אני לא רוצה multi-agent pipeline על כל בקשה מורכבת.
+אני רוצה שהוא ירוץ רק כשבאמת צריך.
+
+תתקן בפועל:
+- pipeline מלא ל-create only
+- לא ל-edit קטן
+- לא ל-fix
+- לא ל-change מקומי
+- לא ל-add small feature unless explicitly justified
+
+edit/fix צריכים להיות קלים, ממוקדים, ומהירים.
+
+5. לתקן באמת את edit/fix flow
+אני רוצה שהמערכת תדע לעבוד על קוד קיים בצורה נכונה.
+
+כלומר:
+- לקרוא state קיים
+- להבין מה קיים
+- לשנות רק מה שהתבקש
+- לא לבנות הכול מחדש
+- לא למחוק חלקים עובדים
+- לא לדרוס structure בלי צורך
+- לשמור consistency
+
+אם המשתמש ביקש תיקון או שינוי מקומי,
+המערכת חייבת להיכנס ל-targeted edit mode אמיתי.
+
+6. לשפר באמת את intent detection
+אני לא רוצה intent routing חלש או גס מדי.
+
+תתקן בפועל את הזיהוי בין:
+- create
+- edit
+- fix
+- add feature
+- inspect
+- deploy
+- git sync
+- continue existing work
+
+אם אין ודאות:
+- תבחר fallback שמרני
+- לא flow אגרסיבי
+- לא regenerate מלא
+- לא destructive behavior
+
+7. לצמצם באמת context overload
+אני לא רוצה שב-edit/fix המערכת תקבל:
+- יותר מדי קבצים
+- יותר מדי HTML
+- יותר מדי כללים
+- יותר מדי layers
+- יותר מדי היסטוריה
+
+אני רוצה context focused בלבד.
+
+תתקן בפועל:
+- תשלח רק את הקבצים או החלקים הרלוונטיים
+- תשלח רק מה שצריך כדי לבצע את המשימה
+- אל תעמיס את כל העולם לכל generation
+
+8. לתקן באמת את HTML vs React separation
+אני רוצה source of truth ברור.
+בלי ערבוב.
+בלי persistence חלקי.
+בלי preview לא עקבי.
+
+תתקן בפועל:
+- HTML project → source of truth ברור
+- React/files project → source of truth ברור
+- persistence עקבי
+- preview update עקבי
+- save flow עקבי
+- done event עקבי
+- no partial state
+- no mixed state
+
+9. להקשיח באמת את output extraction
+אני רוצה parsing הרבה יותר אמין וסלחני.
+
+תתקן בפועל:
+- html extraction
+- file manifest extraction
+- patch extraction
+- fallback behavior
+- truncated output handling
+- validation before save
+
+אל תשמור output שבור כאילו הוא הצלחה.
+
+10. להוסיף validation אמיתי לפני persistence
+לפני שמירת output, תבדוק באמת:
+- האם ה-HTML usable
+- האם יש body
+- האם יש html close
+- האם זה לא output חתוך
+- האם file manifest usable
+- האם יש entrypoint
+- האם preview באמת יכול להיבנות
+
+אם לא:
+- אל תשמור
+- אל תכריז הצלחה
+- תפעיל fallback / retry / safe failure
+
+11. לתקן באמת את project state consistency
+אני רוצה consistency מלאה בין:
+- preview
+- projectFiles
+- snapshots
+- git
+- deploy
+- assistant response
+
+לא ייתכן מצב שבו message אחד אומר שהכול הצליח,
+אבל preview/files/state לא תואמים.
+
+12. לתקן באמת את GitHub flow
+אני לא רוצה רק כפתור או sync חלקי.
+אני רוצה flow אמיתי, עקבי, usable.
+
+המערכת חייבת לדעת:
+- connect GitHub
+- create or reuse repository
+- update files correctly
+- commit
+- push
+- preserve repo continuity
+- show correct status
+- never fake success
+
+13. לתקן באמת את deploy flow
+אני לא רוצה כפתור publish בלי אמת מאחוריו.
+
+המערכת חייבת לדעת:
+- deploy only if output is actually usable
+- build proper deploy payload
+- return real live URL
+- persist deploy state
+- show real status
+- avoid false success
+- not deploy broken/truncated output
+
+14. לתקן באמת את quality of generation
+אני רוצה שתכוון את המערכת ל:
+- correctness over flashiness
+- relevance over generic beauty
+- task fit over forced premium style
+- accurate edits over full regeneration
+- stable output over complicated orchestration
+
+המערכת צריכה לייצר:
+- פחות גנרי
+- פחות template-like
+- פחות marketing page by default
+- יותר תואם לבקשה בפועל
+- יותר usable
+- יותר consistent
+
+15. להפסיק לתת לי summaries במקום implementation
+אני לא רוצה שוב:
+- “תיקנתי”
+- “שיפרתי”
+- “עדכנתי”
+אם זה לא מופיע בפועל בקוד.
+
+אני רוצה:
+- code changes
+- real diffs
+- updated files
+- actual implementation
+- no mismatch between description and repo
+
+16. אני רוצה שתעבוד עכשיו לפי הכלל הבא
+אל תספר לי מה אתה מתכוון לעשות.
+אל תספר לי מה אמור להיות.
+אל תספר לי מה נראה לך שתיקנת.
+
+תבצע בפועל.
+אחר כך תראה לי:
+
+A. אילו קבצים שינית
+B. מה בדיוק הסרת
+C. מה בדיוק פישטת
+D. איך cache key תוקן בפועל
+E. איך intent detection שופר בפועל
+F. איך multi-agent הוגבל בפועל
+G. איך extraction/validation/persistence הוקשחו בפועל
+H. למה עכשיו generation quality תהיה טובה יותר
+
+17. אני רוצה גם הוכחה ברמת קוד
+אני רוצה שתיתן לי:
+- קבצים מלאים מתוקנים או diff ברור
+- לא רק תיאור
+- לא רק bullet points
+- לא רק summary
+
+18. חשוב מאוד
+אם יש משהו שעוד לא תוקן — אל תגיד לי שהוא תוקן.
+תגיד מה עדיין חסר.
+אבל אל תערבב בין “נעשה” לבין “בתכנון”.
+
+19. המטרה
+אני רוצה מערכת שמייצרת תוצאות טובות באמת.
+פחות זבל.
+פחות תבניות כפויות.
+פחות טעויות.
+פחות ערבוב בין פרויקטים.
+פחות rebuild מיותר.
+יותר דיוק.
+יותר איכות.
+יותר התאמה לבקשה.
+יותר consistency.
+
+20. תתחיל עכשיו בביצוע אמיתי
+לא עוד analysis.
+לא עוד promises.
+לא עוד summaries.
+
+אני רוצה implementation אמיתי, מלא, סגור, ונקי.
+בלי חורים.
+בלי פספוסים.
+בלי פער בין מה שאתה אומר לבין מה שיש בפועל בגיטהאב.
