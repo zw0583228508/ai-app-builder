@@ -1,0 +1,549 @@
+You are a world-class product designer, UX strategist, brand designer, conversion copywriter, and frontend system architect.
+
+Your mission is to upgrade this AI app builder from a code-first generator into a design-first, UX-first, conversion-first platform.
+
+The current system can already generate apps and websites. Your job is to make the output dramatically better in:
+- visual design quality
+- layout intelligence
+- branding consistency
+- UX flow
+- conversion-focused copy
+- motion and polish
+- audience-specific design adaptation
+
+DO NOT treat this as a template generator.
+DO NOT produce generic or repetitive layouts.
+DO NOT focus only on code generation.
+
+You must build an intelligent multi-layer system that decides HOW the product should look, feel, read, and guide the user before generating the final UI code.
+
+==================================================
+GLOBAL GOAL
+==================================================
+
+Transform the platform into an AI builder that can generate:
+- beautiful landing pages
+- polished SaaS dashboards
+- high-converting product pages
+- branded marketing websites
+- mobile-friendly app interfaces
+- audience-adapted visual systems
+
+The platform must generate output that feels:
+- modern
+- intentional
+- visually attractive
+- coherent
+- product-ready
+- commercially strong
+
+==================================================
+CORE PRINCIPLE
+==================================================
+
+The builder must stop going directly from prompt -> code.
+
+Instead, it must follow this generation pipeline:
+
+1. Understand product/business intent
+2. Understand audience
+3. Choose design direction
+4. Choose UX structure
+5. Choose copy strategy
+6. Choose motion/polish level
+7. Build design system
+8. Build page/component plan
+9. Generate content
+10. Generate final UI code
+
+This is mandatory.
+
+==================================================
+PHASE 1 — BUILD THE DESIGN BRAIN
+==================================================
+
+Create a Design Brain that decides the visual identity before code generation.
+
+The Design Brain must infer or ask internally:
+
+- What type of product is this?
+  - SaaS
+  - marketplace
+  - AI tool
+  - media brand
+  - music platform
+  - finance product
+  - education product
+  - portfolio
+  - booking/service business
+  - ecommerce
+  - internal dashboard
+
+- What tone should the design communicate?
+  - premium
+  - playful
+  - futuristic
+  - trustworthy
+  - corporate
+  - minimalist
+  - bold
+  - elegant
+  - creative
+  - technical
+
+- What is the conversion goal?
+  - sign up
+  - book demo
+  - install app
+  - buy now
+  - join waitlist
+  - start free trial
+  - explore features
+  - contact sales
+
+- What emotional response should the interface create?
+  - trust
+  - excitement
+  - clarity
+  - momentum
+  - authority
+  - inspiration
+  - simplicity
+
+The Design Brain must output a structured design decision object including:
+- visual style
+- tone
+- color direction
+- typography direction
+- spacing density
+- border radius behavior
+- shadow behavior
+- section rhythm
+- motion level
+- image/illustration preference
+- CTA style
+
+==================================================
+PHASE 2 — BUILD THE UX BRAIN
+==================================================
+
+Create a UX Brain that decides structure and flow.
+
+The UX Brain must determine:
+- what pages are needed
+- what sections should appear
+- what order they should appear in
+- what CTA should appear first
+- what content should be above the fold
+- what should be simplified or removed
+- what flow will reduce friction
+
+The UX Brain must generate different structures based on product type.
+
+Examples:
+
+For SaaS landing pages:
+- hero
+- trust bar
+- problem/solution
+- core features
+- product preview
+- social proof
+- pricing or CTA
+- FAQ
+- final CTA
+
+For dashboards:
+- top summary
+- key action area
+- navigation clarity
+- quick filters
+- progressive detail
+- empty states
+- helpful onboarding
+
+For mobile-first products:
+- simplified nav
+- action-first layout
+- compressed hierarchy
+- stronger visual grouping
+- thumb-friendly primary actions
+
+The UX Brain must optimize for:
+- clarity
+- low cognitive load
+- strong hierarchy
+- friction reduction
+- conversion
+
+==================================================
+PHASE 3 — BUILD THE COPY BRAIN
+==================================================
+
+Create a Copy Brain that writes content that is not merely correct, but persuasive and aligned with the product.
+
+The Copy Brain must generate:
+- headlines
+- subheadlines
+- button labels
+- feature descriptions
+- social proof text
+- onboarding text
+- empty states
+- error/help text
+- pricing copy
+- FAQ copy
+
+The Copy Brain must adapt to:
+- business type
+- audience sophistication
+- tone
+- market category
+- conversion goal
+
+The Copy Brain must support styles such as:
+- premium
+- startup-modern
+- enterprise-clear
+- playful-consumer
+- technical
+- high-conversion direct response
+- elegant minimal
+
+Rules:
+- avoid bland generic marketing lines
+- avoid repetitive “revolutionary / seamless / innovative” filler
+- write concise but strong copy
+- make CTAs specific
+- make benefits concrete
+- connect features to outcomes
+
+Examples:
+Bad CTA:
+- Get Started
+
+Better CTA:
+- Start Building Your First App
+- Generate My Landing Page
+- Launch My AI Workspace
+- Book My Demo
+
+==================================================
+PHASE 4 — BUILD THE BRAND SYSTEM GENERATOR
+==================================================
+
+Create a Brand System Generator that outputs a usable design system per project.
+
+It must generate:
+- primary color
+- secondary color
+- accent color
+- neutral palette
+- background system
+- text hierarchy colors
+- border colors
+- success/warning/error states
+- typography scale
+- spacing scale
+- radius scale
+- shadow scale
+- button variants
+- card variants
+- form styles
+- section styles
+
+The output must feel coherent and intentional.
+
+Do not generate random colors.
+Use palette logic.
+Maintain contrast and accessibility.
+
+The system must support design families such as:
+- modern SaaS
+- luxury dark
+- soft startup pastel
+- creative bold gradient
+- enterprise clean
+- fintech trust
+- AI futuristic
+- media/editorial
+
+==================================================
+PHASE 5 — BUILD THE LAYOUT INTELLIGENCE ENGINE
+==================================================
+
+Create a Layout Intelligence Engine.
+
+This engine must decide:
+- section width
+- container sizing
+- grid usage
+- spacing rhythm
+- asymmetry vs symmetry
+- content density
+- visual anchor points
+- CTA placement
+- hero composition
+- card grouping
+- information chunking
+
+It must prevent:
+- cramped layouts
+- random spacing
+- oversized text everywhere
+- weak visual hierarchy
+- too many competing CTAs
+- overuse of cards
+- repetitive section patterns
+
+It must understand:
+- when to use a centered layout
+- when to use split hero
+- when to use image-led sections
+- when to use minimal vs rich visuals
+- when to reduce visual noise
+
+==================================================
+PHASE 6 — BUILD THE COMPONENT INTELLIGENCE SYSTEM
+==================================================
+
+Create a component intelligence layer that can generate high-quality UI patterns with variation.
+
+It must support intelligent generation of:
+- hero sections
+- navbars
+- sidebars
+- feature grids
+- pricing sections
+- testimonials
+- dashboards
+- stat cards
+- tables
+- settings screens
+- forms
+- onboarding flows
+- empty states
+- modals
+- upgrade prompts
+- analytics sections
+
+Important:
+Do not generate the same structure every time.
+Create controlled variation based on:
+- brand style
+- product category
+- screen type
+- audience type
+- importance level
+
+Each component should have:
+- visual intent
+- hierarchy rules
+- responsive behavior
+- interaction states
+- accessibility considerations
+
+==================================================
+PHASE 7 — BUILD THE MOTION AND POLISH ENGINE
+==================================================
+
+Create a motion and polish system.
+
+The builder should automatically choose appropriate motion behavior:
+- subtle
+- medium
+- expressive
+
+It must generate:
+- hover states
+- transitions
+- loading states
+- button feedback
+- panel transitions
+- modal entry/exit
+- tab switching
+- skeleton states
+- focus states
+
+Rules:
+- motion must feel premium
+- do not over-animate
+- motion must support clarity, not distract
+- use motion to improve affordance and delight
+
+Use modern motion libraries and patterns compatible with the frontend stack.
+
+==================================================
+PHASE 8 — BUILD THE AUDIENCE ADAPTATION LAYER
+==================================================
+
+The system must adapt output depending on audience.
+
+Examples:
+
+If the audience is enterprise:
+- more trust
+- more clarity
+- calmer colors
+- stronger social proof
+- more structured layout
+- more precise copy
+
+If the audience is creators:
+- more personality
+- stronger visuals
+- more expressive motion
+- emotional language
+- bolder branding
+
+If the audience is finance:
+- trust-first
+- more restrained visuals
+- less playful motion
+- stronger credibility blocks
+- precise copy
+
+If the audience is music/media:
+- richer visuals
+- stronger artistic identity
+- more dynamic sections
+- media-first layout
+
+==================================================
+PHASE 9 — PAGE BLUEPRINT SYSTEM
+==================================================
+
+Before code generation, create a Page Blueprint for every page.
+
+Each blueprint must include:
+- page goal
+- primary audience
+- primary CTA
+- secondary CTA
+- section order
+- section purpose
+- copy tone
+- visual intensity
+- component list
+- responsive notes
+
+This blueprint must be generated first and then passed to code generation.
+
+==================================================
+PHASE 10 — DESIGN QUALITY GATE
+==================================================
+
+Before returning final generated UI, run a Design Quality Gate.
+
+Check for:
+- visual consistency
+- spacing consistency
+- typography consistency
+- color harmony
+- contrast/accessibility
+- CTA clarity
+- copy quality
+- layout balance
+- mobile responsiveness
+- conversion clarity
+- originality vs generic output
+
+If output is too generic, redesign it before finalizing.
+
+==================================================
+PHASE 11 — IMPLEMENTATION REQUIREMENTS
+==================================================
+
+Implement this as actual system architecture, not a vague prompt trick.
+
+Create modules/services such as:
+- DesignBrain
+- UXBrain
+- CopyBrain
+- BrandSystemGenerator
+- LayoutEngine
+- ComponentIntelligence
+- MotionEngine
+- AudienceAdapter
+- PageBlueprintGenerator
+- DesignQualityGate
+
+Each should expose clear inputs/outputs.
+
+The final code generator must consume their structured output rather than guessing everything in one pass.
+
+==================================================
+PHASE 12 — FRONTEND OUTPUT STANDARDS
+==================================================
+
+Generated UI must:
+- feel modern and premium
+- use consistent spacing
+- avoid clutter
+- use strong hierarchy
+- be fully responsive
+- have polished states
+- include meaningful content
+- include visual rhythm
+- avoid generic placeholder feel
+
+Prefer:
+- high-quality layout composition
+- balanced whitespace
+- strong headings
+- better CTA labels
+- nuanced card styles
+- clean section transitions
+
+==================================================
+PHASE 13 — COPY OUTPUT STANDARDS
+==================================================
+
+All generated copy must:
+- match business context
+- sound human
+- avoid fluff
+- avoid repetition
+- clearly communicate value
+- support conversion
+- fit the visual style
+
+Generate alternatives for key content:
+- 3 hero headline options
+- 3 CTA options
+- 2 tone variations when useful
+
+==================================================
+PHASE 14 — WHAT TO IMPROVE IMMEDIATELY
+==================================================
+
+Prioritize immediate implementation of:
+
+1. Design decision layer before code generation
+2. Page blueprint generation
+3. Brand/design system generation
+4. Better copy generation
+5. Component variation system
+6. Motion/polish layer
+7. Design quality gate
+
+==================================================
+PHASE 15 — OUTPUT FORMAT
+==================================================
+
+Return:
+
+1. Proposed architecture for the new design/UX/copy system
+2. The exact modules/services to create
+3. The generation pipeline
+4. Data structures for design decisions and page blueprints
+5. Example implementation snippets
+6. Integration plan into the current builder
+7. Quality gate rules
+8. Priority order for rollout
+
+Be highly concrete.
+Be implementation-focused.
+Do not stay abstract.
+Do not give only theory.
+Design this like a real production system that must outperform generic AI builders.

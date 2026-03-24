@@ -1,0 +1,335 @@
+You are a senior staff-level engineer working on a large AI-powered app builder platform.
+
+Your mission is to refactor and harden the system WITHOUT breaking existing functionality.
+
+CRITICAL RULES:
+
+* DO NOT refactor everything at once
+* DO NOT break existing APIs
+* DO NOT change response formats unless explicitly required
+* WORK STEP-BY-STEP and VERIFY after each step
+* AFTER EACH STEP: ensure system still runs
+
+---
+
+# GLOBAL GOAL
+
+Transform the system into:
+
+* modular
+* testable
+* secure
+* scalable
+* production-grade
+
+---
+
+# EXECUTION STRATEGY
+
+You MUST follow this exact order:
+
+1. Stabilize backend core (messages.ts first)
+2. Extract services
+3. Add telemetry
+4. Harden security
+5. Fix frontend structure
+6. Add tests
+
+DO NOT jump between phases.
+
+---
+
+# PHASE 1 — REFACTOR messages.ts (MOST CRITICAL)
+
+TARGET FILE:
+artifacts/api-server/src/routes/projects/messages.ts
+
+THIS FILE IS TOO LARGE AND DOES TOO MUCH.
+
+---
+
+## STEP 1.1 — CREATE MODULE STRUCTURE
+
+Create a new folder:
+
+/services/messages/
+
+Inside it create:
+
+* validateRequest.ts
+* enforcePlanLimits.ts
+* rateLimiter.ts
+* detectIntent.ts
+* resolveMode.ts
+* buildMemoryContext.ts
+* executeAI.ts
+* parseAIResponse.ts
+* snapshotManager.ts
+* suggestionsEngine.ts
+* telemetryLogger.ts
+
+---
+
+## STEP 1.2 — MOVE LOGIC OUT OF ROUTE
+
+From messages.ts:
+
+Extract logic into the new modules.
+
+RULES:
+
+* Each module = single responsibility
+* No duplicated logic
+* No side effects outside module responsibility
+
+---
+
+## STEP 1.3 — KEEP ROUTE THIN
+
+messages.ts should only:
+
+1. validate request
+2. call services in order
+3. return response
+
+NO business logic inside route.
+
+---
+
+## STEP 1.4 — PRESERVE CONTRACT
+
+DO NOT CHANGE:
+
+* request body structure
+* response format
+* streaming behavior
+
+---
+
+## STEP 1.5 — VERIFY
+
+After refactor:
+
+* run server
+* send test request
+* verify response identical
+
+---
+
+# PHASE 2 — CREATE CORE SERVICES
+
+CREATE:
+
+/services/core/
+
+* AIService.ts
+* MemoryService.ts
+* ProjectService.ts
+* DeploymentService.ts
+* TelemetryService.ts
+
+---
+
+## STEP 2.1 — CENTRALIZE AI CALLS
+
+ALL model calls must go through AIService.
+
+Move ALL:
+
+* anthropic calls
+* streaming logic
+* model selection
+
+into AIService.
+
+---
+
+## STEP 2.2 — ADD COST TRACKING
+
+Inside AIService:
+
+For each call record:
+
+* model
+* input tokens
+* output tokens
+* estimated cost
+* latency
+
+Send to TelemetryService.
+
+---
+
+## STEP 2.3 — REPLACE DIRECT CALLS
+
+Find ALL direct AI calls in project and replace with AIService.
+
+---
+
+# PHASE 3 — TELEMETRY (CRITICAL)
+
+CREATE:
+
+/services/telemetry/
+
+Add:
+
+* logAIUsage()
+* logRouteUsage()
+* logErrors()
+
+Ensure EVERY route that uses AI logs usage.
+
+---
+
+# PHASE 4 — SECURITY HARDENING
+
+## STEP 4.1 — ENCRYPTION
+
+* Remove fallback key
+* If missing → throw error in production
+* Use secure AES implementation
+
+---
+
+## STEP 4.2 — TERMINAL
+
+* Disable by default
+* Add feature flag ENABLE_TERMINAL
+* Add audit logs
+
+---
+
+## STEP 4.3 — PROXY
+
+Harden proxy:
+
+Block:
+
+* localhost
+* internal IP ranges
+* metadata services
+
+Add:
+
+* domain allowlist
+* timeout
+* max response size
+
+---
+
+## STEP 4.4 — HTML ESCAPING
+
+Create utility:
+
+utils/escapeHtml.ts
+
+Use it everywhere dynamic HTML is generated.
+
+---
+
+# PHASE 5 — FRONTEND REFACTOR
+
+TARGET FILES:
+
+* PreviewPanel.tsx
+* ChatPanel.tsx
+* ChatInputBar.tsx
+* ProjectFilesPanel.tsx
+* i18n.tsx
+
+---
+
+## STEP 5.1 — SPLIT COMPONENTS
+
+Break into:
+
+* UI components
+* hooks
+* state managers
+
+---
+
+## STEP 5.2 — REMOVE LOGIC FROM COMPONENTS
+
+Move:
+
+* data logic → hooks
+* API calls → services
+
+---
+
+## STEP 5.3 — i18n FIX
+
+Replace giant file with:
+
+/locales/en.json
+/locales/he.json
+
+---
+
+# PHASE 6 — TESTING
+
+## REQUIRED:
+
+### Unit tests:
+
+* AIService
+* parsing
+* security utils
+
+### Integration tests:
+
+* auth
+* project routes
+* deploy
+
+### E2E:
+
+* create project
+* send prompt
+* get result
+* deploy
+
+---
+
+# PHASE 7 — PERFORMANCE
+
+## FRONTEND:
+
+* lazy load
+* memo
+* split components
+
+## BACKEND:
+
+* async flows
+* avoid blocking
+
+---
+
+# SUCCESS CRITERIA
+
+System must:
+
+* behave EXACTLY the same
+* be modular
+* have smaller files
+* have centralized AI logic
+* have full telemetry
+* be secure
+
+---
+
+# FINAL OUTPUT
+
+Return:
+
+1. Updated file structure
+2. New services created
+3. Refactored messages flow
+4. Telemetry integration
+5. Security fixes
+6. Test plan
+
+Be precise. Do not skip steps.

@@ -1,0 +1,425 @@
+You are working on an existing AI app builder monorepo that is already significantly improved.
+
+Important:
+Do NOT restart the architecture.
+Do NOT rewrite working systems.
+Do NOT replace existing deploy/auth/preview/security modules unless strictly necessary.
+
+Your mission now is to close the remaining execution gap and turn the platform from a strong AI-assisted builder into a true execution-capable AI platform.
+
+You must build ON TOP of the current codebase.
+
+CURRENT REALITY OF THE CODEBASE
+- Deploy system exists and is meaningfully improved
+- Auth, ownership checks, and rate limiting exist
+- Preview UI exists and is much better
+- Terminal safety exists
+- Runtime routes and deploy routes exist
+- Agent orchestrator exists
+- Project memory / DNA exists
+
+BUT the following core gaps still remain:
+1. The AI tools layer is not implemented as a real action execution layer
+2. The orchestrator is still mostly a planning pipeline, not a true execution engine
+3. Runtime is still simulated instead of running real isolated environments
+4. Sandbox isolation is still incomplete
+5. Real workspace-per-project filesystem execution is still missing or incomplete
+
+YOUR TASK
+Complete ONLY the missing pieces below.
+
+--------------------------------------------------
+PHASE 1 — BUILD A REAL AI ACTION / TOOL SYSTEM
+--------------------------------------------------
+
+Problem:
+The current ai-tools route is effectively empty, and the system still lacks a true structured tool execution layer.
+
+Implement a real internal action layer.
+
+Create a domain module such as:
+
+artifacts/api-server/src/domain/ai-tools/
+  actions.ts
+  schemas.ts
+  executor.ts
+  logger.ts
+
+Define a strict action schema for AI-generated actions.
+
+At minimum support these actions:
+- create_file
+- update_file
+- read_file
+- delete_file
+- list_files
+- ensure_directory
+- install_dependencies
+- run_command
+- start_runtime
+- stop_runtime
+- get_project_state
+
+Each action must:
+- validate input with Zod
+- execute against a controlled project workspace
+- emit structured logs
+- return typed results
+- fail safely with explicit errors
+
+Do NOT expose raw shell execution directly to the model.
+The model must emit structured actions, and only the executor can translate approved actions into system behavior.
+
+Deliverables:
+- Zod schemas for all tool actions
+- executor that dispatches actions safely
+- audit logging for every tool call
+- reusable typed result objects
+
+--------------------------------------------------
+PHASE 2 — UPGRADE THE ORCHESTRATOR INTO A REAL EXECUTION LOOP
+--------------------------------------------------
+
+Problem:
+The current orchestrator is still a sequential specialist-planning pipeline.
+It produces plans and summaries, but does not truly execute stateful actions in a loop.
+
+Keep the current specialist agents, but add a higher-level execution engine.
+
+Implement a new orchestration flow like:
+
+analyze current state
+→ choose next structured action
+→ execute action through tool executor
+→ observe result
+→ update execution state
+→ decide next step
+→ retry or repair if needed
+→ finish only when goal state is achieved
+
+Create something like:
+artifacts/api-server/src/agents/execution_orchestrator.ts
+
+Add an execution state object that tracks:
+- projectId
+- user goal
+- current step
+- completed steps
+- pending steps
+- workspace path
+- file tree summary
+- last action
+- last action result
+- runtime status
+- deploy status
+- accumulated errors
+- retry counts
+- streamed logs
+
+Rules:
+- The orchestrator must never directly mutate files itself
+- It must only call the tool executor
+- It must be resumable
+- It must support retry with bounded attempts
+- It must support repair steps after failures
+
+Do NOT delete the existing orchestrator.
+Instead:
+- keep the current orchestrator for planning/spec generation
+- add the execution orchestrator for action completion
+
+Deliverables:
+- new execution orchestrator
+- retry policy
+- repair loop after failures
+- typed execution state
+- streamed execution events for UI
+
+--------------------------------------------------
+PHASE 3 — IMPLEMENT A REAL PROJECT WORKSPACE SYSTEM
+--------------------------------------------------
+
+Problem:
+The platform still lacks a fully reliable workspace-per-project model for actual file execution.
+
+Create a real workspace manager.
+
+Implement a module such as:
+artifacts/api-server/src/domain/workspace/
+  workspace-manager.ts
+  file-tree.ts
+  snapshots.ts
+  metadata.ts
+
+Each project must have a real filesystem workspace, for example:
+project_workspaces/{projectId}/
+
+Inside each workspace support:
+- source files
+- generated files
+- metadata.json
+- snapshots/
+- logs/
+
+Requirements:
+- create workspace on demand
+- ensure path safety
+- forbid path traversal
+- maintain file tree index
+- support lightweight snapshots before destructive mutations
+- support restore from snapshot
+- expose workspace summary to orchestrator and UI
+
+Do NOT rely only on DB records for project structure.
+The filesystem workspace must become the source of truth for executable project contents.
+
+Deliverables:
+- workspace creation
+- safe file read/write/delete operations
+- file tree generation
+- snapshot support
+- metadata support
+
+--------------------------------------------------
+PHASE 4 — CONNECT AI ACTIONS TO THE REAL WORKSPACE
+--------------------------------------------------
+
+Problem:
+The current platform still behaves too much like “AI generates plans/text” instead of “AI performs project mutations”.
+
+Integrate the new tool executor with the new workspace manager.
+
+The flow must become:
+AI decides action
+→ action validated
+→ action executed in workspace
+→ result captured
+→ orchestrator continues
+
+At this stage, the model should return structured action objects, not vague prose.
+
+For example:
+{
+  "action": "create_file",
+  "input": {
+    "path": "src/App.tsx",
+    "content": "..."
+  }
+}
+
+or
+{
+  "action": "install_dependencies",
+  "input": {
+    "packages": ["react-router-dom", "zod"]
+  }
+}
+
+Do NOT let the model invent arbitrary commands.
+Use an allowlisted action vocabulary.
+
+Deliverables:
+- structured action prompting
+- safe action parsing
+- action execution wiring
+- state update after each action
+
+--------------------------------------------------
+PHASE 5 — REPLACE SIMULATED RUNTIME WITH REAL EXECUTION
+--------------------------------------------------
+
+Problem:
+The current runtime route explicitly states that runtime is simulated in DB and there is no real Docker in this environment.
+
+This is one of the biggest remaining gaps.
+
+Implement a real local execution layer first.
+If containers are not available in the environment, implement process-based isolation as the first production step.
+
+Create a runtime manager such as:
+artifacts/api-server/src/domain/runtime/
+  runtime-manager.ts
+  process-runtime.ts
+  runtime-registry.ts
+  resource-policy.ts
+
+Requirements:
+- start a project from its real workspace
+- use controlled child_process execution
+- run only approved commands
+- assign a port safely
+- track stdout/stderr
+- track lifecycle state
+- stop/restart cleanly
+- attach runtime to projectId
+- expose preview URL
+
+The runtime status must reflect actual process state, not synthetic DB-only state.
+
+If containerization is not possible in this environment, implement a clean abstraction so Docker/container runtime can be plugged in later without rewriting the orchestration layer.
+
+Deliverables:
+- real runtime manager
+- real process startup
+- stdout/stderr capture
+- actual running/stopped/error states
+- preview URL from real running process
+
+--------------------------------------------------
+PHASE 6 — STRENGTHEN SANDBOX AND ISOLATION
+--------------------------------------------------
+
+Problem:
+Terminal safety exists, but that is not enough.
+The system still needs stronger per-project execution isolation.
+
+Build a true sandbox policy layer around the runtime and tool executor.
+
+Requirements:
+- each project can only access its own workspace
+- strict command allowlist
+- deny dangerous shell patterns
+- enforce per-project working directory
+- enforce env allowlist
+- enforce CPU/memory/timeouts where possible
+- cap concurrent runtimes
+- prevent cross-project file access
+- ensure path normalization everywhere
+
+You may begin with process isolation and policy controls if full containers are unavailable, but design the interfaces so real containers can be introduced later.
+
+Deliverables:
+- centralized sandbox policy module
+- command allowlist
+- env allowlist
+- timeout policy
+- isolation checks for every file and runtime action
+
+--------------------------------------------------
+PHASE 7 — MAKE THE UI REFLECT REAL EXECUTION
+--------------------------------------------------
+
+Problem:
+The UI is much better now, but it still needs to reflect true action execution rather than just high-level progress.
+
+Keep the existing PreviewPanel / RuntimePanel / DeployPanel.
+Do NOT rewrite them unnecessarily.
+
+Enhance the UI by streaming:
+- execution steps
+- tool calls
+- file mutations
+- runtime logs
+- install progress
+- build progress
+- retry / repair events
+
+The user should be able to see:
+- what action the AI is taking
+- what files were changed
+- whether dependencies were installed
+- whether runtime is actually running
+- real logs from the process
+
+Deliverables:
+- event stream contract
+- action log UI
+- runtime log UI
+- real-time file tree updates
+- visible repair/retry state
+
+--------------------------------------------------
+PHASE 8 — KEEP DEPLOYMENT, BUT CONNECT IT TO REAL BUILD OUTPUT
+--------------------------------------------------
+
+Problem:
+Deployment has improved a lot and should NOT be rebuilt from scratch.
+But it must be connected to real workspace/build output.
+
+Refine the deploy pipeline so that deploy acts on actual generated project contents from the workspace and actual build artifacts where relevant.
+
+Requirements:
+- validate workspace before deploy
+- validate required files
+- validate build success before marking deployment live
+- connect deploy status to real execution results
+- surface real deploy errors in UI
+
+Do NOT remove the existing deployment modules.
+Extend them to consume the new real execution/workspace/runtime layers.
+
+--------------------------------------------------
+PHASE 9 — OBSERVABILITY AND FAILURE RECOVERY
+--------------------------------------------------
+
+Problem:
+As the system becomes execution-capable, observability becomes mandatory.
+
+Add structured logs for:
+- action requested
+- action validated
+- action executed
+- action failed
+- retry attempt
+- runtime started
+- runtime failed
+- deploy started
+- deploy failed
+- repair action selected
+
+Store enough detail for debugging without leaking secrets.
+
+Create a clear error taxonomy:
+- validation_error
+- workspace_error
+- runtime_error
+- sandbox_error
+- deploy_error
+- model_output_error
+
+Add bounded recovery logic:
+- retry safe transient failures
+- do not retry dangerous failures blindly
+- surface non-recoverable failures clearly
+
+--------------------------------------------------
+PHASE 10 — FINAL INTEGRATION RULES
+--------------------------------------------------
+
+Non-negotiable rules:
+- build on top of the current architecture
+- do not rewrite working deploy/auth/preview/security layers unnecessarily
+- do not return vague TODO-based implementations
+- do not leave fake simulation where real execution is now required
+- keep modules typed, validated, and composable
+- prefer extension over replacement
+- preserve ownership/security/rate-limit protections already present
+
+SUCCESS CRITERIA
+The work is complete only when the following becomes true:
+
+1. AI can emit structured actions
+2. The action executor can safely mutate a real project workspace
+3. The execution orchestrator can repeatedly plan → act → observe → repair
+4. A project can actually run from its workspace
+5. Runtime status reflects a real running process
+6. UI shows real execution activity and logs
+7. Deploy consumes real project output rather than mostly simulated state
+
+IMPLEMENTATION ORDER
+Work strictly in this order:
+1. Tool/action schemas + executor
+2. Workspace manager
+3. Execution orchestrator
+4. Runtime manager
+5. Sandbox policy hardening
+6. UI execution streaming
+7. Deploy integration refinement
+8. Observability and recovery polish
+
+When coding:
+- produce real code
+- wire it into the existing monorepo
+- keep changes modular
+- avoid regressions
+- prefer minimal, high-leverage changes over large rewrites

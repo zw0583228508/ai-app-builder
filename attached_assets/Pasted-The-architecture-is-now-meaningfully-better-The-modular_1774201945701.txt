@@ -1,0 +1,443 @@
+The architecture is now meaningfully better.
+The modular refactor improved the codebase.
+
+Do NOT redo the architectural cleanup.
+Do NOT reopen the big refactor unless absolutely necessary.
+
+Your mission now is to finish EVERYTHING THAT IS STILL MISSING.
+
+This is now a product-polish and chat-experience mission.
+
+The remaining gaps are:
+1. streaming still does not feel truly smooth
+2. entrepreneur mode is still not simple/premium enough
+3. the input area is still too crowded
+4. the product still does not fully feel like “everything through chat”
+5. helper surfaces still create too much cognitive load
+6. preview/panels still slightly compete with the chat-first feel
+7. the overall emotional product quality is still not high enough
+
+NON-NEGOTIABLE RULES
+1. Preserve the current modular structure.
+2. Do not re-monolith the codebase.
+3. Do not break any existing features.
+4. Do not break chat, preview, deploy, GitHub sync, files, share, snapshots, secrets, database, or mode switching.
+5. Work safely and incrementally.
+6. Preserve RTL/Hebrew support.
+7. Keep advanced capabilities available.
+8. Focus on feel, polish, speed, hierarchy, and trust.
+9. The product must become more premium, more fluid, more attractive, and more chat-first.
+10. Do not waste time on unnecessary backend restructuring now.
+
+PRIMARY GOAL
+Finish the remaining work so the app feels like a world-class chat-led builder:
+- smooth
+- premium
+- clear
+- addictive
+- lightweight
+- fast
+- elegant
+- founder-friendly
+- operational through chat
+
+============================================================
+PHASE 1 — REMOVE THE REMAINING STREAMING JANK COMPLETELY
+============================================================
+
+Target:
+artifacts/app-builder/src/hooks/use-chat-stream.ts
+
+This is still the biggest UX issue.
+
+Current problem:
+The assistant response still risks feeling stuck, delayed, bursty, or dumped in chunks.
+That kills the premium feeling.
+
+Required:
+Eliminate the remaining artificial lag in normal text streaming.
+
+Implementation direction:
+- remove or drastically weaken the frontend typewriter queue for normal conversational text
+- do not buffer text long enough to create visible pauses
+- do not “hold then dump”
+- do not aggressively flush a large remainder at the end
+- prefer near-direct rendering of incoming text chunks
+- if light throttling is needed, keep it extremely minimal and invisible
+- code streaming can remain separate and intact
+
+Specifically review and improve:
+- typewriterQueueRef
+- typewriterShownRef
+- typewriterTimerRef
+- startTypewriter()
+- appendStreamedText()
+- flushTypewriter()
+- avgChunkIntervalRef-based pacing
+- end-of-stream behavior
+
+The correct result:
+- the text should feel live
+- the response should keep moving
+- no obvious freezing
+- no burst dumps
+- no ugly final jump
+
+Also review whether scroll behavior contributes to perceived lag.
+If needed, lighten streaming-time scroll updates.
+
+SUCCESS CRITERIA FOR THIS PHASE
+- smooth streaming
+- natural pacing
+- no chunk dumping
+- no visible artificial lag
+- code preview streaming still works
+
+============================================================
+PHASE 2 — MAKE ENTREPRENEUR MODE ACTUALLY FEEL DIFFERENT
+============================================================
+
+Target:
+all entrepreneur-mode chat UI behavior inside:
+artifacts/app-builder/src/components/chat/*
+
+Current problem:
+Entrepreneur mode is improved, but it still feels too close to a softened builder interface.
+It still exposes too much tool density and too many visible capabilities at once.
+
+Required:
+Entrepreneur mode must become:
+- simpler
+- calmer
+- cleaner
+- more premium
+- more guided
+- more business-friendly
+- less technical
+- more emotionally confident
+
+In entrepreneur mode:
+- advanced controls must be less visually prominent
+- tool density must be lower
+- helper surfaces must be reduced
+- technical actions must be tucked away more
+- the main emotional focus must be the conversation
+
+The user in entrepreneur mode should mainly feel:
+- “describe what you want”
+- “the assistant understands”
+- “the product is building for me”
+- “this feels easy and premium”
+
+You must improve:
+- what is visible by default
+- what is muted
+- what is collapsed
+- what gets priority
+- how much technical UI is shown
+
+Do NOT remove functionality.
+Reduce exposure, not capability.
+
+============================================================
+PHASE 3 — SIMPLIFY THE INPUT BAR FURTHER
+============================================================
+
+Target:
+ChatInputBar and related chat controls
+
+Current problem:
+The input area still feels too busy.
+Too many controls compete with the text field.
+The emotional center of the interface is diluted.
+
+Required:
+Make the input bar feel much more premium and focused.
+
+The input bar should feel:
+- elegant
+- calm
+- obvious
+- inviting
+- high-confidence
+- low-friction
+
+Required improvements:
+- the text field must dominate visually
+- the send action must feel clear and satisfying
+- secondary controls must become quieter
+- spacing must improve
+- the bar must feel intentionally composed, not crowded
+
+Specifically:
+- reduce the visual prominence of secondary icons
+- make advanced actions feel secondary or tucked away
+- improve spacing rhythm between controls
+- reduce the sense of “toolbar clutter”
+- entrepreneur mode should have the cleanest version of the input bar
+
+Do not remove advanced functionality.
+Just stop letting it visually overpower the primary interaction.
+
+============================================================
+PHASE 4 — MAKE THE PRODUCT TRULY FEEL “EVERYTHING THROUGH CHAT”
+============================================================
+
+Current problem:
+The app still feels partially like:
+chat + tools
+instead of:
+chat as the operating system
+
+Required:
+Strengthen the feeling that almost everything meaningful can be done through conversation.
+
+Without introducing unstable new systems, improve:
+- discoverability of what chat can do
+- confidence that chat requests lead to real execution
+- action-oriented UX around the assistant
+- the sense that the assistant is operating the workspace
+
+The user should feel that chat can naturally drive:
+- building pages/screens
+- redesigning sections
+- fixing bugs
+- improving mobile
+- updating copy
+- editing selected elements
+- publishing
+- GitHub actions
+- integration-related tasks
+- project-wide changes
+
+Required product feel:
+- asking should feel powerful
+- execution should feel reliable
+- the assistant should feel operational, not passive
+- the chat should feel like the fastest route to progress
+
+Improve the UX around this feeling.
+Do not focus only on code structure.
+
+============================================================
+PHASE 5 — REDUCE THE REMAINING COGNITIVE OVERLOAD
+============================================================
+
+Current issue:
+There are still too many possible UI layers competing in the chat area:
+- helper banners
+- suggestion cards
+- plan cards
+- quick action rows
+- queue indicators
+- attachments
+- progress/status surfaces
+- agent-related UI
+- technical affordances
+
+Required:
+Tighten the information hierarchy more aggressively.
+
+Priority order must be:
+1. current conversation
+2. current response
+3. input bar
+4. one relevant helper/context surface
+5. advanced actions
+6. internal/technical states
+
+Rules:
+- do not let multiple helper surfaces compete at once
+- suppress secondary UI when it is not useful
+- reduce stacking
+- reduce visual noise during active conversation
+- reduce “always-on” support UI
+
+The interface should feel quieter and more intentional.
+
+============================================================
+PHASE 6 — MAKE THE WHOLE CHAT SURFACE MORE PREMIUM
+============================================================
+
+Target:
+chat surface visual polish
+
+Current problem:
+The structure is better, but the emotional visual quality still is not high enough.
+It is not yet irresistible.
+
+Required improvements:
+- spacing consistency
+- cleaner message rhythm
+- better breathing room
+- calmer surfaces
+- better shadows
+- better border subtlety
+- stronger typography hierarchy
+- cleaner muted text behavior
+- more elegant quick-start cards
+- more polished message rendering
+- smoother microinteractions
+
+The product should feel:
+- modern
+- high-end
+- light
+- premium
+- founder-friendly
+- attractive
+- not noisy
+- not internal-tool-like
+
+Do not overdesign.
+Do not make it heavy.
+Make it look expensive and effortless.
+
+============================================================
+PHASE 7 — IMPROVE HELPER SURFACES SO THEY FEEL SMART, NOT LOUD
+============================================================
+
+Current issue:
+Some helper UI still feels like it is “present because it exists”, not because it is currently needed.
+
+Required:
+Make helper surfaces more contextual and less constant.
+
+This applies to:
+- suggestions
+- quick actions
+- chips
+- banners
+- plan cards
+- queue UI
+- agent UI
+- technical support surfaces
+
+Rules:
+- show help when relevant
+- hide help when it distracts
+- do not keep too many assistant-side UI blocks permanently visible
+- preserve usefulness without constant visual pressure
+
+The chat should feel more conversational and less cluttered.
+
+============================================================
+PHASE 8 — REVIEW PREVIEW SUPPORT ONLY THROUGH THE LENS OF CHAT-FIRST FEEL
+============================================================
+
+Target:
+preview-related UX only where it affects the overall product feel
+
+Current issue:
+Preview is functional, but the product still needs a stronger relationship between:
+- ask
+- build
+- show result
+
+Required:
+Improve only the parts of preview UX that reinforce the chat-led experience.
+
+Focus on:
+- making result transitions feel satisfying
+- reducing any preview behavior that weakens the feeling that chat is central
+- ensuring the preview feels like the assistant’s output surface, not a competing center of gravity
+
+Do not do a new giant preview refactor unless absolutely necessary.
+
+============================================================
+PHASE 9 — FINAL MODE DIFFERENTIATION PASS
+============================================================
+
+Push the emotional difference between modes further.
+
+Entrepreneur:
+- cleanest
+- calmest
+- most premium
+- least technical
+- most guided
+
+Builder:
+- more hands-on
+- more flexible
+- somewhat tool-visible
+
+Developer:
+- richest control
+- most technical
+- strongest explicit feedback
+
+Maker:
+- playful
+- creative
+- still clean
+
+This should be obvious from the UI behavior, not just from labels.
+
+============================================================
+PHASE 10 — FINAL PRODUCT FEEL PASS
+============================================================
+
+After all remaining UX fixes are done, perform one final premium product pass.
+
+Review:
+- empty state
+- first impression
+- streaming state
+- active conversation state
+- long-response state
+- entrepreneur mode
+- input bar
+- helper surfaces
+- perceived responsiveness
+- “how expensive and polished this feels”
+
+Target:
+This should feel like a serious premium product, not just a cleaned-up project.
+
+============================================================
+EXECUTION ORDER
+============================================================
+
+Do the work in this order:
+
+1. Fix streaming smoothness completely
+2. Simplify entrepreneur mode further
+3. simplify and polish the input bar
+4. strengthen “everything through chat” feel
+5. reduce remaining cognitive overload
+6. premium visual polish pass on the chat surface
+7. contextualize helper surfaces better
+8. preview support pass only where needed
+9. stronger mode differentiation
+10. final product-feel polish pass
+
+At each step:
+- explain exactly what you are changing
+- explain why it is safe
+- preserve existing behavior
+- verify imports/references
+- run typecheck/build if possible
+- report what still remains
+
+============================================================
+SUCCESS CRITERIA
+============================================================
+
+This work is successful only if:
+
+- streaming is finally smooth and natural
+- entrepreneur mode feels clearly more premium and simpler
+- the input area feels focused and elegant
+- the interface feels less cluttered
+- the product feels more like “everything through chat”
+- helper UI becomes smarter and quieter
+- the assistant feels more operational
+- the conversation becomes the emotional center of the product
+- the whole experience feels more world-class
+- all existing functionality remains stable
+
+Start now with the biggest remaining issue:
+1. use-chat-stream.ts
+2. entrepreneur-mode simplification
+3. input bar premium cleanup

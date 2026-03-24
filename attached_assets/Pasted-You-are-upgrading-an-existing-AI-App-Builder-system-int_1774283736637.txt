@@ -1,0 +1,269 @@
+You are upgrading an existing AI App Builder system into a fully autonomous, production-ready platform.
+
+Your goal:
+Transform the system from a planning AI into a fully executing AI that can build, run, and deploy real applications end-to-end.
+
+You MUST NOT redesign everything from scratch.
+You MUST build ON TOP of the existing architecture and reuse current modules.
+
+Follow the steps EXACTLY in order:
+
+----------------------------------------
+STEP 1 — Convert AI Orchestrator into Execution Engine
+----------------------------------------
+
+Current state:
+- agent_orchestrator exists
+- agents produce plans but do NOT execute
+
+Your task:
+Turn the orchestrator into a full execution loop.
+
+Implement:
+
+1. Add agent loop:
+
+while not task_completed:
+    analyze_state()
+    decide_next_action()
+    execute_action()
+    observe_result()
+    update_state()
+
+2. Add execution state object:
+- current_task
+- completed_tasks
+- file_tree
+- errors
+- logs
+
+3. Add retry + self-correction:
+- if action fails → retry with fix
+- if repeated failure → fallback strategy
+
+----------------------------------------
+STEP 2 — Build Real Tool System (CRITICAL)
+----------------------------------------
+
+Create a tool execution layer.
+
+Define tools:
+
+- create_file(path, content)
+- update_file(path, content)
+- delete_file(path)
+- read_file(path)
+- list_files(path)
+- install_dependencies(packages)
+- run_command(command)
+- run_project()
+- stop_project()
+
+Requirements:
+
+- Tools MUST actually perform actions on filesystem
+- Use a controlled workspace directory per project
+- All actions must be logged
+
+----------------------------------------
+STEP 3 — Implement Project File System Engine
+----------------------------------------
+
+Create a real project workspace system.
+
+Each project must have:
+
+- root directory
+- file tree
+- metadata.json
+
+Implement:
+
+- project initialization
+- file tracking
+- version history (simple: snapshots)
+
+Add:
+
+project_workspace/
+  /project_id/
+    /src
+    /public
+    metadata.json
+
+----------------------------------------
+STEP 4 — Connect AI → Tools → Files
+----------------------------------------
+
+Modify agents so they DO NOT return text plans.
+
+Instead they must return structured actions:
+
+Example:
+
+{
+  "action": "create_file",
+  "path": "src/App.tsx",
+  "content": "..."
+}
+
+The orchestrator must:
+
+- parse actions
+- call tools
+- update state
+- continue loop
+
+----------------------------------------
+STEP 5 — Real-Time Build + Preview
+----------------------------------------
+
+Connect frontend to execution engine.
+
+Implement:
+
+- stream logs to UI
+- show file creation in real-time
+- auto-refresh preview
+
+Add:
+
+- WebSocket or streaming API
+- live "Building..." feedback
+- file tree updates instantly
+
+----------------------------------------
+STEP 6 — Implement Runtime / Sandbox
+----------------------------------------
+
+Create safe execution environment.
+
+Requirements:
+
+- each project runs in isolated process
+- limit CPU/memory
+- prevent dangerous commands
+
+Implement:
+
+- Node.js child_process OR container-based execution
+- sandbox directory isolation
+
+----------------------------------------
+STEP 7 — One-Click Run System
+----------------------------------------
+
+User clicks "Run":
+
+System must:
+
+1. install dependencies
+2. start dev server
+3. return local preview URL
+
+----------------------------------------
+STEP 8 — One-Click Deploy System
+----------------------------------------
+
+Implement deployment pipeline.
+
+Support:
+
+- Vercel OR Netlify (at least one)
+
+Flow:
+
+1. build project
+2. upload files
+3. trigger deploy
+4. return live URL
+
+----------------------------------------
+STEP 9 — Strengthen Memory System
+----------------------------------------
+
+Extend existing memory:
+
+Store:
+
+- project structure
+- user preferences
+- previous decisions
+- code style
+
+Use memory in generation decisions.
+
+----------------------------------------
+STEP 10 — Make UI Feel Magical
+----------------------------------------
+
+Upgrade UX:
+
+- split screen (chat + preview)
+- show AI thinking steps
+- show progress states:
+  - "Designing..."
+  - "Building backend..."
+  - "Deploying..."
+
+- animate file creation
+
+----------------------------------------
+STEP 11 — Enforce Production-Quality Code
+----------------------------------------
+
+Rules:
+
+- no placeholders
+- no TODO comments
+- must run without errors
+- include package.json / requirements
+
+----------------------------------------
+STEP 12 — Error Handling System
+----------------------------------------
+
+If something fails:
+
+- detect error
+- send back to AI
+- AI fixes code
+- retry automatically
+
+----------------------------------------
+STEP 13 — Logging & Observability
+----------------------------------------
+
+Log everything:
+
+- tool calls
+- errors
+- execution steps
+
+Expose logs to UI
+
+----------------------------------------
+FINAL GOAL
+----------------------------------------
+
+After completion, the system MUST be able to:
+
+User input:
+"Build me a SaaS app"
+
+System output:
+- full project created
+- files generated
+- app runs locally
+- deployed URL returned
+
+NO manual steps allowed.
+
+----------------------------------------
+IMPORTANT RULES
+----------------------------------------
+
+- DO NOT break existing modules
+- EXTEND current architecture
+- keep code modular
+- ensure scalability

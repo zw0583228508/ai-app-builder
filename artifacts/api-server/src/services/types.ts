@@ -1,0 +1,36 @@
+export interface IntegrationKeys {
+  supabaseUrl?: string;
+  supabaseAnonKey?: string;
+  openaiKey?: string;
+  anthropicKey?: string;
+  groqKey?: string;
+  huggingfaceToken?: string;
+  replicateToken?: string;
+  firebaseApiKey?: string;
+  firebaseProjectId?: string;
+  mongodbUri?: string;
+  upstashRedisUrl?: string;
+  upstashRedisToken?: string;
+  stripePublishableKey?: string;
+  stripeSecretKey?: string;
+  paypalClientId?: string;
+  auth0Domain?: string;
+  auth0ClientId?: string;
+  clerkPublishableKey?: string;
+  cloudinaryCloudName?: string;
+  cloudinaryApiKey?: string;
+  pusherKey?: string;
+  pusherCluster?: string;
+  pusherAppId?: string;
+  mapboxToken?: string;
+  googleMapsApiKey?: string;
+  twitterBearerToken?: string;
+  algoliaAppId?: string;
+  algoliaApiKey?: string;
+  slackBotToken?: string;
+  discordBotToken?: string;
+  twilioAccountSid?: string;
+  twilioAuthToken?: string;
+  sendgridApiKey?: string;
+  resendApiKey?: string;
+}

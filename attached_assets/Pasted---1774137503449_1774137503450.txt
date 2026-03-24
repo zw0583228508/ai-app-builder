@@ -1,0 +1,220 @@
+אני רוצה להבהיר עוד משהו חשוב מאוד:
+
+המערכת שאני בונה חייבת לספק לפחות את רוחב היכולות של פלטפורמת builder מתקדמת מאוד, ובמקומות מסוימים אפילו יותר.
+
+אני לא מדבר רק על “יכולת ליצור קוד דרך צ'אט”.
+אני מדבר על פלטפורמת בנייה מלאה, שבה המשתמש יכול לנהל את כל חיי הפרויקט דרך ממשק פשוט, כשהצ'אט הוא המרכז.
+
+==================================================
+1. PRINCIPLE
+==================================================
+
+המוצר חייב להיות:
+- simple for the user
+- extremely capable behind the scenes
+- chat-first
+- full project lifecycle oriented
+
+המשתמש לא אמור להרגיש שיש מאחורי הקלעים עשרות מערכות.
+אבל בפועל המערכת כן צריכה לספק את כולן.
+
+==================================================
+2. USER-FACING CAPABILITIES
+==================================================
+
+המשתמש חייב לקבל דרך המערכת את כל היכולות הבאות:
+
+A. Project creation
+- יצירת פרויקט חדש מאפס
+- בחירת stack מתאים
+- יצירת קבצים
+- יצירת preview usable
+
+B. Project editing
+- שינוי פרויקט קיים
+- עריכת קבצים קיימים
+- הוספת קבצים
+- מחיקת קבצים כשצריך
+- שינוי מבנה הפרויקט
+
+C. Bug fixing
+- תיקון באגים דרך הצ'אט
+- הבנת error / behavior issue
+- תיקון קוד קיים בצורה ממוקדת
+- שמירה על שאר המערכת
+
+D. Feature development
+- הוספת פיצ'רים חדשים
+- שיפור capabilities קיימות
+- הרחבת המוצר בהמשך דרך chat
+
+E. Preview and iteration
+- preview עדכני
+- עדכון preview אחרי כל שינוי
+- loop מהיר של request -> result
+
+F. Versioning
+- שמירת מצבים / snapshots / versions
+- יכולת להמשיך מאותה נקודה
+- restore / rollback הגיוני
+
+G. Git integration
+- חיבור לחשבון Git
+- יצירת repository
+- חיבור repository קיים
+- commit
+- push
+- update code remotely
+
+H. Cloud publish / deployment
+- publish / deploy לענן
+- קבלת link עובד
+- עדכון deployment אחרי שינויים
+- סטטוס deployment ברור
+
+I. Secrets / environment
+- ניהול secrets / env vars
+- שמירת מפתחות בצורה בטוחה
+- שימוש בהם בפרויקט
+
+J. Data / storage
+- בסיס נתונים לפרויקט
+- object/file storage
+- runtime data persistence
+
+K. Auth
+- אפשרות למשתמשי הקצה של האפליקציה להתחבר
+- תמיכה במערכת login/auth לפרויקטים שצריכים את זה
+
+L. Validation / testing / debugging
+- בדיקה אם הפרויקט עובד
+- הצגת בעיות
+- עזרה בתיקון
+- validation flow
+
+M. Project continuity
+- המשתמש ממשיך דרך chat
+- build / edit / fix / deploy / continue — הכול מאותו flow
+
+==================================================
+3. SYSTEM CAPABILITIES THAT MUST EXIST INTERNALLY
+==================================================
+
+גם אם המשתמש לא רואה את כל זה ישירות,
+המערכת עצמה חייבת לדעת לבצע מאחורי הקלעים:
+
+1. Read current project state
+2. Parse existing files
+3. Understand project structure
+4. Detect request intent
+5. Decide create vs edit vs fix vs deploy
+6. Generate code
+7. Modify existing code safely
+8. Keep file consistency
+9. Keep project state consistency
+10. Keep preview consistency
+11. Keep Git consistency
+12. Keep deployment consistency
+13. Handle secrets
+14. Handle database/storage provisioning
+15. Maintain version history
+16. Support iterative workflow
+17. Support debugging / correction cycle
+
+==================================================
+4. IMPORTANT: DO NOT REDUCE THE PRODUCT TO JUST CHAT + PREVIEW
+==================================================
+
+הצ'אט הוא המרכז,
+אבל המוצר לא מסתכם רק בצ'אט + preview.
+
+הוא חייב להיות מערכת מלאה שיודעת גם:
+- files
+- versions
+- git
+- deploy
+- secrets
+- database
+- storage
+- auth
+- validation
+- debugging
+- maintenance
+
+כל זה צריך להיות קיים.
+
+רק שהחוויה למשתמש צריכה להיות פשוטה.
+
+==================================================
+5. UX REQUIREMENT
+==================================================
+
+אני לא רוצה שכל היכולות האלו ירגישו כמו בלגן של panels ו-tools.
+אני רוצה שהן יהיו מאורגנות נכון.
+
+העיקרון:
+- Chat is the main interaction layer
+- Project/preview is the main visual layer
+- Git/deploy/status are core supporting layers
+- advanced tools can exist, but must not dominate the experience
+
+כלומר:
+המערכת כן צריכה את כל היכולות המתקדמות,
+אבל הן צריכות להיות מאורגנות סביב flow ברור ופשוט.
+
+==================================================
+6. THE CORE FLOW MUST SUPPORT ALL OF THIS
+==================================================
+
+ה-flow הראשי חייב להיות מסוגל לתמוך בכל אחד מהתרחישים הבאים:
+
+- user creates a new app
+- user edits existing app
+- user asks to fix a bug
+- user asks to add a feature
+- user asks to connect git
+- user asks to push code
+- user asks to deploy
+- user asks to update deployed app
+- user asks to inspect project state
+- user continues work from previous state
+
+==================================================
+7. WHAT I EXPECT YOU TO UNDERSTAND
+==================================================
+
+אני לא בונה:
+“chat that generates code once”
+
+אני בונה:
+“full software creation, editing, fixing, syncing, and deployment platform powered by chat”
+
+==================================================
+8. WHAT I WANT YOU TO DO NOW
+==================================================
+
+אני רוצה שתבחן את המערכת הקיימת מול כל רשימת היכולות הזו.
+
+תחזיר לי תשובה מסודרת לפי זה:
+
+A. Which of these capabilities already exist
+B. Which are partial
+C. Which are missing
+D. Which are implemented but exposed badly in the UX
+E. Which should remain internal
+F. Which should become first-class in the main flow
+
+==================================================
+9. CRITICAL DESIGN DIRECTION
+==================================================
+
+If there is a tradeoff between:
+- having many visible tools
+and
+- keeping the user experience simple and centered around chat/project/preview/deploy
+
+prefer simplicity in the visible UX,
+but do NOT remove real power from the system.
+
+The system must stay powerful.
+The UX must stay simple.

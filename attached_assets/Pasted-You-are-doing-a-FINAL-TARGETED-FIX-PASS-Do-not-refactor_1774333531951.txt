@@ -1,0 +1,259 @@
+You are doing a FINAL TARGETED FIX PASS.
+
+Do not refactor broadly.
+Do not add features.
+Do not improve unrelated code.
+Do not stop until every item below is fully fixed.
+
+Your task is to fix ONLY the remaining concrete issues listed here.
+
+==================================================
+REMAINING ISSUES THAT MUST BE FIXED NOW
+==================================================
+
+1. Integrations save contract is broken between frontend and backend
+2. Message API schema still allows `integrations`
+3. intent-handler still reads `body.integrations`
+4. AgentMode / agent-run still send raw Netlify token
+5. Ownerless projects still exist without a real guest model
+6. Legacy integrations route still exists
+7. Legacy `integrations` field still exists in user_dna
+8. Auth tests still reflect old insecure behavior
+
+If any one of these remains, the task is incomplete.
+
+==================================================
+1) FIX THE INTEGRATIONS SAVE CONTRACT
+==================================================
+
+Problem:
+Frontend sends:
+{ provider, secrets }
+
+Backend currently expects a flat object map and processes it incorrectly.
+
+Required fix:
+- Make frontend and backend use ONE explicit contract only.
+- Preferred contract:
+  {
+    "provider": "<provider-name>",
+    "secrets": { ...providerSecretFields }
+  }
+
+Implementation requirements:
+- Update backend route to validate exactly this shape
+- Reject invalid payloads
+- Correctly pass `provider` and `secrets` into vault save logic
+- Ensure save works for all supported providers
+- Ensure response returns SAFE metadata only, never raw secrets
+
+Validation:
+- Saving an integration must actually persist encrypted secrets correctly
+- Reading integrations must return only safe metadata/capabilities
+
+==================================================
+2) REMOVE `integrations` FROM MESSAGE API SCHEMA
+==================================================
+
+Problem:
+Even though frontend no longer sends secrets in normal chat, the official API contract still allows:
+integrations?: Record<string, string>
+
+Required fix:
+Remove `integrations` completely from the message API contract everywhere:
+
+- OpenAPI spec
+- Zod schemas
+- generated API types
+- request validators
+- route handler types
+
+Validation:
+- It must become impossible for `/messages` API to accept integrations payload
+- Type system and runtime validation must both reject it
+
+==================================================
+3) REMOVE `body.integrations` FROM intent-handler
+==================================================
+
+Problem:
+intent-handler still reads values such as:
+- body.integrations?.netlifyToken
+- body.integrations?.githubToken
+
+Required fix:
+- Delete all usage of `body.integrations`
+- Replace with secure server-side lookup from integration vault using authenticated user identity
+- If provider credentials are missing, return a safe, explicit error
+- Do not silently fall back to insecure behavior
+
+Validation:
+- Deploy / GitHub / similar intent flows must work using vault-based credentials only
+- No token must be read from request body
+
+==================================================
+4) REMOVE RAW TOKEN FLOW FROM AGENT MODE
+==================================================
+
+Problem:
+AgentMode frontend still keeps and sends `netlifyToken`
+agent-run backend still reads it from request body
+
+Required fix:
+- Remove `netlifyToken` state from frontend AgentMode
+- Remove `netlifyToken` from agent-run request body schema and handler
+- agent-run must use server-side vault lookup only
+- If Netlify is not connected, return a clear actionable error
+
+Validation:
+- No raw Netlify token should exist in frontend runtime after save
+- No raw Netlify token should be accepted by agent-run API
+- Agent deploy behavior must depend only on connected integration in vault
+
+==================================================
+5) RESOLVE OWNERLESS PROJECTS DEFINITIVELY
+==================================================
+
+Problem:
+Projects can still be created without userId:
+userId: userId ?? undefined
+
+This leaves ownerless projects in the system without a real guest-access model.
+
+Required fix:
+Choose ONE and implement it fully:
+
+OPTION A (preferred, simpler, safer):
+- Disallow ownerless project creation entirely
+- Require authenticated user for project creation
+
+OPTION B (only if already mostly implemented):
+- Add a real guest project model with guestSessionId / signed token
+- Bind access to that guest identity strictly
+- Deny all access otherwise
+
+Do not leave half-implemented ownerless behavior.
+
+Validation:
+- Project creation must no longer produce ambiguous ownerless records
+- Access control must be explicit and enforceable
+
+==================================================
+6) DELETE LEGACY INTEGRATIONS ROUTE
+==================================================
+
+Problem:
+Legacy route file still exists:
+routes/integrations.ts
+
+Required fix:
+- If not used, delete it
+- If mounted anywhere, unmount it first, then delete it
+- Keep exactly one integrations route system: the secure vault-based one
+
+Validation:
+- There must be a single clear source of truth for integrations handling
+
+==================================================
+7) REMOVE LEGACY `integrations` FIELD FROM user_dna
+==================================================
+
+Problem:
+user_dna schema still contains legacy integrations JSON field
+
+Required fix:
+- Remove legacy `integrations` field from schema
+- Add a migration if needed
+- Ensure no code path reads from or writes to this old field anymore
+
+Validation:
+- Sensitive integrations data must live only in dedicated encrypted integrations storage
+- No fallback legacy blob storage must remain
+
+==================================================
+8) FIX TESTS TO MATCH SECURE BEHAVIOR
+==================================================
+
+Problem:
+Some auth/ownership tests still reflect old insecure ownerless/public logic
+
+Required fix:
+Update and expand tests so they verify the NEW secure rules only.
+
+Required coverage:
+- cannot access project by ID alone
+- non-owner cannot modify project
+- message API rejects integrations field
+- agent-run rejects raw token body field
+- ownerless project creation is disallowed (if Option A)
+  OR guest access works only with valid guest identity (if Option B)
+- vault-backed intent flows fail safely when credentials are missing
+- integrations save/read contract works end-to-end
+
+Important:
+Do not keep tests that normalize insecure legacy behavior.
+
+==================================================
+MANDATORY FILES TO CHECK
+==================================================
+
+At minimum inspect and update these if relevant:
+
+Frontend:
+- artifacts/app-builder/src/hooks/use-integrations.ts
+- artifacts/app-builder/src/hooks/use-chat-stream.ts
+- artifacts/app-builder/src/components/AgentMode.tsx
+
+Backend:
+- artifacts/api-server/src/routes/user-integrations.ts
+- artifacts/api-server/src/routes/integrations.ts
+- artifacts/api-server/src/routes/projects/messages/intent-handler.ts
+- artifacts/api-server/src/routes/projects/agent-run.ts
+- artifacts/api-server/src/routes/projects/create-project.ts
+- artifacts/api-server/src/routes/projects/index.ts
+
+API contracts / schemas:
+- lib/api-spec/openapi.yaml
+- lib/api-zod/src/generated/api.ts
+- lib/api-zod/src/generated/types/sendMessageBody.ts
+- any message request validator schema
+
+DB:
+- lib/db/src/schema/user-dna.ts
+- migrations related to integrations / user_dna
+
+Tests:
+- artifacts/api-server/src/__tests__/auth-matrix.test.ts
+- artifacts/api-server/src/__tests__/project-ownership.test.ts
+- add or update tests for integrations/message/agent flows
+
+==================================================
+DEFINITION OF DONE
+==================================================
+
+You are NOT done until all of the following are true:
+
+1. Integration save contract is correct and working
+2. `/messages` API cannot accept `integrations` at type level or runtime
+3. intent-handler uses vault only, never request-body secrets
+4. agent-run uses vault only, never request-body token
+5. ownerless project ambiguity is fully eliminated
+6. legacy integrations route is gone
+7. legacy user_dna integrations field is gone
+8. tests reflect only the new secure behavior
+9. all affected types/schemas/routes/tests are updated consistently
+
+==================================================
+REQUIRED OUTPUT
+==================================================
+
+When finished, provide:
+
+1. Files changed
+2. Exact issue fixed per file
+3. Which option you chose for ownerless projects
+4. Proof checklist for all 9 Definition of Done items
+5. Any breaking changes introduced
+6. Any remaining risks, if any
+
+Do not claim success unless the actual code fully matches all requirements above.

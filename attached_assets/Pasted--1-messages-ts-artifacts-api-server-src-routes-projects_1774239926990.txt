@@ -1,0 +1,102 @@
+
+
+🔴 עדיפות גבוהה — חובה
+1. פיצול messages.ts
+קובץ artifacts/api-server/src/routes/projects/messages.ts
+הוא 2127 שורות. פצל אותו לארבעה קבצים תחת תיקייה חדשה
+routes/projects/messages/:
+  - list.ts         — GET /:id/messages
+  - send.ts         — POST /:id/messages (logic ראשי + SSE handler)
+  - agent.ts        — multi-agent pipeline
+  - streaming.ts    — SSE utilities, broadcastUpdate, auto-continuation
+שמור את index.ts כ-router שמחבר את כולם.
+אל תשנה לוגיקה, רק העבר קוד.
+2. כיסוי בדיקות
+הוסף unit tests לשלושה אזורים:
+1. services/ai/intent.ts — detectChatIntent (5 intents, edge cases)
+2. services/ai/mode.ts — detectUserMode (Hebrew keywords, default)
+3. services/ai/preview.ts — extractHtml, isHtmlUsable
+
+הוסף integration tests:
+- auth flow: login → session → logout
+- project CRUD: create, read, update, soft-delete
+
+הוסף E2E test אחד עם Playwright:
+- שלח הודעה בצ'אט → ודא שה-preview השתנה
+3. React Snapshots
+ב-routes/projects/messages.ts, בנתיב הצלחה של React projects,
+שמור snapshot שכולל את file manifest (רשימת קבצים + תוכן)
+ולא רק HTML בודד.
+הוסף עמודה snapshot_type='react' | 'html' לטבלת project_snapshots.
+עדכן את PreviewHistoryMenu.tsx להציג את הסוג הנכון.
+4. Share link expiry
+בטבלת project_shares (או שם השדה הרלוונטי),
+הוסף עמודה expires_at TIMESTAMPTZ DEFAULT NULL.
+בנתיב POST /share, קבל פרמטר optional expires_in_days.
+ב-GET /share/:token, בדוק expires_at לפני ה-render.
+ב-cleanup.ts, הוסף job שמוחק shares שפגו מעבר ל-30 יום.
+5. Billing enforcement
+ב-middleware/planLimits.ts (קיים כבר),
+חבר את הגבולות לשדה plan בטבלת subscriptions.
+הוסף בדיקה לפני כל POST /messages:
+  - Free: max 10 projects, max 50 AI messages/day
+  - Pro: max 50 projects, max 500 messages/day
+  - Enterprise: ללא הגבלה
+החזר 402 Payment Required עם body ברור כשמגיעים לגבול.
+עדכן את ChatPanel.tsx להציג הודעת upgrade.
+
+🟡 כדאי לשפר — קרוב
+6. Vector Memory (pgvector)
+הוסף extension pgvector לסכמת PostgreSQL.
+בטבלת memory_chunks, הוסף עמודה embedding vector(1536).
+צור function embedChunk(text: string): Promise<number[]>
+שקוראת ל-Anthropic embeddings API.
+ב-services/memory/index.ts, עדכן את
+retrieveRelevantMemory להשתמש בחיפוש קוסינוס
+במקום keyword scoring.
+Fallback: אם pgvector לא זמין, חזור ל-keyword.
+7. Deploy State Machine
+ב-routes/projects/deploy.ts,
+החלף את הלוגיקה הישירה ב-state machine:
+states: pending → queued → uploading → deployed | failed
+transitions: retry עד 3 פעמים עם exponential backoff (2s, 4s, 8s)
+שמור את ה-state ב-DB בכל מעבר.
+שדר WebSocket event על כל שינוי state.
+8. GitHub incremental sync
+ב-routes/projects/github-sync.ts,
+לפני upload, קרא מה-GitHub את העץ הנוכחי:
+GET /repos/:owner/:repo/git/trees/HEAD?recursive=1
+השווה SHA של כל קובץ לעומת מה שיש בפרויקט.
+שלח רק קבצים ששונו או נוספו.
+הוסף UI indicator ב-GitHubPanel: "N files changed".
+9. DB Indexes
+ב-lib/db/drizzle/, הוסף migration חדש עם האינדקסים:
+CREATE INDEX idx_project_messages_project_id ON project_messages(project_id);
+CREATE INDEX idx_project_snapshots_project_id ON project_snapshots(project_id);
+CREATE INDEX idx_project_files_project_id ON project_files(project_id);
+CREATE INDEX idx_deployments_project_id ON deployments(project_id);
+CREATE INDEX idx_projects_owner_id ON projects(owner_id);
+10. CI Pipeline
+ב-.github/workflows/ci.yml (קיים),
+הוסף step של הרצת בדיקות:
+- pnpm --filter @workspace/api-server run test
+- pnpm --filter @workspace/app-builder run build
+הגדר את ה-workflow לרוץ על push ל-main ועל כל PR.
+הוסף badge ל-README.md.
+
+🟢 הזדמנויות עתיד — גדולות
+11. AI-to-AI Agent Chain
+צור orchestrator שמריץ אוטומטית:
+planner → builder → qa → reviewer
+ללא התערבות משתמש.
+כל agent מקבל את output של הקודם כ-context.
+הוסף UI stepper שמציג את ההתקדמות.
+כניסה: הודעה עם כוונת build + score של confidence > 0.9
+12. לוגיקת ניקוי וייצוב כלליים
+חפש בכל הקוד דפוסים של:
+  .catch(() => {})         — בלוע שגיאות בשקט
+  as any                   — cast לא בטוח
+  TODO: / FIXME:           — הערות שנשארו
+תקן כל אחד: הוסף logger.warn עם context,
+החלף any בטיפוס מדויק,
+הוצא כל TODO לissue מסודר ומחק מהקוד.

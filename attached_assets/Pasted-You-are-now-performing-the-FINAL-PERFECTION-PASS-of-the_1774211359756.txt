@@ -1,0 +1,161 @@
+You are now performing the FINAL PERFECTION PASS of the product.
+
+This is NOT about features.
+This is NOT about architecture.
+
+This is about eliminating all remaining friction, inconsistency, and weakness.
+
+Your mission:
+Make the product feel flawless, fast, consistent, and world-class.
+
+============================================================
+PRIMARY GOAL
+============================================================
+
+Remove all remaining weaknesses in:
+
+- responsiveness
+- consistency
+- edge cases
+- mobile experience
+- onboarding clarity
+- empty states
+- perceived quality
+
+The user should feel:
+
+“This just works.”
+“This is fast.”
+“This is clear.”
+“This is solid.”
+
+============================================================
+PHASE 1 — PERFORMANCE & RESPONSIVENESS
+============================================================
+
+Review and improve:
+
+- time to first response (TTFB)
+- time until text starts streaming
+- time until preview updates
+- unnecessary re-renders
+- blocking UI states
+
+Goal:
+Everything should feel fast and immediate.
+
+============================================================
+PHASE 2 — CONSISTENCY
+============================================================
+
+Ensure consistency across:
+
+- UI components
+- spacing
+- typography
+- message style
+- action feedback
+- interaction patterns
+
+The product should feel uniform and intentional.
+
+============================================================
+PHASE 3 — EDGE CASE HANDLING
+============================================================
+
+Handle all edge cases:
+
+- multiple rapid messages
+- interrupted streams
+- failed responses
+- invalid AI output
+- preview failures
+- network issues
+
+Ensure:
+- graceful fallback
+- no broken states
+- clear recovery paths
+
+============================================================
+PHASE 4 — MOBILE EXPERIENCE
+============================================================
+
+Optimize mobile UX:
+
+- chat input usability
+- scrolling behavior
+- keyboard handling
+- paste behavior
+- attachment handling
+- preview usability
+
+The product must feel good on mobile.
+
+============================================================
+PHASE 5 — ONBOARDING CLARITY
+============================================================
+
+Improve first-time experience:
+
+- clear initial prompt
+- clear guidance
+- no confusion
+- fast first success
+
+User must understand instantly:
+what to do and what happens.
+
+============================================================
+PHASE 6 — EMPTY & ERROR STATES
+============================================================
+
+Improve all empty states:
+
+- no blank screens
+- no dead UI
+- helpful guidance
+- smart suggestions
+
+Improve error states:
+
+- clear messages
+- calm tone
+- next step guidance
+
+============================================================
+PHASE 7 — PERCEPTION TEST
+============================================================
+
+Simulate a new user:
+
+- no prior context
+- no explanation
+- no guidance
+
+Ask:
+Does this feel obvious?
+Does this feel fast?
+Does this feel premium?
+
+Fix anything that fails.
+
+============================================================
+SUCCESS CRITERIA
+============================================================
+
+The product is ready only if:
+
+- everything feels fast
+- everything feels consistent
+- nothing breaks under edge cases
+- mobile works smoothly
+- onboarding is instant
+- no empty states feel dead
+- errors are handled gracefully
+- new users understand immediately
+- the experience feels polished and complete
+
+Final result should feel like:
+
+“A finished, reliable, high-quality product.”

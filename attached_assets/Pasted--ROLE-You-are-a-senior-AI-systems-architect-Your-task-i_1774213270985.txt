@@ -1,0 +1,236 @@
+## ROLE
+
+You are a senior AI systems architect. Your task is to upgrade an existing AI app builder into a **top-tier intelligent platform surpassing V0/Replit/Cursor**.
+
+---
+
+## OBJECTIVE
+
+Transform system from:
+
+* Code generator
+
+To:
+
+* Full **AI system builder with autonomous agents**
+
+---
+
+## PHASE 1 — SYSTEM ARCHITECT AGENT
+
+### TASK
+
+Add a planning layer before code generation.
+
+### IMPLEMENTATION
+
+* Create:
+
+  * `architect_agent.ts`
+
+### FUNCTION
+
+* Input: user request
+* Output:
+
+  * system architecture
+  * tech stack
+  * folder structure
+  * data models
+
+---
+
+## PHASE 2 — MULTI-AGENT SYSTEM
+
+### TASK
+
+Split responsibilities into agents.
+
+### AGENTS
+
+* Architect
+* Backend Developer
+* Frontend Developer
+* DevOps
+* QA
+
+### IMPLEMENTATION
+
+* Create:
+
+  * `agent_orchestrator.ts`
+
+### FLOW
+
+* Agents communicate and iterate
+
+---
+
+## PHASE 3 — PROJECT DNA MEMORY
+
+### TASK
+
+Persist project intelligence.
+
+### STORE
+
+* architecture decisions
+* user preferences
+* code patterns
+
+### IMPLEMENTATION
+
+* Use:
+
+  * vector DB (Weaviate / Pinecone)
+
+---
+
+## PHASE 4 — AUTO DEBUGGING LOOP
+
+### TASK
+
+Fix errors automatically.
+
+### FLOW
+
+* detect error
+* analyze logs
+* propose fix
+* apply fix
+* re-run
+
+### IMPLEMENTATION
+
+* `debug_engine.ts`
+
+---
+
+## PHASE 5 — LIVE APP UNDERSTANDING
+
+### TASK
+
+Allow AI to understand running app.
+
+### IMPLEMENTATION
+
+* Connect to:
+
+  * logs
+  * API responses
+  * UI snapshots
+
+---
+
+## PHASE 6 — DESIGN AI SYSTEM
+
+### TASK
+
+Generate UI/UX, not just code.
+
+### IMPLEMENTATION
+
+* Integrate:
+
+  * Figma API OR
+  * UI generation engine
+
+### OUTPUT
+
+* layouts
+* components
+* animations
+
+---
+
+## PHASE 7 — FULL APP GENERATION
+
+### TASK
+
+Generate complete SaaS systems.
+
+### MUST INCLUDE
+
+* frontend
+* backend
+* auth
+* database
+* payments
+* emails
+
+---
+
+## PHASE 8 — INTEGRATIONS ENGINE
+
+### TASK
+
+Prebuilt integrations.
+
+### INCLUDE
+
+* Stripe
+* Supabase
+* Firebase
+* WhatsApp API
+
+---
+
+## PHASE 9 — DEPLOYMENT AUTOMATION
+
+### TASK
+
+One-click deploy.
+
+### TARGETS
+
+* Vercel
+* Netlify
+* Docker
+
+---
+
+## PHASE 10 — ANALYTICS AI
+
+### TASK
+
+Understand user behavior.
+
+### OUTPUT
+
+* churn reasons
+* usage insights
+
+---
+
+## PHASE 11 — COST & PERFORMANCE OPTIMIZATION
+
+### TASK
+
+Optimize infrastructure.
+
+### INCLUDE
+
+* auto scaling
+* cost estimation
+* resource allocation
+
+---
+
+## FINAL RESULT
+
+System must:
+
+1. Understand full product requirements
+2. Design architecture
+3. Generate full app
+4. Fix itself automatically
+5. Deploy instantly
+6. Improve over time
+
+---
+
+## IMPORTANT
+
+* Do not act as code generator only
+* Always reason about system-level design
+* Prioritize autonomy and intelligence

@@ -1,0 +1,268 @@
+🔥 חלק 1 — בניית Runtime Control Plane
+🎯 מטרה: שליטה מלאה על שרתים, jobs ו־GPU
+🧠 Prompt 1 — יצירת Runtime Manager
+You are a senior distributed systems architect.
+
+Design and implement a Runtime Control Plane for a cloud AI app builder platform.
+
+Requirements:
+- Manage isolated execution environments per project
+- Support start/stop/restart of environments
+- Track CPU, RAM, GPU usage per environment
+- Support ephemeral environments (auto shutdown after inactivity)
+- Provide preview URLs per environment
+- Maintain environment lifecycle states: creating, running, idle, stopped, failed
+
+Tech constraints:
+- Node.js (TypeScript) or Python backend
+- Use Docker containers for isolation
+- Use Redis for state and queues
+- PostgreSQL for persistence
+
+Output:
+1. Architecture diagram (text)
+2. Database schema for environments table
+3. API endpoints (REST)
+4. Worker logic for environment lifecycle
+5. Example implementation code (core parts only)
+🧠 Prompt 2 — Job Queue System
+Design a production-grade async job queue system for handling heavy AI and compute tasks.
+
+Requirements:
+- Queue types: default, high-priority, gpu
+- Retry logic with exponential backoff
+- Job states: pending, running, success, failed
+- Job timeouts and cancellation
+- Worker scaling
+- Dead-letter queue
+
+Tech:
+- Redis (BullMQ or custom)
+- TypeScript
+
+Output:
+- Job schema
+- Queue architecture
+- Worker implementation
+- API to enqueue jobs
+- Example job: audio processing task
+⚡ חלק 2 — GPU On-Demand System
+🎯 מטרה: לא לשלם על GPU כשהוא לא בשימוש
+🧠 Prompt 3 — GPU Manager
+Design a GPU On-Demand Execution System.
+
+Requirements:
+- GPU should only run when a job exists
+- Spin up GPU instance dynamically
+- Assign job → process → shutdown
+- Support providers: RunPod, Modal, or custom Docker GPU nodes
+- Queue-based GPU scheduling
+- Track GPU usage time per job
+
+Output:
+- Architecture (queue → scheduler → GPU node)
+- API for requesting GPU job
+- Worker that spins up GPU container
+- Shutdown strategy after idle
+- Cost tracking model
+🧠 Prompt 4 — GPU Job Integration
+Implement integration between job queue and GPU system.
+
+Flow:
+1. User uploads file
+2. Job created
+3. If GPU needed → route to GPU queue
+4. Spin up GPU worker
+5. Process job
+6. Store result
+7. Shutdown GPU
+
+Output:
+- Full flow code (controller + worker)
+- Job routing logic
+- Example: audio separation using Python script
+💸 חלק 3 — Cost Engine
+🎯 מטרה: שליטה מלאה על עלויות
+🧠 Prompt 5 — Cost Tracking System
+Design a cost tracking engine for a cloud platform.
+
+Track:
+- CPU seconds
+- RAM usage (MB-hours)
+- GPU seconds
+- Storage usage (GB)
+- Bandwidth (GB)
+
+Requirements:
+- Per project tracking
+- Per user tracking
+- Real-time aggregation
+- Historical records
+
+Output:
+- Database schema (usage_records)
+- Cost calculation formulas
+- API endpoints for usage
+- Example aggregation query
+🧠 Prompt 6 — Cost Optimization Agent
+Design an AI agent that optimizes infrastructure cost.
+
+Capabilities:
+- Analyze project architecture
+- Suggest cheaper alternatives
+- Detect always-on services
+- Recommend autoscale / serverless
+- Predict monthly cost
+
+Output:
+- Agent logic
+- Prompt design
+- Example inputs/outputs
+- Integration into build flow
+🧠 חלק 4 — Multi-Agent Orchestration
+🎯 מטרה: להפוך את ה־AI שלך למכונה אמיתית
+🧠 Prompt 7 — Agent Pipeline
+Design a multi-agent orchestration system.
+
+Agents:
+- Planner
+- Architect
+- Frontend
+- Backend
+- QA
+- DevOps
+- Cost
+- Security
+
+Requirements:
+- Sequential + parallel execution
+- Shared memory (project context)
+- Task decomposition
+- Conflict resolution
+
+Output:
+- Orchestration flow
+- Task graph model
+- Agent communication format
+- Example execution pipeline
+🧠 Prompt 8 — Planner Agent
+You are a product architect.
+
+Given a user idea, generate:
+- Feature list
+- Screens
+- APIs
+- Database schema
+- Required integrations
+- Deployment strategy
+
+Output JSON format only.
+🧬 חלק 5 — DNA 2.0
+🎯 מטרה: זיכרון חכם אמיתי
+🧠 Prompt 9 — DNA Expansion
+Design an advanced persistent memory system for users and projects.
+
+Include:
+- User DNA (preferences, skill level)
+- Project DNA (business + technical)
+- Cross-project learning
+- Cost sensitivity
+- Growth goals
+
+Output:
+- Database schema
+- Extraction logic
+- Injection into AI prompts
+🚀 חלק 6 — Deployment Intelligence
+🎯 מטרה: פריסה חכמה ולא סתם deploy
+🧠 Prompt 10 — Deployment Brain
+Design an intelligent deployment decision engine.
+
+It should choose between:
+- static hosting
+- autoscale server
+- background worker
+- scheduled job
+- GPU job
+
+Based on:
+- app type
+- traffic expectation
+- cost
+- performance
+
+Output:
+- Decision tree
+- Implementation logic
+- Example scenarios
+🔥 חלק 7 — One Click SaaS Generator
+🎯 מטרה: פיצ'ר שובר שוק
+🧠 Prompt 11 — SaaS Generator
+Generate a complete SaaS application template.
+
+Include:
+- Authentication
+- User dashboard
+- Admin panel
+- Subscription billing (Stripe)
+- Database schema
+- Email system
+- Analytics
+
+Output:
+- Full project structure
+- Code for backend + frontend
+- Deployment instructions
+🧪 חלק 8 — Testing + QA System
+🧠 Prompt 12 — AI QA System
+Design an automated QA system for generated applications.
+
+Include:
+- Unit tests
+- API tests
+- UI tests
+- Error detection
+- Auto-fix suggestions
+
+Output:
+- Testing architecture
+- Example tests
+- Integration with build pipeline
+🧱 חלק 9 — Monitoring System
+🧠 Prompt 13 — Monitoring Engine
+Design a monitoring system for deployed applications.
+
+Track:
+- Errors
+- Performance
+- Logs
+- User actions
+
+Include:
+- Alert system
+- Dashboard
+- Auto-recovery suggestions
+
+Output:
+- Architecture
+- Data model
+- API endpoints
+⚡ חלק 10 — השדרוג הכי חשוב (חובה)
+🧠 Prompt 14 — Full System Integration
+You are a principal engineer.
+
+Combine all subsystems into one unified architecture:
+
+- AI orchestration
+- runtime control
+- job queue
+- GPU system
+- cost engine
+- deployment system
+- monitoring
+
+Output:
+- Full system architecture
+- Service breakdown
+- Data flow between services
+- Recommended tech stack

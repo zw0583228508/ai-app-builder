@@ -1,0 +1,210 @@
+אני לא רוצה ממך יותר ניתוחים, לא רשימות כלליות, ולא מיפוי תיאורטי בלבד.
+
+אני רוצה ממך ביצוע.
+
+קח את המערכת הקיימת, ותיישר אותה בפועל כך שהיא תהיה מערכת אחת פשוטה וחזקה, שבה המשתמש מדבר עם המערכת בצ'אט, והמערכת יודעת לבצע עבורו את כל חיי הפרויקט דרך אותו flow מרכזי.
+
+מה שאתה צריך לעשות עכשיו, אחד אחרי השני:
+
+1. תפסיק לחשוב על המוצר כאוסף של panels, tools, utilities ו-routes נפרדים.
+תתחיל לחשוב עליו כמערכת אחת מרכזית, שבה הצ'אט הוא שכבת האינטראקציה הראשית, והמערכת מבצעת מאחוריה את כל הפעולות הדרושות לפרויקט.
+
+2. תיישר את כל הארכיטקטורה של המוצר כך שה-flow הראשי יהיה:
+user chats -> system understands intent -> system reads current project state ->
+system creates/edits/fixes code -> system updates preview ->
+system syncs GitHub -> system deploys/publishes ->
+user continues through chat
+
+3. תוודא שהמערכת יודעת בצורה מלאה לבצע את כל היכולות הבאות:
+ליצור פרויקט חדש, לערוך פרויקט קיים, לתקן באגים בפרויקט קיים, להוסיף פיצ'רים, לבצע refactor ממוקד, לנהל קבצים, לייצר preview, לשמור snapshots/versions, לנהל secrets, לעבוד עם database/storage, לבצע GitHub sync אמיתי, ולבצע publish/deploy usable.
+
+4. תוודא שהמערכת לא יודעת רק לייצר משהו חדש, אלא גם יודעת לעבוד לאורך כל חיי הפרויקט.
+היא חייבת לדעת:
+לבנות, לשנות, לתקן, לשפר, להמשיך, לסנכרן, ולפרוס — דרך אותו צ'אט.
+
+5. תגרום למערכת להבין אוטומטית את intent של המשתמש.
+היא חייבת לדעת להבדיל בין:
+create new project,
+edit existing project,
+fix bug,
+add feature,
+refactor,
+connect git,
+push code,
+deploy,
+update deployed project,
+inspect current project state,
+continue previous work.
+
+6. תוודא שבכל פעם שיש פרויקט קיים, המערכת קודם קוראת את המצב הנוכחי של הפרויקט לפני שהיא משנה משהו.
+היא לא יכולה להניח שהיא תמיד מתחילה מאפס.
+היא חייבת להבין קבצים קיימים, state קיים, dependencies בין קבצים, ומה בדיוק צריך להשתנות.
+
+7. תבטל כל behavior שבו שינוי קטן גורם לבנייה מחדש של כל הפרויקט בלי צורך.
+כשיש בקשת תיקון או שינוי מקומי, המערכת חייבת לבצע שינוי ממוקד, לשמור על החלקים התקינים, ולא לדרוס עבודה קיימת.
+
+8. תוודא שהצ'אט הוא לא רק “מחולל קוד”.
+הצ'אט חייב להיות ממשק ניהול מלא של חיי הפרויקט:
+build, edit, fix, extend, sync, deploy, continue.
+
+9. תסדר את message flow כך שהוא יהיה יציב ונכון:
+הודעת המשתמש נשמרת,
+תגובת ה-AI נשמרת,
+המערכת מחליטה נכון אם מדובר ב-HTML flow או React/files flow,
+והשינוי נשמר בצורה עקבית בלי partial state.
+
+10. תסדר את extraction של output מה-AI כך שהוא יהיה חזק וקשיח.
+אם מדובר ב-HTML output, חלץ אותו באופן יציב.
+אם מדובר ב-files output, חלץ אותם באופן יציב.
+אם הפלט לא מושלם, הוסף fallback behavior.
+אל תאפשר מצב שבו ההודעה נשמרת אבל הפרויקט לא מסתנכרן נכון.
+
+11. תוודא שיש source of truth ברור לכל סוג פרויקט.
+אם זה HTML project — תן source of truth ברור עבור previewHtml, index.html, snapshots.
+אם זה React/files project — תן source of truth ברור עבור projectFiles.
+אל תאפשר ערבוב מסוכן בין שני המסלולים.
+
+12. תסדר את ה-preview flow כך שהוא יהיה חלק מה-flow הראשי ולא feature צדדי.
+אחרי כל build/edit/fix, ה-preview חייב להתעדכן למצב הנכון של הפרויקט.
+ה-preview חייב לשקף את state האמיתי, לא מצב חלקי ולא מצב ישן.
+
+13. תסדר את snapshots / versions כך שהם יהיו עקביים עם מצב הפרויקט.
+save snapshot צריך לשמור את המצב האמיתי.
+restore snapshot צריך להחזיר את המצב האמיתי.
+לא ייתכן מצב שבו snapshot, preview, files, ו-state של הפרויקט אינם תואמים זה לזה.
+
+14. תסדר את GitHub integration כך שהוא לא יהיה רק export חלקי או פתרון צדדי.
+המערכת חייבת לדעת:
+לחבר GitHub,
+ליצור repository אמיתי או לחבר repository קיים,
+ליצור/update קבצים,
+לבצע commit,
+לבצע push,
+ולשמור sync אמיתי בין מצב הפרויקט במערכת לבין הקוד ב-GitHub.
+
+15. תוודא ש-GitHub הוא חלק מה-flow הראשי.
+הוא לא צריך להרגיש כמו utility מוסתר.
+המשתמש צריך להרגיש שזה חלק טבעי מהמערכת:
+build -> preview -> git sync -> continue.
+
+16. תסדר את deploy/publish flow כך שהוא יהיה usable באמת.
+המערכת חייבת לדעת להכין build/deploy בצורה תקינה,
+לא להחזיר false success,
+לא להציג publish כהצלחה אם אין output usable,
+ולהחזיר למשתמש link אמיתי וברור.
+
+17. תוודא ש-deploy הוא חלק מה-flow הראשי של המוצר.
+הוא לא פיצ'ר צדדי.
+הוא חלק טבעי ממה שהמשתמש מצפה מהמערכת לעשות.
+
+18. תגרום למערכת לדעת להציע בזמן אמת capabilities רלוונטיות מתוך הצ'אט.
+אם נדרש database — שתציע את זה.
+אם נדרש secret/API key — שתציע לשמור אותו.
+אם נדרש auth — שתציע login/auth setup.
+אם יש error ב-preview — שתציע תיקון.
+המשתמש לא אמור לחפש את זה בעצמו בכלים צדדיים.
+
+19. תסדר את bug-fixing loop כך שהוא יהיה סגור.
+אם יש באג, error, או behavior broken:
+המערכת צריכה להבין את הבעיה,
+לזהות אילו קבצים קשורים,
+לתקן,
+לעדכן preview,
+ולאפשר למשתמש להמשיך באותו chat flow.
+
+20. תסדר את continuity של הפרויקט.
+כשהמשתמש חוזר לפרויקט, המערכת צריכה להבין את ההקשר הקיים,
+לא להחזיר אותו למצב של “התחל מאפס”.
+המערכת חייבת להמשיך מאותו project state.
+
+21. תצמצם complexity חשופה למשתמש.
+כל complexity פנימית יכולה להישאר בפנים:
+services, helpers, internal routes, provisioning, orchestration, parsing, persistence logic.
+אבל כלפי המשתמש, החוויה צריכה להיות פשוטה וברורה.
+
+22. תוודא שהממשק הראשי של המוצר בנוי סביב הדברים המרכזיים בלבד:
+chat,
+current project,
+preview,
+build/update status,
+GitHub connection/sync status,
+deploy/publish status.
+
+23. תוריד מהמרכז כל מה שלא חייב להיות visible למשתמש הראשי.
+יכולות מתקדמות יכולות להישאר קיימות,
+אבל הן לא צריכות לשלוט ב-UX.
+ה-UX הראשי חייב להיות chat-centered and result-centered.
+
+24. תבדוק כל capability במערכת ותסווג אותו לעצמך לפי:
+קיים טכנית בלבד,
+קיים חלקית כחוויית מוצר,
+או משולב באמת ב-main flow.
+אבל אל תעצור בניתוח הזה — תשתמש בו כדי לבצע את השינויים.
+
+25. תעביר ל-main flow את כל מה שחייב להיות חלק טבעי מחוויית המוצר:
+chat,
+create/edit/fix,
+preview,
+GitHub sync,
+publish/deploy,
+error/fix loop,
+contextual suggestions for db/secrets/auth when relevant.
+
+26. תשאיר פנימי את מה שלא חייב להיות exposed:
+internal memory logic,
+multi-agent orchestration,
+stream parsing internals,
+bundle generation internals,
+decision logging,
+background persistence logic,
+state synchronization internals.
+
+27. תעשה restructuring של המערכת כך שהיא תרגיש כמו assistant אחד חכם, ולא כמו dashboard עמוס בכלים.
+המטרה היא לא “כמה שיותר panels”.
+המטרה היא “כמה שיותר יכולת אמיתית דרך flow פשוט”.
+
+28. תתקן בפועל את הקבצים והזרימות שצריך.
+אני לא רוצה להישאר ברמת מסמך או המלצה.
+אני רוצה implementation.
+
+29. אם יש routes או קבצים גדולים מדי שמכילים יותר מדי אחריות, תפצל אותם במקומות הנכונים.
+תעשה פירוק פונקציונלי, לא קוסמטי.
+תוציא helpers נפרדים ל-message flow, output extraction, persistence, git/deploy/share logic, preview sync וכל מה שנשבר בקלות.
+
+30. אם יש יכולות שקיימות טכנית אבל לא מחוברות נכון לחוויית המשתמש, תחבר אותן.
+אם יש יכולות שחשופות יותר מדי, תפשט את החשיפה.
+אם יש יכולות שחסרות, תוסיף אותן.
+
+31. אל תיתן לי עוד ניתוח כללי.
+אני רוצה ממך:
+מה אתה משנה,
+אילו קבצים אתה משנה,
+אילו flows אתה מחבר,
+אילו behaviors אתה מתקן,
+ואיך המוצר ייראה ויתנהג נכון אחרי השינויים.
+
+32. תעבוד מעשית.
+אם משהו דורש קוד — כתוב קוד.
+אם משהו דורש refactor — בצע refactor.
+אם משהו דורש חיבור בין flows — חבר אותם.
+אם משהו דורש שינוי UX — תן שינוי UX ברור וישים.
+
+33. התוצאה שאני מצפה לה בסוף היא מערכת אחת שבה:
+המשתמש מדבר עם הצ'אט,
+המערכת בונה או מתקנת את הפרויקט,
+ה-preview מתעדכן,
+הקוד נשמר נכון,
+המערכת יודעת לסנכרן GitHub,
+המערכת יודעת לפרוס,
+והמשתמש ממשיך לעבוד דרך אותו צ'אט.
+
+34. אני מצפה ממך להחזיר לי בסוף:
+מה תיקנת,
+אילו קבצים שינית,
+אילו קבצים הוספת,
+מה עכשיו מחובר ל-main flow,
+מה עדיין פנימי,
+ואיך המוצר עכשיו מספק את כל היכולות האלו בצורה פשוטה וחזקה.
+
+תעבור עכשיו מ-analysis ל-execution.
+אל תעצור עד שיש לך תכנית ביצוע ברורה ותיקון בפועל.

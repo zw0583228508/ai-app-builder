@@ -1,0 +1,253 @@
+אני לא רוצה כרגע עוד redesign, עוד panels, עוד features, או עוד ניתוחים כלליים.
+
+אני רוצה שתתקן עכשיו ישירות את הסיבה שבגללה המערכת מייצרת תוצאות לא טובות בבניית אתרים ואפליקציות.
+
+הבעיה המרכזית:
+המערכת לא מכוונת את ה-AI נכון.
+יש יותר מדי prompt layers, יותר מדי חוקים, יותר מדי רעש, ויותר מדי לוגיקה שמבלבלת את המודל במקום למקד אותו.
+
+מה לתקן עכשיו, אחד אחרי השני:
+
+1. תפשט דרמטית את כל prompt architecture
+אני רוצה שתעבור על כל שכבות ה-prompt במערכת ותצמצם אותן בצורה חדה.
+
+תבדוק ותפשט:
+- mode prompts
+- shared output rules
+- premium design instructions
+- stack-specific instructions
+- memory injection
+- DNA injection
+- agent context
+- planning/spec instructions
+- extra behavioral additions
+
+מטרה:
+שהמודל יקבל prompt ברור, קצר, ממוקד, ורלוונטי לבקשה הנוכחית בלבד.
+
+אני לא רוצה mega-prompt ענקי.
+אני רוצה task-specific prompting.
+
+2. תפסיק לדחוף כל בקשה לכיוון flashy landing page
+כרגע המערכת דוחפת יותר מדי לכיוון:
+- hero sections
+- gradients
+- glow
+- CTA sections
+- testimonials
+- stats
+- marketing-style pages
+
+זה הורס את איכות התוצאה כשמבקשים:
+- אפליקציה
+- dashboard
+- workflow tool
+- editor
+- מערכת פנימית
+- bug fix
+- שינוי ממוקד
+- מסך אחד פשוט
+- UI פונקציונלי
+
+אני רוצה שתשנה את ההנחיות כך שהעיצוב והמבנה ייגזרו מסוג הבקשה,
+ולא מתוך premium-landing-page bias.
+
+3. תתקן מיידית את ה-cache
+כרגע ה-cache מחזיר תשובות שיכולות להיות לא שייכות לפרויקט הנוכחי.
+
+תתקן עכשיו את cache key.
+הוא חייב לכלול לפחות:
+- projectId
+- current project state hash
+- intent
+- stack
+- mode
+- whether this is create/edit/fix
+- maybe even file state hash for multi-file projects
+
+אם אתה לא יכול להבטיח correctness מלאה,
+תכבה זמנית את ה-cache.
+
+אני מעדיף בלי cache בכלל
+מאשר cache שמחזיר תוצאות שגויות.
+
+4. תשפר את intent detection
+כרגע intent detection חלש מדי ופשטני מדי.
+
+אני רוצה שתתקן את הלוגיקה כך שהמערכת תבדיל נכון יותר בין:
+- create
+- edit
+- fix
+- add feature
+- inspect
+- deploy
+- git sync
+- continue existing work
+
+המערכת לא יכולה להחליט intent רק לפי regex גס.
+תשפר את ההבנה הלוגית, ותוסיף fallback behavior בטוח כשאין ודאות.
+
+אם אין ודאות:
+- אל תנתב ל-flow אגרסיבי מדי
+- תעדיף behavior שמרני
+- במיוחד לא להרוס קוד קיים
+
+5. תצמצם context overload ב-edit/fix flows
+כשיש פרויקט קיים, המערכת כרגע דוחפת יותר מדי context בבת אחת.
+
+אני רוצה שתשנה את זה כך:
+- תשלח רק את הקבצים או הקטעים הרלוונטיים
+- תשלח רק את ה-state שצריך
+- תשלח רק את ההוראות המתאימות ל-edit/fix
+- אל תעמיס את כל חוקי העולם בכל request
+
+המטרה:
+focused context, not everything at once.
+
+6. תפריד בצורה קשיחה יותר בין HTML flow לבין React/files flow
+אני רוצה שתבדוק ותתקן:
+- extraction
+- parsing
+- persistence
+- preview update
+- files update
+- done event contracts
+
+Rules:
+- HTML project → source of truth ברור
+- React/multi-file project → source of truth ברור
+- no mixed persistence
+- no partial saves
+- no ambiguous preview state
+
+7. תקשיח את output extraction
+המערכת חייבת להיות הרבה יותר סלחנית לפלט לא מושלם של המודל.
+
+אני רוצה שתשפר:
+- extraction of ```html blocks
+- extraction of FILE: manifests
+- fallback parsing
+- repair behavior when output is truncated
+- validation before persistence
+
+אל תאפשר מצב שבו:
+- תשובת AI נשמרת
+אבל
+- preview/files לא מסתנכרנים נכון
+
+8. תעשה validation לפני שמירה
+לפני persistence של output, תבדוק:
+- האם זה HTML תקין מספיק
+- האם זה files manifest תקין מספיק
+- האם יש entrypoint
+- האם יש output usable
+- האם preview יכול באמת להיבנות
+
+אם לא:
+- אל תשמור state שבור כאילו הוא הצלחה
+- תחזיר fallback / recovery / retry behavior
+
+9. תקטין משמעותית את כמות ה-orchestration שמתווספת לכל generation
+כרגע יש יותר מדי:
+- planning
+- multi-agent analysis
+- memory
+- DNA
+- grow-with-me
+- contextual suggestions
+- QA auto-trigger
+- auto-fix
+- extra system additions
+
+אני לא אומר למחוק הכול.
+אני אומר:
+אל תכניס הכול לכל בקשה.
+
+תעשה gating ברור:
+- מה חובה
+- מה optional
+- מה רק לבקשות מורכבות
+- מה לא נכנס בכלל ל-generation path הראשי
+
+10. תבנה generation path פשוט ונקי
+אני רוצה generation pipeline ברור:
+
+A. detect intent
+B. load only relevant project context
+C. choose correct prompt template
+D. generate
+E. validate output
+F. persist correctly
+G. update preview/files
+H. return clean result
+
+לא יותר מזה ב-path הראשי.
+
+11. תבדוק במיוחד את האזורים האלו
+אני רוצה שתטפל בפועל ב:
+- routes/projects/index.ts
+- prompt building logic
+- detectChatIntent
+- cache key logic
+- message flow
+- extraction logic
+- HTML persistence
+- React file persistence
+- preview update flow
+- done event payload
+- project state consistency
+
+12. תעשה quality pass ממוקד על generation quality
+אני לא רוצה עכשיו עוד UI polish.
+אני לא רוצה עכשיו עוד feature additions.
+אני רוצה quality pass על:
+- relevance of output
+- correctness of output
+- consistency of output
+- appropriateness to user request
+- less generic results
+- less landing-page bias
+- better edit/fix behavior
+
+13. תעדכן את המערכת כך שהיא תעדיף:
+- correctness over impressiveness
+- relevance over flashiness
+- clean output over overloaded output
+- task fit over generic “premium” style
+- stable persistence over clever behavior
+
+14. תוצרים שאני רוצה ממך
+אני רוצה שתחזיר לי:
+1. מה בדיוק שינית
+2. אילו קבצים שינית
+3. אילו prompt layers צמצמת או מחקת
+4. איך תיקנת את cache correctness
+5. איך שיפרת intent routing
+6. איך הקשחת extraction/persistence
+7. למה עכשיו התוצאות יהיו יותר טובות
+8. קבצים מתוקנים בפועל
+
+15. חשוב מאוד
+אני לא רוצה ממך רק הסבר.
+אני רוצה ביצוע.
+
+אם צריך:
+- תמחק חוקים מיותרים
+- תפשט prompts
+- תבטל cache זמנית
+- תפצל קוד
+- תכתוב helper חדש
+- תשנה flow
+- תתקן extraction
+- תעדכן persistence
+
+אבל תעשה בפועל.
+
+המטרה:
+שהמערכת תייצר תוצאות הרבה יותר טובות,
+יותר מדויקות,
+פחות גנריות,
+פחות “זבל”,
+ויותר תואמות למה שהמשתמש באמת ביקש.
+
+תתחיל עכשיו מתיקון generation quality, לא מעיצוב, לא מ-UX, ולא מפיצ'רים חדשים.

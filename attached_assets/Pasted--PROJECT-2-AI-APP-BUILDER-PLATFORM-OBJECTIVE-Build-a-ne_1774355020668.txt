@@ -1,0 +1,139 @@
+🚀 PROJECT 2 — AI APP BUILDER PLATFORM
+🎯 OBJECTIVE
+
+Build a next-generation AI app builder that:
+
+Generates full applications via chat
+Maintains persistent project memory
+Fixes, improves, and deploys apps automatically
+🧠 CORE ARCHITECTURE
+Layers:
+User Chat
+→ Intent Understanding
+→ Project Memory (DNA Layer)
+→ Code Generation Engine
+→ File System Manager
+→ Execution / Preview Engine
+→ Deployment Engine
+📦 REQUIRED STACK
+Frontend
+React
+TypeScript
+Vite
+TailwindCSS
+Editor
+Monaco Editor
+Backend
+FastAPI
+Node.js (optional for tooling)
+AI Layer
+OpenAI / Claude API
+LangChain (optional)
+Custom orchestration layer
+Database
+PostgreSQL
+Redis
+Realtime
+WebSockets
+Deployment
+Vercel
+Netlify
+Docker
+🔥 CORE FEATURES TO BUILD
+1. PROJECT DNA MEMORY (CRITICAL)
+
+Store:
+
+app type
+tech stack
+design style
+business model
+user preferences
+
+Persist across sessions.
+
+2. FILE-AWARE AI
+
+The AI must:
+
+read entire project
+understand dependencies
+modify multiple files safely
+3. AUTO DEBUG SYSTEM
+
+When errors occur:
+
+detect stack trace
+locate source file
+fix automatically
+4. LIVE BUILD MODE (DIFFERENTIATOR)
+
+User sees:
+
+app updating in real-time while AI works
+5. AUTO IMPROVEMENT ENGINE
+
+AI should proactively:
+
+improve UI
+optimize performance
+refactor code
+6. MULTI-MODE SYSTEM
+
+Support modes:
+
+Entrepreneur
+Builder
+Developer
+Maker
+
+Each mode:
+
+different tone
+different level of detail
+different suggestions
+7. MONETIZATION ENGINE (UNIQUE EDGE)
+
+AI should generate:
+
+pricing models
+landing pages
+funnels
+analytics suggestions
+🤖 AI BEHAVIOR RULES
+
+The AI must:
+
+think in full project context (not single prompt)
+modify code incrementally (not regenerate everything)
+explain changes briefly
+avoid breaking working code
+⚡ PRIORITY EXECUTION ORDER
+Project memory system
+File-aware code editing
+Live preview
+Auto-debug system
+Multi-mode AI
+Deployment automation
+🧠 FINAL STRATEGY (IMPORTANT)
+Muzikal
+
+→ Deep tech product
+→ Focus on accuracy + AI models
+→ Long-term massive value
+
+App Builder
+
+→ Productized SaaS
+→ Focus on UX + differentiation
+→ Faster to market
+
+If you want next step, I can give you:
+
+✅ Exact folder structure
+✅ Ready-to-use code templates
+✅ API endpoints
+✅ Training scripts for the models
+
+Just tell me:
+“next step — implementation”

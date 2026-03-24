@@ -1,0 +1,68 @@
+🔴 קריטי — שוברים את הזרימה הראשית
+1. React files לא נשמרים ב-DB אחרי message
+Expected: כשיש extractedReactFiles, כל קובץ נשמר ב-project_files ו-done event מציין previewUpdated: true.
+Actual: הקוד שומר את ה-fullResponse כ-message, אבל לא מריץ upsert לכל קובץ מה-extractedReactFiles. רק HTML projects מקבלים persistence מלא. React projects לא מקבלים שום כתיבה ל-DB.
+Root cause: אחרי הלולאה של extraction, הקוד עושה update previewHtml רק אם extractedHtml קיים — ולא נוגע ב-projectFiles אם isReactStack.
+Fix: לאחר extraction, אם extractedReactFiles.length > 0 — לבצע upsert לכל קובץ ב-project_files.
+
+2. done event נשלח עם previewUpdated: false גם כשיש output חדש
+Expected: done מכיל previewUpdated: true כשנוצר output חדש, כדי שה-frontend יעשה refetch.
+Actual: done event נשלח עם previewUpdated: !!(extractedHtml) — כלומר עבור React תמיד false, ועבור HTML רק אם הextraction הצליח.
+Root cause: הפרמטר לא מחושב נכון — לא לוקח בחשבון React files.
+Fix: previewUpdated: !!(extractedHtml || extractedReactFiles.length > 0)
+
+3. previewHtml ו-projectFiles.index.html לא תמיד מסונכרנים
+Expected: כשנשמר HTML חדש, גם projects.previewHtml וגם project_files['index.html'] מתעדכנים בו-זמנית, אטומית.
+Actual: יש שני עדכונים נפרדים — update projectsTable ואז insert/conflict projectFilesTable. אם ה-server קורס בין השניים, נוצר state לא עקבי.
+Root cause: שני DB calls נפרדים ללא transaction.
+Fix: לעטוף את שניהם ב-db.transaction(...).
+
+4. Snapshot נוצר גם כשאין HTML חדש (HTML ריק / שגוי)
+Expected: snapshot נוצר רק כשיש HTML תקין חדש.
+Actual: הקוד בודק if (extractedHtml) לפני יצירת snapshot — אבל extractedHtml יכול להיות HTML חלקי שתוקן רק בחלקו (מה-truncated fallback), ונשמר snapshot פגום.
+Root cause: אין validation של minimal HTML quality לפני שמירה.
+Fix: לוודא ש-HTML מכיל לפחות <html ו-</html> לפני שמירת snapshot.
+
+5. Agent flow — autoFix משנה currentHtml אבל לא תמיד שומר ל-DB
+Expected: אם autoFix מוצא בעיות ומחזיר fixedHtml, ה-HTML החדש נשמר ב-previewHtml ובקבצים.
+Actual: ב-agent flow, לאחר לולאת ה-fix, הקוד שומר currentHtml — אך אם fixedHtml הוחזר בלי HTML block (רק issues JSON), currentHtml לא מתעדכן ולא נשמר הגרסה המתוקנת.
+Root cause: הענף if (fixedHtml) לא מטפל במצב שבו ה-fix model מצא בעיות אבל לא החזיר HTML — מה שגורם ל-break ולשמירת גרסה ישנה.
+Fix: לוודא שאם issues.length > 0 וגם אין fixedHtml, מוסיפים retry שלישי מלא.
+
+🟠 חמור — מחזירים תוצאה לא נכונה
+6. Share flow — GET /share/:token יכול להחזיר preview ריק
+Expected: מי שנכנס לקישור share רואה את הפרויקט.
+Actual: ה-route מביא את project.previewHtml — אך אם הפרויקט הוא React stack, previewHtml ריק ואין fallback ל-bundle.
+Root cause: אין branch logic לפי project.stack בנתיב ה-share.
+Fix: אם isReactStack — להגיש redirect ל-/api/projects/:id/bundle או לבנות static bundle זמני.
+
+7. Netlify deploy — zipBase64 fallback שגוי
+Expected: אם המשתמש שולח zipBase64, הוא משמש כ-zip ישיר.
+Actual: בנתיב /netlify-deploy הישן, הקוד עושה Buffer.from(zipBase64, 'base64') — אבל לא בודק שה-base64 תקין לפני שמעביר ל-Netlify, מה שגורם ל-deploy שנכשל בשקט.
+Root cause: אין validation על ה-zipBase64 לפני שימוש.
+Fix: לעטוף ב-try/catch + לוודא שה-Buffer מתחיל ב-PK (ZIP magic bytes).
+
+8. inCode detection — counting שגוי של backticks
+Expected: tracking של backtick fences כדי לדעת אם ה-AI כרגע בתוך code block.
+Actual: הקוד סופר newFences על כל chunk — אבל chunk יכול להכיל גם ``` חלקי (פוצל בין chunks). זה גורם ל-inCode להיות לא מדויק ול-code events שגויים.
+Root cause: counting per-chunk במקום per-accumulated-buffer.
+Fix: לספור על fullResponse המצטבר, לא על כל chunk בנפרד.
+
+9. fallback2Regex ל-React files — יכול לחלץ קבצים שגויים
+Expected: Fallback regex מוצא קבצי React רק אם ה-primary pattern כשל לחלוטין.
+Actual: fallback2Regex מחפש **filename** או `filename` — פטרן שיכול לתפוס כל bold/inline-code בתשובה, גם אם הוא לא file header.
+Root cause: הפטרן לא מוגבל מספיק — למשל **important** עם code block אחריו ייתפס בטעות.
+Fix: לדרוש שהpath מכיל / או . עם סיומת ידועה (tsx/jsx/ts/js/css).
+
+🟡 בינוני — edge cases ו-inconsistencies
+10. growWithMeSuggestion — side effect שלא blocked על שגיאות
+הפונקציה generateGrowWithMeSuggestion רצה כ-fire-and-forget. אם היא זורקת שגיאה, הלוג מתמלא בשגיאות שקטות. לא קריטי, אך כדאי לעטוף ב-.catch(() => {}) מפורש.
+11. Snapshot restore — אין invalidation של cache בפרונטאנד
+כשמשחזרים snapshot, ה-backend עושה update ל-DB. אך ה-frontend לא מקבל event מפורש — הוא סומך על polling / refetch. אם ה-refetch לא קורה מייד, ה-preview לא מתעדכן.
+Fix: לשלוח broadcastProjectUpdate גם אחרי restore.
+12. Multi-agent analysis רץ על כל הודעה
+כרגע runMultiAgentAnalysis רץ לפני כל הודעה — גם להודעות קצרות של "תוסיף כפתור". זה מוסיף latency מיותר.
+Fix: להגביל ל-first message בלבד, או כשה-content ארוך מ-100 תווים.
+13. SHARED_LIBRARIES — רשימה ארוכה מדי בכל prompt
+הרשימה כוללת עשרות libraries שנשלחות בכל system prompt — מנפחת את ה-tokens ומאטה תגובות.
+Fix: לשמור רק ~8 libraries נפוצות.

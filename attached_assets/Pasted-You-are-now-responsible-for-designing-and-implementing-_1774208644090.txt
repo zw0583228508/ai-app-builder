@@ -1,0 +1,241 @@
+You are now responsible for designing and implementing a HIGH-CONVERSION MONETIZATION SYSTEM.
+
+Do NOT break the product experience.
+Do NOT create aggressive or annoying paywalls.
+Do NOT reduce the product’s value.
+
+Your mission is:
+Make users WANT to upgrade, not feel forced to.
+
+============================================================
+PRIMARY GOAL
+============================================================
+
+Convert engaged users into paying users by:
+
+- letting them experience real value first
+- letting them build something meaningful
+- creating momentum and dependency
+- introducing upgrade points at the right moment
+
+The user should feel:
+
+“This is powerful. I’ve already built something real. I want more.”
+
+============================================================
+NON-NEGOTIABLE RULES
+============================================================
+
+1. Do NOT block users too early.
+2. Do NOT interrupt the core building flow.
+3. Do NOT reduce the quality of the free experience too aggressively.
+4. Do NOT add annoying popups.
+5. Do NOT create friction during the first successful experience.
+6. Monetization must feel natural, well-timed, and justified.
+7. Preserve chat-first flow.
+8. Preserve simplicity and clarity.
+
+============================================================
+PHASE 1 — DEFINE NATURAL UPGRADE TRIGGERS
+============================================================
+
+Identify key moments where users are most likely to upgrade:
+
+- after building a working project
+- after seeing a good result
+- after improving something multiple times
+- after reaching a limit
+- after trying to publish/deploy
+- after asking for advanced improvements
+- after using the system for several steps
+
+At these moments:
+- introduce upgrade options softly
+- do NOT interrupt the flow aggressively
+- do NOT break the experience
+
+============================================================
+PHASE 2 — IMPLEMENT SOFT LIMITS (NOT HARD BLOCKS)
+============================================================
+
+Introduce limits that encourage upgrading without killing momentum.
+
+Examples:
+- number of projects
+- number of generations
+- advanced edits
+- high-quality outputs
+- export/publish features
+- advanced customization
+
+When a limit is reached:
+- do NOT stop the user abruptly
+- explain clearly what happened
+- show what upgrading unlocks
+- keep tone calm and premium
+
+============================================================
+PHASE 3 — ADD UPGRADE MOMENTS INSIDE THE FLOW
+============================================================
+
+When the user reaches a meaningful moment:
+
+Trigger a soft upgrade suggestion.
+
+Examples:
+- after a strong result:
+  “Want to take this further? Unlock advanced customization.”
+- before publishing:
+  “You’re ready to go live. Upgrade to publish your project.”
+- after repeated usage:
+  “You’re building fast. Unlock unlimited iterations.”
+
+Rules:
+- no spam
+- no repetition
+- no pressure
+- one clear message
+- high timing quality
+
+============================================================
+PHASE 4 — MAKE VALUE CLEAR
+============================================================
+
+When presenting upgrade:
+
+Clearly show:
+- what the user gets
+- why it matters
+- what they can do next
+
+Avoid:
+- vague wording
+- generic pricing language
+
+Prefer:
+- concrete outcomes
+- action-based value
+
+Example:
+NOT:
+“Upgrade for more features”
+
+INSTEAD:
+“Unlock unlimited edits, publish your app, and keep building without limits”
+
+============================================================
+PHASE 5 — KEEP THE EXPERIENCE PREMIUM
+============================================================
+
+Monetization UI must feel:
+- clean
+- minimal
+- well-integrated
+- non-intrusive
+- high-end
+
+Avoid:
+- aggressive banners
+- flashing elements
+- cheap-looking upgrade prompts
+- clutter
+
+The upgrade experience should feel like:
+a natural continuation of success
+
+============================================================
+PHASE 6 — ADD PROGRESS-BASED MONETIZATION
+============================================================
+
+Use progress to drive upgrades.
+
+As the user builds more:
+- increase value shown
+- increase need for advanced features
+- increase upgrade relevance
+
+The more they succeed:
+The more they should WANT to upgrade.
+
+============================================================
+PHASE 7 — SUPPORT MULTIPLE USER TYPES
+============================================================
+
+Different users want different things:
+
+Entrepreneur:
+- wants fast results
+- wants publish
+- wants simplicity
+
+Builder:
+- wants control
+- wants customization
+
+Developer:
+- wants power
+- wants flexibility
+
+Make upgrade messaging relevant to the current user mode.
+
+============================================================
+PHASE 8 — AVOID BREAKING MOMENTUM
+============================================================
+
+Never block the user mid-flow in a frustrating way.
+
+If limit is hit:
+- allow a small continuation when possible
+- show upgrade clearly
+- preserve the feeling of progress
+
+Momentum is more important than restriction.
+
+============================================================
+PHASE 9 — ADD CLEAR PLAN STRUCTURE (IF NEEDED)
+============================================================
+
+Define simple plans:
+
+- Free → basic usage
+- Pro → unlimited or expanded usage
+- (Optional) higher tier for advanced users
+
+Keep plans:
+- simple
+- understandable
+- clearly differentiated
+
+Do NOT overload with options.
+
+============================================================
+PHASE 10 — TEST AND OPTIMIZE
+============================================================
+
+Track:
+- when users drop off
+- when users upgrade
+- what triggers upgrades
+- where users hesitate
+
+Iterate based on:
+- behavior
+- engagement
+- conversion
+
+============================================================
+SUCCESS CRITERIA
+============================================================
+
+This system is successful if:
+
+- users reach value before seeing monetization
+- users are not frustrated by limits
+- upgrade prompts feel well-timed
+- users understand what they gain
+- users feel progress and momentum
+- conversion improves without harming UX
+
+The product should feel like:
+
+“I’ve already built something valuable — upgrading is the natural next step.”

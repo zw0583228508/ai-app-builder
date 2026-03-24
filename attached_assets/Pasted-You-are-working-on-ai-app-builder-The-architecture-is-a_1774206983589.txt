@@ -1,0 +1,529 @@
+You are working on ai-app-builder.
+
+The architecture is already in a strong place.
+Do NOT reopen broad structural refactors unless absolutely necessary.
+Do NOT re-monolith the codebase.
+Do NOT waste time on low-value feature sprawl.
+
+Your mission now is to make this product capable of beating tools like Replit and v0 in actual user experience.
+
+This means the product must become:
+- sharper
+- faster
+- more premium
+- more operational
+- more intuitive
+- more attractive
+- more trustworthy
+- more chat-native
+- more impressive from the first result
+
+============================================================
+MASTER GOAL
+============================================================
+
+Turn this into a world-class chat-first builder where:
+
+- the first result looks strong
+- the assistant feels like an operator, not a chatbot
+- the user can do almost everything through chat
+- the UI feels premium and light
+- visual editing feels elegant
+- the user always understands what changed
+- follow-up edits feel natural and contextual
+- the product feels addictive, not just functional
+
+The user should feel:
+
+“I describe what I want, and the system understands, executes, refines, and clearly shows progress.”
+“This feels better than generic AI builders.”
+“This product is polished, smart, and fast.”
+
+============================================================
+NON-NEGOTIABLE RULES
+============================================================
+
+1. Preserve the current modular structure.
+2. Do not reintroduce giant files.
+3. Do not break chat, preview, deploy, GitHub sync, files, share, snapshots, secrets, database, or mode switching.
+4. Do not remove current functionality.
+5. Keep advanced capability, but do not let it create clutter.
+6. Preserve RTL/Hebrew support.
+7. Keep the app buildable after every step.
+8. Work incrementally and safely.
+9. Focus on product quality and execution feel, not random new complexity.
+10. Optimize for premium experience, user trust, and fast iteration through chat.
+
+============================================================
+PHASE 1 — MAKE THE ASSISTANT FEEL LIKE AN OPERATOR
+============================================================
+
+Current issue:
+The assistant still sometimes sounds like it is explaining instead of truly operating the workspace.
+
+Required:
+Make the assistant feel more like a senior product operator.
+
+Behavior requirements:
+- if user intent is clear, act immediately
+- ask fewer questions
+- never ask too many questions at once
+- infer sensible defaults when possible
+- reduce filler
+- reduce generic enthusiasm
+- reduce form-like conversation
+- keep momentum high
+
+The assistant should sound:
+- decisive
+- sharp
+- premium
+- aware of design/product context
+- action-oriented
+- trustworthy
+
+Examples of desired behavior:
+- “I redesigned the hero and tightened the layout hierarchy.”
+- “I improved mobile spacing and fixed the overflow issue.”
+- “I updated the dashboard cards and clarified the CTA.”
+- “I applied the changes to the selected section.”
+- “I published the updated build.”
+
+Do not make the assistant robotic.
+Make it strong, concise, and operational.
+
+============================================================
+PHASE 2 — IMPROVE CONVERSATION QUALITY ITSELF
+============================================================
+
+Current problem:
+Conversation quality is still not premium enough.
+It can feel generic, verbose, overly structured, or insufficiently sharp.
+
+Required:
+Upgrade the quality of the actual conversation.
+
+Focus on:
+A. Opening replies
+- remove weak generic openings
+- make first replies feel tailored and confident
+- avoid boilerplate
+
+B. Questioning style
+- ask only high-leverage questions
+- ask one or two things max, not a whole checklist
+- infer defaults where safe
+- maintain momentum
+
+C. Response structure
+- be concise when possible
+- avoid fluff
+- avoid repeated filler
+- improve clarity
+- improve elegance
+- improve Hebrew quality and tone
+
+D. Execution-first conversation
+- prefer action + short summary over long explanation
+- when user request is clear, move the product forward
+
+The chat should feel premium, intelligent, and fast.
+
+============================================================
+PHASE 3 — MAKE FIRST OUTPUT QUALITY STRONGER
+============================================================
+
+Current issue:
+To beat major builders, the first generated result must already look impressive.
+
+Required:
+Improve the default quality of initial generated output.
+
+Focus on:
+- stronger layout hierarchy
+- better spacing
+- better typography scale
+- better section composition
+- cleaner cards
+- stronger CTA emphasis
+- more balanced color usage
+- fewer awkward or empty-looking layouts
+- more polished dashboard patterns
+- stronger business-facing landing structures
+- better mobile responsiveness from the start
+
+Goal:
+Even the first result should feel designed, not raw.
+
+============================================================
+PHASE 4 — ADD A STRONG TRUST LAYER AFTER EVERY CHANGE
+============================================================
+
+Current issue:
+Users need to feel fully in control and understand what changed.
+
+Required:
+After meaningful actions, clearly and concisely communicate:
+
+- what changed
+- where it changed
+- what kind of change it was
+- why it matters
+
+Add or improve:
+- short change summaries
+- stronger success confirmations
+- more confidence-building post-action responses
+
+Examples:
+- “Updated: hero layout, CTA emphasis, and section spacing.”
+- “Fixed: mobile overflow and inconsistent card alignment.”
+- “Improved: readability, hierarchy, and button contrast.”
+- “Published: latest version is now live.”
+
+Rules:
+- short
+- sharp
+- useful
+- not verbose
+- confidence-building
+
+The user must always feel:
+“I know exactly what just happened.”
+
+============================================================
+PHASE 5 — MAKE THE PRODUCT FEEL MORE “EVERYTHING THROUGH CHAT”
+============================================================
+
+Current issue:
+The app still partially feels like chat + tools instead of chat as the operating system.
+
+Required:
+Strengthen the feeling that almost all meaningful work can be done through conversation.
+
+Improve the UX so chat clearly feels capable of:
+- building screens/pages
+- redesigning sections
+- editing selected elements
+- improving copy
+- fixing bugs
+- improving mobile
+- refining spacing/typography/colors
+- creating missing pages
+- publishing
+- GitHub actions
+- integration-related actions
+- project-wide changes
+
+Required:
+- better discoverability of chat capabilities
+- stronger action confidence
+- stronger sense that the assistant is operating the workspace
+- smoother follow-up editing through natural language
+
+Do not turn this into noisy feature marketing.
+Make it feel natural, powerful, and real.
+
+============================================================
+PHASE 6 — IMPROVE CONTEXT CONTINUITY AND PROJECT MEMORY
+============================================================
+
+Current issue:
+The assistant must retain project context much better across the conversation.
+
+Required:
+Strengthen continuity so the assistant better remembers:
+- what kind of product is being built
+- target audience
+- chosen design direction
+- app structure
+- earlier decisions
+- previous edits
+- what is already done
+- what still remains
+
+Result:
+The user should not need to repeat core context constantly.
+Follow-up edits should feel natural.
+
+============================================================
+PHASE 7 — IMPROVE VISUAL EDITING UX
+============================================================
+
+Current issue:
+Visual editing must not feel intrusive or ugly.
+
+Required:
+Make visual editing subtle, elegant, and non-disruptive.
+
+Rules:
+- no aggressive edit rectangles everywhere
+- no persistent ugly section boxes
+- clean preview in normal mode
+- subtle hover affordance in edit mode
+- one elegant active selection state
+- selected element should be obvious but beautiful
+- non-selected elements should remain visually clean
+
+Goal:
+Visual editing should feel like a premium design tool, not a debugging overlay.
+
+============================================================
+PHASE 8 — FULLY SUPPORT CLIPBOARD-DRIVEN CHAT WORKFLOWS
+============================================================
+
+Current issue:
+To be truly chat-native, the composer must support fast real-world workflows.
+
+Required:
+Support and polish:
+- direct paste of screenshots/images from clipboard
+- text + image paste together
+- pasted image attachment preview
+- removal before send
+- preserving typed text
+- instant and native-feeling behavior
+
+Also improve:
+- keyboard flow
+- focus handling
+- send ergonomics
+- attachment speed and smoothness
+
+Goal:
+The chat should feel fast and native, not clunky.
+
+============================================================
+PHASE 9 — REDUCE CLUTTER WITHOUT REDUCING POWER
+============================================================
+
+Current issue:
+The app still risks feeling like “too much system” in some states.
+
+Required:
+Keep power, but reduce visible clutter.
+
+Improve:
+- contextual action visibility
+- helper surface timing
+- advanced action discoverability without overload
+- when to show chips, banners, suggestions, queue UI, and status surfaces
+
+Priority order:
+1. conversation
+2. current streamed answer
+3. input area
+4. one relevant helper surface
+5. advanced actions
+6. internal/technical details
+
+Do not show too much at once.
+Make the product feel lighter and calmer.
+
+============================================================
+PHASE 10 — IMPROVE ENTREPRENEUR MODE FURTHER
+============================================================
+
+Current issue:
+Entrepreneur mode must be significantly better than a softened builder mode.
+
+Required:
+Make entrepreneur mode feel:
+- simpler
+- calmer
+- more premium
+- more founder-friendly
+- less technical
+- more guided
+- more confident
+
+Improve:
+- what is visible by default
+- what helper UI appears
+- quick-start framing
+- amount of technical exposure
+- how much cognitive load exists in the first minute
+
+The entrepreneur user should feel:
+“This is polished, clear, and made for me.”
+
+============================================================
+PHASE 11 — IMPROVE ERROR RECOVERY AND PRODUCT RESILIENCE
+============================================================
+
+Current issue:
+A premium product must feel calm and trustworthy even when something fails.
+
+Required:
+Improve recovery flows for:
+- failed chat send
+- failed streaming
+- failed preview update
+- failed deploy
+- failed GitHub action
+- failed attachment handling
+- auth errors
+- rate limits
+- network failures
+
+Required UX:
+- clear messages
+- calm tone
+- useful next step
+- retry affordances where safe
+- less technical fear
+
+Do not expose raw scary system behavior when not necessary.
+
+============================================================
+PHASE 12 — IMPROVE PREVIEW / RESULT TRANSITIONS
+============================================================
+
+Current issue:
+The emotional jump from request -> result can still be stronger.
+
+Required:
+Make result transitions feel satisfying and trustworthy.
+
+Improve:
+- the feeling that preview reflects the assistant’s action
+- the relationship between chat response and visible output
+- subtle but clear confirmation that requested changes landed
+- smoother ask -> build -> show flow
+
+The preview should feel like the assistant’s output surface.
+
+============================================================
+PHASE 13 — IMPROVE PRODUCT COPY AND MICROCOPY
+============================================================
+
+Required:
+Improve product language everywhere it matters:
+- placeholders
+- empty states
+- confirmations
+- helper text
+- success states
+- error states
+- quick prompts
+- entrepreneur-mode text
+- editing-mode text
+
+The copy should feel:
+- clear
+- premium
+- calm
+- confident
+- concise
+- non-robotic
+- non-generic
+
+============================================================
+PHASE 14 — ADD TARGETED OBSERVABILITY FOR PRODUCT QUALITY
+============================================================
+
+Required:
+Add focused observability to help improve real UX quality.
+
+Track useful signals such as:
+- stream interruption rate
+- preview update success rate
+- deploy success rate
+- GitHub sync success rate
+- attachment/paste success rate
+- common assistant recovery failures
+- common user retry loops
+
+Keep it focused and practical.
+Do not build a giant analytics platform.
+
+============================================================
+PHASE 15 — FINAL WORLD-CLASS POLISH PASS
+============================================================
+
+After all of the above, do one final complete premium product pass.
+
+Review the full journey:
+- first visit
+- first chat message
+- first streamed answer
+- first generated result
+- first follow-up edit
+- first screenshot paste
+- first selected-element edit
+- first publish flow
+- entrepreneur mode experience
+- long-session experience
+- failure/retry states
+
+Final target:
+The product should feel:
+- premium
+- smooth
+- fast
+- modern
+- intelligent
+- operational
+- beautiful
+- trustworthy
+- emotionally convincing
+- addictive
+
+============================================================
+EXECUTION ORDER
+============================================================
+
+Do the work in this exact order:
+
+1. make the assistant more operational
+2. improve conversation quality
+3. improve first-output quality
+4. strengthen trust after changes
+5. make the product feel more everything-through-chat
+6. improve project memory/context continuity
+7. improve visual editing UX
+8. improve clipboard/chat-native workflows
+9. reduce clutter without reducing power
+10. improve entrepreneur mode further
+11. improve error recovery and resilience
+12. improve preview/result transitions
+13. improve microcopy throughout
+14. add targeted product observability
+15. final world-class polish pass
+
+============================================================
+WORKING METHOD
+============================================================
+
+At each step:
+1. explain exactly what you are changing
+2. explain why it matters
+3. explain why it is safe
+4. implement the change
+5. verify imports and references
+6. run typecheck/build if possible
+7. report what still remains
+
+Do not do one giant uncontrolled pass.
+Work in small, high-quality, focused stages.
+
+============================================================
+SUCCESS CRITERIA
+============================================================
+
+This work is successful only if:
+- the assistant feels more operational and decisive
+- the conversation quality feels premium
+- first generated results are more impressive
+- users clearly understand what changed after each action
+- the product feels more like everything-through-chat
+- context continuity is stronger
+- visual editing feels subtle and premium
+- clipboard-driven workflows feel native
+- the UI feels lighter without losing power
+- entrepreneur mode feels notably better
+- failure states feel calm and recoverable
+- preview/result transitions feel satisfying
+- copy throughout the product is stronger
+- the overall experience feels closer to a world-class premium builder
+- all existing functionality remains stable

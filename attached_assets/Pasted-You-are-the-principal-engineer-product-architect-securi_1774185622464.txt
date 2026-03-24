@@ -1,0 +1,635 @@
+You are the principal engineer, product architect, security lead, backend lead, frontend lead, AI systems architect, and platform stabilization owner for this repository.
+
+Your task is to take this entire project from its current state to a fully stabilized, production-grade, premium AI app-builder platform.
+
+You must work through the entire repository end-to-end and fix everything that is still incorrect, fragile, incomplete, unsafe, inconsistent, or poorly structured.
+
+CRITICAL RULES
+
+1. Do not do random changes.
+2. Do not skip phases.
+3. Do not rewrite everything blindly.
+4. Preserve working behavior unless there is a clear bug, security issue, or architectural reason to change it.
+5. Refactor in controlled steps.
+6. After each major step, ensure the app still builds and runs.
+7. Keep all fixes production-minded.
+8. Prefer modularity, safety, observability, and correctness.
+9. If you find disabled or half-finished features, evaluate whether to complete them, redesign them, or remove them cleanly.
+10. At every phase, document what you changed and why.
+
+PROJECT GOAL
+
+Transform this repository into a world-class adaptive AI platform for building websites and applications through conversation, with:
+- strong security
+- clean modular architecture
+- trustworthy AI behavior
+- excellent UX
+- stable persistence
+- GitHub sync
+- deployment
+- history/versioning
+- multi-file React support
+- adaptive user modes
+- memory and context
+- premium frontend workspace shell
+- clear trust and change visibility
+
+==================================================
+PHASE 1 — FULL CODEBASE AUDIT
+==================================================
+
+Perform a complete repository audit across the full project.
+
+You must inspect:
+- backend entrypoints
+- all Express routes
+- websocket handlers
+- authentication/session code
+- DB schema and usage patterns
+- AI generation pipeline
+- prompt system
+- mode detection
+- intent routing
+- memory system
+- snapshot/versioning system
+- deploy system
+- GitHub sync system
+- templates
+- subscriptions
+- runtime/jobs
+- proxy routes
+- React bundling/preview flow
+- frontend workspace shell
+- chat panel
+- preview panel
+- file panel
+- integrations UI
+- any attached helper panels/components
+
+Generate these documents:
+- docs/audit/repo-overview.md
+- docs/audit/backend-map.md
+- docs/audit/frontend-map.md
+- docs/audit/ai-system-map.md
+- docs/audit/security-findings.md
+- docs/audit/current-defects.md
+- docs/audit/refactor-roadmap.md
+
+The audit must explicitly identify:
+- critical bugs
+- critical security risks
+- incomplete flows
+- stale code
+- giant files
+- duplicated logic
+- synchronization problems
+- missing authorization checks
+- missing transactions
+- weak UX flows
+- missing observability
+- expensive AI prompt waste
+- weak React multi-file handling
+- broken share/deploy/version edge cases
+
+==================================================
+PHASE 2 — FIX ALL CRITICAL DATA FLOW BUGS
+==================================================
+
+You must fix all high-severity state and persistence bugs first.
+
+This includes at minimum:
+
+1. React files persistence
+- When extractedReactFiles are generated, they must always be upserted into project_files.
+- React output must not disappear after generation.
+- The system must persist React project state just as reliably as HTML projects.
+
+2. previewUpdated correctness
+- done events must set previewUpdated=true whenever there is any meaningful new output:
+  - new HTML
+  - new React files
+  - restored snapshot
+  - agent-run final result
+- frontend must reliably refetch when output changed.
+
+3. Synchronization between projects.previewHtml and project_files/index.html
+- For HTML projects, these must be kept in sync.
+- Use a DB transaction where both must be updated together.
+- Never leave partially updated state if the server crashes between writes.
+
+4. Snapshot validity
+- Do not create snapshots from invalid/truncated/partial HTML.
+- Validate minimum quality before persisting a snapshot.
+- Require at least a proper html/body closure or a defined valid threshold.
+
+5. Agent flow persistence
+- If autoFix changes the final output, the fixed result must be what gets saved.
+- If issues are found but no fixedHtml is returned, do not silently keep stale output.
+- Add deterministic fallback/retry behavior.
+
+6. Restore flow refresh
+- Snapshot restore must notify the frontend immediately.
+- Trigger project update broadcast after restore.
+- Ensure restored state is visible without waiting for polling.
+
+==================================================
+PHASE 3 — FIX ALL CRITICAL PRODUCT FLOW BREAKS
+==================================================
+
+You must fix all major user-visible broken flows.
+
+This includes at minimum:
+
+1. Share flow for React projects
+- Public share links must work for React/multi-file projects.
+- If previewHtml is empty for React stacks, route share to bundle preview or another stable share mechanism.
+- Do not return blank pages.
+
+2. Deploy flow correctness
+- Validate zipBase64 before using it.
+- If using zipBase64, verify it is valid zip content.
+- Add proper error handling for corrupt zip payloads.
+- Fail loudly and clearly.
+
+3. Bundle flow reliability
+- React bundle preview must work consistently.
+- Entrypoint resolution must be deterministic.
+- Improve fallback behavior if entrypoint is ambiguous.
+- Improve user-facing build error reporting.
+
+4. Chat/code stream classification
+- Make code vs text detection reliable.
+- Current chunk-based fence counting is fragile.
+- Replace it with a more correct streaming parser or more reliable accumulation strategy.
+- Patch blocks must be hidden from normal chat text and routed correctly.
+
+5. Manifest fallback extraction
+- Tighten fallback regex for React file extraction.
+- Do not let generic bold text or inline code be mistaken for file headers.
+- Only accept valid file-like paths with known extensions and/or realistic structure.
+
+==================================================
+PHASE 4 — SECURITY HARDENING
+==================================================
+
+Perform a full hardening pass across the platform.
+
+You must review and fix:
+
+1. Terminal websocket
+- This is high risk.
+- If shell command restrictions are not truly enforced, fix it immediately.
+- If safe enforcement is not possible, disable terminal behind a feature flag or restrict it to controlled environments only.
+- Do not leave a practically open interactive shell exposed.
+
+2. Proxy and AI proxy
+- Lock down allowed target behavior.
+- Add abuse protection, quotas, and stronger validation.
+- Prevent unsafe generic external usage.
+- Add explicit policy around which apps may use the proxy and under what limits.
+- Review open CORS behavior.
+
+3. Project authorization
+- Every project-scoped route must verify ownership/access properly.
+- Audit:
+  - projects routes
+  - files
+  - secrets
+  - db
+  - deploy
+  - GitHub sync
+  - runtime
+  - jobs
+  - snapshots
+  - share
+  - analytics
+  - templates
+  - teams
+  - comments
+  - webhooks
+  - errors
+  - performance
+  - plan/deploy-brain/qa/cost/saas-generator
+- Fix all missing or inconsistent authorization checks.
+
+4. Team authorization
+- Ensure membership/ownership is properly checked on all team detail and mutation routes.
+- Do not expose team information too broadly.
+
+5. Runtime/jobs safety
+- Add ownership checks to runtime and jobs flows.
+- Prevent unauthorized project access.
+
+6. Session/auth hardening
+- Review session handling, refresh logic, cookie settings, CSRF behavior, and OIDC flows.
+- Ensure safe defaults and no hidden bypasses.
+
+7. SQL and secrets
+- Review project DB query endpoint for safe boundaries.
+- Ensure secrets never leak in logs, responses, previews, public shares, or AI prompts unintentionally.
+
+8. CORS policy
+- Replace overly permissive production CORS behavior with explicit origin handling.
+
+Create:
+- docs/security/final-hardening-report.md
+
+==================================================
+PHASE 5 — BREAK UP THE GIANT PROJECTS ROUTE FILE
+==================================================
+
+The giant projects route file must be decomposed.
+
+Refactor:
+artifacts/api-server/src/routes/projects/index.ts
+
+into modular files and services.
+
+Target structure example:
+
+artifacts/api-server/src/routes/projects/
+  index.ts
+  create.ts
+  get.ts
+  update.ts
+  delete.ts
+  messages.ts
+  preview.ts
+  snapshots.ts
+  share.ts
+  files.ts
+  database.ts
+  secrets.ts
+  deploy.ts
+  github.ts
+  analytics.ts
+  review.ts
+  prompt-enhance.ts
+  agent-run.ts
+
+artifacts/api-server/src/services/
+  ai/
+  memory/
+  projects/
+  deploy/
+  github/
+  snapshots/
+  preview/
+  auth/
+  integrations/
+  analytics/
+  security/
+
+Rules:
+- Routes should become thin.
+- Business logic must move into services.
+- Prompts must move out of route files.
+- Preserve behavior while improving maintainability.
+
+==================================================
+PHASE 6 — REBUILD AI ORCHESTRATION CLEANLY
+==================================================
+
+The AI system is powerful but too hardcoded and too entangled.
+
+Create a modular AI layer with:
+
+1. Prompt registry
+- Move all prompts out of huge route files.
+- Each prompt must have a clear name, purpose, version, and expected output shape.
+
+2. Intent routing layer
+- Isolate intent detection.
+- Make it testable.
+- Avoid route-level sprawl.
+
+3. Mode system
+- Isolate mode detection and per-mode prompt strategy.
+- Keep Entrepreneur / Builder / Developer / Maker logic separate and testable.
+
+4. Output extraction layer
+- Separate HTML extraction, React files extraction, patch extraction, continuation, and fallback handling.
+
+5. Multi-agent analysis layer
+- Do not run heavy multi-agent analysis on every trivial message.
+- Introduce rules:
+  - run on first message
+  - run on long/complex messages
+  - skip on small edits unless explicitly needed
+- Reduce unnecessary latency.
+
+6. Token reduction
+- SHARED_LIBRARIES is too large.
+- Reduce prompt bloat substantially.
+- Only include the most important libraries by default.
+- Move extended library data to optional context injection instead of always-on prompts.
+
+7. Planning/spec flow
+- Re-enable and stabilize guided planning/spec generation in a clean architecture.
+- Support fast build vs guided build explicitly.
+
+Create:
+- docs/ai/prompt-system.md
+- docs/ai/orchestration.md
+- docs/ai/mode-system.md
+- docs/ai/token-optimization.md
+
+==================================================
+PHASE 7 — MEMORY SYSTEM CLEANUP
+==================================================
+
+The memory system is a differentiator. Make it reliable and clean.
+
+Improve:
+- project DNA
+- user DNA
+- memory chunks
+- decision log
+- grow-with-me suggestions
+
+Requirements:
+1. Separate extraction, scoring, storage, and injection.
+2. Add strict schemas.
+3. Reduce silent fire-and-forget errors.
+4. Wrap non-critical side effects with explicit safe handling.
+5. Make relevance scoring deterministic and reviewable.
+6. Expose debug visibility for memory state if useful.
+
+Fix at minimum:
+- any unguarded fire-and-forget side effects
+- noisy background failures
+- unstable memory writes
+- unclear injection logic
+
+Create:
+- docs/ai/memory-cleanup.md
+
+==================================================
+PHASE 8 — FRONTEND WORKSPACE SHELL COMPLETION
+==================================================
+
+You must inspect the frontend workspace thoroughly and complete/polish it into a premium product shell.
+
+Make sure the frontend has a coherent experience across:
+- dashboard
+- project list
+- chat panel
+- preview panel
+- files panel
+- snapshot/history UI
+- deploy UI
+- GitHub UI
+- integrations UI
+- memory/business panel
+- mode selector
+- templates gallery
+- teams/collaboration views
+- subscriptions/usage views
+- error/QA/review views
+
+Requirements:
+1. Eliminate broken placeholder behavior.
+2. Make the UI feel cohesive.
+3. Add good loading states.
+4. Add good empty states.
+5. Add clear project status visibility.
+6. Add clear AI action visibility.
+7. Make preview refresh behavior reliable.
+8. Ensure the preview panel handles HTML and React projects correctly.
+9. Ensure the chat panel handles patch/code display correctly.
+10. Ensure restore/deploy/sync actions visibly update the UI.
+
+Create:
+- docs/frontend/workspace-shell-plan.md
+- docs/frontend/component-map.md
+
+==================================================
+PHASE 9 — TRUST LAYER
+==================================================
+
+Build a strong trust layer so users understand what the AI did.
+
+Implement:
+- changed files summary
+- generation summary
+- patch summary
+- full generation vs patch mode distinction
+- snapshot comparison
+- restore confirmation
+- deploy result explanation
+- GitHub sync result explanation
+- visible “what changed” UX
+
+Users must be able to trust and verify AI changes, not just hope.
+
+==================================================
+PHASE 10 — VERSIONING / SNAPSHOTS / ROLLBACK
+==================================================
+
+Finish the versioning system properly.
+
+Requirements:
+1. Valid snapshots only
+2. clear labels
+3. restore flow
+4. compare flow
+5. rollback reliability
+6. frontend refresh on restore
+7. HTML and React compatibility
+8. strong synchronization guarantees
+
+==================================================
+PHASE 11 — REACT / MULTI-FILE MATURITY
+==================================================
+
+Make React and multi-file projects first-class.
+
+You must improve:
+- manifest parsing
+- fallback parsing
+- file persistence
+- entrypoint resolution
+- bundling
+- preview shell
+- share handling
+- deploy handling
+- user-facing errors
+- file tree UX consistency
+
+React projects must not feel like second-class citizens compared to single-file HTML projects.
+
+==================================================
+PHASE 12 — DEPLOY + GITHUB MATURITY
+==================================================
+
+Refine both systems.
+
+Deploy:
+- make status clearer
+- improve logs
+- improve validation
+- improve failure reporting
+- improve React deployment reliability
+- improve custom domain flow safety
+
+GitHub:
+- ensure authorization is correct everywhere
+- make sync state visible and understandable
+- preserve repo connection metadata correctly
+- improve user-facing success/failure feedback
+
+==================================================
+PHASE 13 — TEMPLATES, SUBSCRIPTIONS, TEAMS, RUNTIME, JOBS
+==================================================
+
+Audit and complete all auxiliary platform systems.
+
+Templates:
+- ensure create/use/delete/public/my flows are correct and authorized
+- verify file copying is correct
+
+Subscriptions:
+- ensure admin-only upgrade path is safe
+- audit all subscription-related enforcement
+
+Teams:
+- verify membership checks and owner-only actions
+- ensure invite email behavior is safe and resilient
+
+Runtime:
+- clearly separate simulated runtime from real runtime behavior
+- do not mislead users
+- add proper authorization and status consistency
+
+Jobs:
+- improve ownership checks
+- improve correctness
+- improve retry clarity
+- improve queue status UX
+
+==================================================
+PHASE 14 — TESTING AND CI
+==================================================
+
+Add serious coverage.
+
+You must add or improve tests for:
+- intent detection
+- mode detection
+- extraction logic
+- React manifest parsing
+- fallback extraction
+- snapshot validation
+- restore flow
+- share routing
+- deploy validation
+- GitHub authorization
+- proxy safety
+- project authorization
+- runtime/jobs authorization
+- patch mode behavior
+- previewUpdated correctness
+- persistence synchronization logic
+
+Add CI checks for:
+- typecheck
+- tests
+- critical build validation
+
+Create:
+- docs/engineering/testing-plan.md
+
+==================================================
+PHASE 15 — PERFORMANCE AND OBSERVABILITY
+==================================================
+
+Improve:
+- AI latency
+- unnecessary multi-agent calls
+- token bloat
+- repeated DB hits
+- log quality
+- traceability
+- operational visibility
+- structured error handling
+- cache correctness
+- background task clarity
+
+Add:
+- better structured logs
+- more useful server diagnostics
+- better frontend error visibility
+- better error-to-fix loops
+
+==================================================
+PHASE 16 — FINAL PRODUCT POLISH
+==================================================
+
+After all systems are corrected, do a final polish pass.
+
+Review:
+- naming consistency
+- message consistency
+- UX consistency
+- loading/empty/error states
+- premium feel
+- trust cues
+- responsiveness
+- mode UX
+- integrations UX
+- deploy UX
+- versioning UX
+- accessibility basics
+- internationalization consistency where relevant
+
+==================================================
+MANDATORY EXECUTION ORDER
+==================================================
+
+Work in this order:
+
+1. full audit
+2. critical persistence/data flow bugs
+3. critical product flow breaks
+4. security hardening
+5. giant route decomposition
+6. AI orchestration cleanup
+7. memory cleanup
+8. frontend workspace shell completion
+9. trust layer
+10. versioning/rollback
+11. React/multi-file maturity
+12. deploy + GitHub maturity
+13. templates/subscriptions/teams/runtime/jobs
+14. tests + CI
+15. performance + observability
+16. final polish
+
+==================================================
+FOR EACH PHASE
+==================================================
+
+For every phase you must:
+1. state the goal
+2. list exact files to inspect/change
+3. implement the fixes
+4. explain what was changed
+5. note any risks or deferred items
+6. ensure the app still builds and runs
+
+==================================================
+SUCCESS STANDARD
+==================================================
+
+The final result must be:
+- secure
+- reliable
+- modular
+- premium
+- production-minded
+- easy to extend
+- easy to trust
+- clearly better than a basic prompt-to-HTML toy
+- strong in both backend engine and frontend product experience
+
+Start now with Phase 1 and proceed in order.

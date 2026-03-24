@@ -1,0 +1,489 @@
+🔴 קריטי
+
+בעיה 1 — React files לא נשמרים ב-DB לאחר message
+קובץ: artifacts/api-server/src/routes/projects/index.ts
+מה קורה בפועל:
+הקוד מריץ לולאה שמבצעת upsert לכל קובץ מ-extractedReactFiles. זה נראה נכון — אבל הבעיה היא ב-updateData. הקוד עושה:
+typescriptif (extractedReactFiles.length > 0) {
+  // ... upsert files ...
+  updateData.previewHtml = null; // React projects don't use previewHtml
+}
+כלומר, עבור React projects, previewHtml מאופס ל-null. אבל ה-update projectsTable שמריץ עם updateData קורה לפני ה-upsert של הקבצים. אם ה-upsert נכשל (network issue, constraint violation), ה-projectsTable כבר עודכן עם previewHtml = null בלי שהקבצים נשמרו — פרויקט ריק לחלוטין.
+גורם שורש: שני DB writes נפרדים, לא אטומיים, לא עטופים ב-transaction.
+השפעה: פרויקט React יכול להישמר עם previewHtml = null ו-project_files ריק — preview לא עולה, bundle מחזיר דף ריק.
+תיקון:
+typescriptawait db.transaction(async (tx) => {
+  await tx.update(projectsTable).set(updateData).where(eq(projectsTable.id, params.id));
+  for (const f of extractedReactFiles) {
+    await tx.insert(projectFilesTable).values({ ... })
+      .onConflictDoUpdate({ ... });
+  }
+});
+
+בעיה 2 — done event מחזיר previewUpdated: false עבור React projects
+קובץ: artifacts/api-server/src/routes/projects/index.ts
+מה קורה בפועל:
+typescriptsendEvent({
+  done: true,
+  previewUpdated: !!(extractedHtml),  // ← תמיד false לReact
+  ...
+});
+עבור React projects, extractedHtml תמיד null (כי if (isReactStack) return null). אז previewUpdated תמיד false.
+השפעה: ה-frontend מקבל previewUpdated: false ולא מבצע refetch. המשתמש רואה את ה-preview הישן עד שיעשה F5 ידני. ב-use-chat-stream.ts הלוגיקה שמאזינה ל-data.previewUpdated לא מופעלת, ו-builder-files-updated event לא נורה.
+תיקון:
+typescriptconst previewUpdated = !!(extractedHtml) || extractedReactFiles.length > 0;
+sendEvent({ done: true, previewUpdated, filesUpdated: extractedReactFiles.length > 0, ... });
+
+בעיה 3 — previewHtml ו-project_files['index.html'] לא אטומיים
+קובץ: artifacts/api-server/src/routes/projects/index.ts
+מה קורה בפועל:
+typescript// כתיבה 1
+if (extractedHtml) {
+  updateData.previewHtml = autoCdnInject(extractedHtml);
+}
+await db.update(projectsTable).set(updateData)...
+
+// כתיבה 2 — נפרדת לגמרי
+if (extractedHtml) {
+  await db.insert(projectFilesTable).values({ path: "index.html", content: html ... })
+    .onConflictDoUpdate(...);
+}
+אם השרת קורס, מאבד חיבור ל-DB, או נקטע בין שתי הכתיבות — projects.previewHtml מעודכן אבל project_files['index.html'] לא, או להיפך. זה גורם ל-inconsistency שבו GET /preview מחזיר גרסה אחת ו-GET /files מחזיר גרסה אחרת.
+גורם שורש: שני DB writes עצמאיים ללא transaction.
+תיקון: אותו transaction מבעיה 1 — לעטוף את שתי הכתיבות יחד.
+
+בעיה 4 — Snapshot נוצר מ-HTML חלקי (truncated fallback)
+קובץ: artifacts/api-server/src/routes/projects/index.ts
+מה קורה בפועל:
+ה-HTML extraction כולל fallback לתשובות שנחתכו:
+typescript// Truncated response fallback
+const truncatedMatch = fullResponse.match(/```(?:html)?\r?\n((?:<!DOCTYPE|<html)[\s\S]+)$/i);
+if (truncatedMatch?.[1]?.trim()) {
+  let partial = truncatedMatch[1].trim();
+  if (!/<\/html>/i.test(partial)) {
+    if (!/<\/body>/i.test(partial)) partial += "\n</body>";
+    partial += "\n</html>";
+  }
+  return partial;
+}
+זה מחזיר HTML שנחתך באמצע ו"תוקן" בתוספת tag סגירה בלבד. ה-snapshot נוצר מה-HTML הזה:
+typescriptif (extractedHtml) {
+  await db.insert(projectSnapshotsTable).values({ html: snapshotHtml, ... });
+}
+אין בדיקת איכות מינימלית לפני שמירת ה-snapshot.
+השפעה: משחזרים snapshot ומקבלים אפליקציה שבורה לחצי. המשתמש חושב שהוא חוזר לגרסה עובדת.
+תיקון:
+typescriptfunction isHtmlUsable(html: string): boolean {
+  return html.length > 500 
+    && /<html/i.test(html) 
+    && /<\/html>/i.test(html)
+    && /<body/i.test(html);
+}
+
+if (extractedHtml && isHtmlUsable(extractedHtml)) {
+  await db.insert(projectSnapshotsTable).values({ ... });
+}
+
+בעיה 5 — Agent flow autoFix — שינויים לא נשמרים כשhtmlחסר
+קובץ: artifacts/api-server/src/routes/projects/index.ts
+מה קורה בפועל:
+בלולאת ה-autoFix של ה-agent:
+typescriptfor (let iter = 1; iter <= 2; iter++) {
+  // ...
+  if (fixIssues.length === 0) { break; } // ← no issues → stop
+
+  if (fixedHtml) {
+    currentHtml = fixedHtml; // עדכן HTML
+    sendEvent({ type: "agent_fix_done", fixed: true, ... });
+  } else {
+    sendEvent({ type: "agent_fix_done", fixed: false, ... });
+    break; // ← יש issues אבל אין HTML → stop
+  }
+}
+// ── Step 4: Save everything ──
+await db.update(projectsTable).set({ previewHtml: currentHtml, ... });
+המצב הבעייתי: iteration 1 מצא issues ותיקן → currentHtml עודכן. iteration 2 מצא issues אבל ה-model לא החזיר HTML block (רק JSON). currentHtml נשאר מ-iteration 1 אבל נשמר בסוף. זה בסדר.
+הבעיה האמיתית: כשה-autoFix model מחזיר fixedHtml שנחלץ עם:
+typescriptconst fixHtmlMatch = fixText.match(/```html\s*\n([\s\S]*?)```/);
+הregex הזה שונה מהregex הראשי שמחלץ HTML (/```html\r?\n([\s\S]*?)\n```/gi). הוא לא תומך ב-\r\n לפני ה-backtick הסוגר ולא מחפש את גדול ביותר אלא הראשון. אם ה-fix model מחזיר HTML גדול עם nested backticks בתוך script tags, ה-regex ייחתך מוקדם ויחזיר HTML חלקי.
+גורם שורש: inconsistency בין regex של extraction הראשי לbetween ה-autoFix — regex שבירה אחרת.
+תיקון: להשתמש באותה extractFencedHtml function בשניהם:
+typescriptconst fixedHtml = extractFencedHtml(fixText); // same function as main flow
+
+בעיה 14 — Authorization חסר על רוב ה-routes
+קובץ: artifacts/api-server/src/routes/projects/index.ts + כל route files
+מה קורה בפועל:
+כל route שמכיל /:id/messages, /:id/snapshots, /:id/secrets, /:id/deploy בודק:
+typescriptconst project = await db.select()...where(eq(projectsTable.id, params.id)).then(r => r[0]);
+if (!project) { res.status(404).json({ error: "Project not found" }); return; }
+// ← אין בדיקת בעלות!
+```
+`authMiddleware` רק מאכלס `req.user` — הוא לא חוסם אם המשתמש לא מחובר, ולא בודק בעלות. משתמש לא מחובר (guest) עם projectId כלשהו יכול לשלוח הודעות, לקרוא secrets (המוצפנים, אמנם), למחוק snapshots, לפרוס — כל עוד הוא יודע את ה-ID.
+
+**הדוגמה הקשה ביותר:**
+```
+DELETE /api/projects/5  →  project.userId לא נבדק → מוחק פרויקט של מישהו אחר
+POST /api/projects/5/messages  →  גורם לחיוב Anthropic API של בעל הפרויקט
+GET /api/projects/5/secrets  →  מחזיר secrets מוצפנים (לא plaintext, אבל עדיין)
+גורם שורש: אין requireProjectAccess middleware. ה-authMiddleware לא נדרש על project routes.
+תיקון:
+typescript// middlewares/projectAuth.ts
+export async function requireProjectOwner(req, res, next) {
+  if (!req.user) { return res.status(401).json({ error: "Authentication required" }); }
+  const projectId = Number(req.params.id);
+  const [project] = await db.select().from(projectsTable)
+    .where(and(eq(projectsTable.id, projectId), isNull(projectsTable.deletedAt)));
+  if (!project) { return res.status(404).json({ error: "Not found" }); }
+  if (project.userId !== req.user.id) { return res.status(403).json({ error: "Forbidden" }); }
+  req.project = project;
+  next();
+}
+
+בעיה 15 — אין rate limiting על AI calls
+קובץ: artifacts/api-server/src/app.ts / index.ts
+מה קורה בפועל:
+ב-build.ts רשום express-rate-limit ב-allowlist, וב-CHANGELOG.md כתוב שנוסף rate limiting — אבל בקוד בפועל של app.ts ו-index.ts לא קיים שום rateLimit() middleware. המגבלה היחידה היא ה-plan limit (50/200/2000 הודעות סה"כ), שלא מגינה מפני burst.
+השפעה: משתמש יכול לשלוח 100 בקשות בשנייה ל-/api/projects/:id/messages — כל אחת תקרא ל-Anthropic API. עלות API בלתי מוגבלת, עומס על DB.
+תיקון:
+typescriptimport rateLimit from 'express-rate-limit';
+app.use('/api/projects/:id/messages', rateLimit({
+  windowMs: 60_000, max: 15,
+  keyGenerator: (req) => req.user?.id ?? req.ip ?? 'anon',
+  standardHeaders: true,
+  message: { error: 'יותר מדי בקשות, המתן דקה' }
+}));
+
+בעיה 16 — אין CSRF protection
+קובץ: artifacts/api-server/src/app.ts
+מה קורה בפועל:
+Auth הוא cookie-based (sid cookie). כל POST request לכל endpoint יישלח עם ה-cookie אוטומטית מכל דף. אין SameSite=Strict (יש SameSite=Lax שמגן חלקית על navigation אבל לא על fetch). אין CSRF token.
+השפעה: אתר זדוני יכול לבצע:
+javascriptfetch('https://yourapp.com/api/projects/123/messages', {
+  method: 'POST',
+  body: JSON.stringify({ content: '...' }),
+  credentials: 'include' // שולח את ה-sid cookie
+});
+תיקון: להחליף SameSite=Lax ל-SameSite=Strict על ה-session cookie, או להוסיף CSRF token לכל mutating requests.
+
+🟠 חמור
+
+בעיה 6 — Share view עבור React project מבצע redirect חלקי
+קובץ: artifacts/api-server/src/routes/projects/index.ts
+מה קורה בפועל:
+typescript// React/multi-file project — redirect to bundle preview
+if (isReactProject) {
+  res.send(`<meta http-equiv="refresh" content="0; url=/api/projects/${project.id}/bundle">`);
+  return;
+}
+```
+ה-redirect עובד — אבל `/api/projects/:id/bundle` דורש authentication (או לא — תלוי אם יש middleware). אם `bundle.ts` מוגן ב-auth middleware, מישהו שמקבל share link לא יוכל לראות React project כלל.
+
+**בנוסף:** ה-`ShareView.tsx` ב-frontend מגיש iframe עם:
+```
+src="/api/projects/share/:token"
+```
+אבל הroute בשרת הוא:
+```
+GET /api/projects/share/:token  → router.get("/share/:token", ...)
+זה route בתוך ה-projects router שמותקן ב-/api/projects. כלומר ה-URL האמיתי הוא /api/projects/share/:token. נראה נכון — אבל זה לא מוגן ב-auth, שזה נכון לshare public. אך אם bundle endpoint מוגן — React share שבור.
+תיקון: לוודא שה-bundle endpoint ב-bundle.ts לא דורש auth כשמגיעים אליו דרך share token redirect, או להעביר את ה-HTML המ-bundle בshare route עצמו.
+
+בעיה 7 — Netlify zipBase64 לא validated לפני שימוש
+קובץ: artifacts/api-server/src/routes/projects/index.ts (הroute הישן /:id/netlify-deploy)
+מה קורה בפועל:
+typescriptconst zipBuffer = zipBase64
+  ? Buffer.from(zipBase64, "base64")
+  : await createZip({ "index.html": project.previewHtml as string });
+אין בדיקה ש-zipBase64 הוא base64 תקין, ואין בדיקה שה-Buffer שנוצר הוא ZIP תקין (ZIP files מתחילים ב-PK\x03\x04). Netlify יחזיר 400 אבל השגיאה תיראה ל-client כ-"Deploy failed" בלי הסבר.
+בנוסף: אם project.previewHtml הוא null ואין zipBase64, הקוד עושה as string cast על null וה-createZip יקבל null — crash בשקט.
+גורם שורש: אין guards לפני ה-zip creation.
+תיקון:
+typescriptif (!project.previewHtml && !zipBase64) {
+  res.status(400).json({ error: "No content to deploy" });
+  return;
+}
+if (zipBase64) {
+  const buf = Buffer.from(zipBase64, "base64");
+  if (buf[0] !== 0x50 || buf[1] !== 0x4B) { // PK magic bytes
+    res.status(400).json({ error: "Invalid ZIP format" });
+    return;
+  }
+  zipBuffer = buf;
+}
+
+בעיה 8 — inCode detection שגוי בגלל chunk splitting
+קובץ: artifacts/api-server/src/routes/projects/index.ts
+מה קורה בפועל:
+typescriptconst newFences = (text.match(/```/g) ?? []).length;
+openFences += newFences;
+const inCode = openFences % 2 === 1;
+sendEvent({ type: inCode ? "code" : "text", content: text });
+זה סופר backtick triplets על כל chunk בנפרד. אבל chunk יכול לחתוך ``` באמצע — למשל chunk1 מכיל `` וchunk2 מכיל `. כל אחד מהם לא יחשב כ-triple backtick אבל יחד הם fence שלם.
+השפעה: inCode מתהפך בעיתוי לא נכון — preview streaming מקבל "text" chunks שהם בעצם HTML, ולא מציג אותם ב-live preview.
+תיקון: לספור על buffer מצטבר:
+typescript// מחוץ ללולאה:
+let accumulatedForFenceCount = "";
+// בתוך ה-chunk handler:
+accumulatedForFenceCount += text;
+const totalFences = (accumulatedForFenceCount.match(/```/g) ?? []).length;
+const inCode = totalFences % 2 === 1;
+
+בעיה 17 — שתי מערכות plan limits שאינן מסונכרנות
+קבצים: middlewares/planLimits.ts ו-routes/projects/index.ts
+מה קורה בפועל:
+מערכת A — ב-planLimits.ts:
+
+מגבלה per-day (מסתכלת על usageLogsTable לפי תאריך היום)
+ערכים: free=maxMessagesPerDay, pro/studio = אחרים
+לא מוחל על POST /projects/:id/messages (לא רשום כ-middleware שם)
+
+מערכת B — inline ב-routes/projects/index.ts:
+typescriptconst PLAN_LIMITS = {
+  free: { maxMessages: 50 },
+  pro: { maxMessages: 200 },
+  studio: { maxMessages: 2000 },
+};
+// בודק total count מכל ה-messages (לא per-day)
+שתי המערכות עם ערכים שונים, מטריקות שונות, ואחת מהן לא מוחלת בכלל.
+תיקון: לבחור מערכת אחת — לרוב ה-inline אחת עובדת, להסיר את ה-middleware הלא מוחל, ולוודא ערכים אחידים.
+
+בעיה 19 — esbuild bundle: אין הודעת שגיאה ברורה על entrypoint שבור
+קובץ: artifacts/api-server/src/routes/projects/bundle.ts
+מה קורה בפועל:
+typescriptconst entryFile =
+  files.find((f) => f.isEntrypoint) ||
+  files.find((f) => /index\.(jsx?|tsx?)$/.test(f.path)) ||
+  files.find((f) => /main\.(jsx?|tsx?)$/.test(f.path)) ||
+  files.find((f) => /app\.(jsx?|tsx?)$/i.test(f.path)) ||
+  files[0]; // ← fallback: כל קובץ
+אם אין entrypoint ידוע, הוא לוקח files[0] — שיכול להיות package.json או README.md. esbuild ינסה לbundle אותו, ייכשל עם שגיאה לא ברורה, ו-catch:
+typescript} catch (err: unknown) {
+  const msg = err instanceof Error ? err.message : "Build error";
+  res.setHeader("Content-Type", "text/html");
+  res.send(generateErrorPage(projectId, msg));
+}
+המשתמש רואה error page ולא יודע שהבעיה היא entrypoint לא מוגדר — כי ה-isEntrypoint לא הוגדר נכון בשמירה (בעיה 1).
+תיקון: לוודא שכשמוסיפים React files, לפחות קובץ אחד מסומן isEntrypoint: true. להוסיף validation בבundte:
+typescriptif (!files.find(f => f.isEntrypoint) && !files.find(f => /index\.(jsx?|tsx?)$/.test(f.path))) {
+  res.status(400).json({ error: "No entrypoint found. Expected src/main.tsx or src/index.tsx" });
+  return;
+}
+
+בעיה 20 — Collab WebSocket: auth check מתעלם מ-Bearer token
+קובץ: artifacts/api-server/src/routes/collab.ts
+מה קורה בפועל:
+typescriptconst cookieHeader = req.headers.cookie ?? "";
+const sidMatch = cookieHeader.match(/(?:^|;\s*)sid=([^;]+)/);
+const sid = sidMatch?.[1];
+if (!sid) { ws.close(4001, "Unauthorized"); return; }
+ה-authMiddleware הכללי בודק גם Bearer token (Authorization: Bearer <sid>):
+typescriptconst authHeader = req.headers["authorization"];
+if (authHeader?.startsWith("Bearer ")) return authHeader.slice(7);
+return req.cookies?.[SESSION_COOKIE];
+אבל ה-WebSocket handler בודק רק cookie. Mobile clients או clients שלא מגדירים cookies כראוי לא יוכלו להתחבר ל-collab.
+תיקון:
+typescriptconst cookieHeader = req.headers.cookie ?? "";
+const sidFromCookie = cookieHeader.match(/(?:^|;\s*)sid=([^;]+)/)?.[1];
+const authHeader = req.headers["authorization"] as string | undefined;
+const sidFromBearer = authHeader?.startsWith("Bearer ") ? authHeader.slice(7) : undefined;
+const sid = sidFromCookie ?? sidFromBearer;
+
+בעיה 25 — SSE connection leak: stream ממשיך לאחר disconnect
+קובץ: artifacts/api-server/src/routes/projects/index.ts
+מה קורה בפועל:
+ה-Anthropic stream פועל ב-for await (const event of stream). אין הגנה:
+typescriptlet clientDisconnected = false;
+req.on("close", () => { clientDisconnected = true; });
+
+// בלולאת הstream:
+for await (const event of stream) {
+  // אין בדיקה של clientDisconnected כאן!
+  ...
+  sendEvent({ type: "code", content: text }); // ← res.write() על חיבור סגור
+}
+כשהלקוח מתנתק, ה-stream ממשיך לרוץ, ממשיך לקבל tokens מ-Anthropic (ולשלם), ממשיך לבצע res.write() שבשקט נכשל.
+בנוסף: לאחר ה-stream, הקוד עדיין ממשיך לבצע כל ה-DB writes (save message, update project, create snapshot, extract DNA). כל זה קורה גם אם המשתמש ניתק לפני שה-stream הסתיים.
+תיקון:
+typescriptfor await (const event of stream) {
+  if (clientDisconnected) {
+    stream.controller.abort(); // ← עצור את ה-Anthropic stream
+    break;
+  }
+  ...
+}
+// לאחר הלולאה:
+if (clientDisconnected) {
+  res.end();
+  return; // ← אל תמשיך ל-DB writes
+}
+
+בעיה 18 — WhatsApp sessions נאבדים בכל server restart
+קובץ: artifacts/api-server/src/routes/whatsapp/index.ts
+מה קורה בפועל:
+typescriptconst sessions = new Map<number, WhatsAppSession>(); // ← in-memory only
+ה-sessions Map הוא in-memory לחלוטין. אחרי כל restart:
+
+ה-Map מתאפס
+כל הchannels המחוברים נותקים
+המשתמש רואה "disconnected" ומחפש איפה ה-QR code
+Baileys auth files נשמרים ב-filesystem (לא ב-DB) אז הם אמנם נשמרים בין restarts — אבל המפה לא מתאחזרת
+
+גורם שורש: אין restoreActiveSessions() בsartup שמסתכל על auth directories קיימים ומאחזר sessions.
+תיקון:
+typescript// בsartup:
+async function restoreActiveSessions() {
+  const authBase = join(process.cwd(), "whatsapp-auth");
+  if (!existsSync(authBase)) return;
+  const dirs = readdirSync(authBase);
+  for (const dir of dirs) {
+    const projectId = parseInt(dir);
+    if (!isNaN(projectId)) {
+      startSession(projectId).catch(() => {});
+    }
+  }
+}
+// בindex.ts אחרי server.listen:
+restoreActiveSessions();
+
+🟡 בינוני
+
+בעיה 9 — fallback2Regex תופס false positives
+קובץ: artifacts/api-server/src/routes/projects/index.ts
+מה קורה בפועל:
+typescriptconst fallback2Regex =
+  /(?:\*\*|`)([a-z][\w./\-]+\.[a-z]+)(?:\*\*|`)\s*\n```[a-z]*\n([\s\S]*?)\n```/g;
+```
+הפטרן תופס כל דבר בפורמט `` `filename.ext` `` או `**filename.ext**` לפני code block. אם ה-AI כותב:
+```
+The `package.json` file should contain:
+```json
+{ "name": "app" }
+```
+הregex יתפוס package.json עם התוכן של block הjson — ויוסיף אותו לרשימת הקבצים. זה יגרום ל-package.json מ-JSON ריק להיכנס ל-project_files.
+תיקון: להוסיף whitelist של סיומות קבצי קוד:
+typescriptconst VALID_EXTENSIONS = /\.(tsx?|jsx?|css|html|json|md|env|gitignore|svg)$/;
+const fallback2Regex = /(?:\*\*|`)([a-z][\w./\-]+)(?:\*\*|`)\s*\n```[a-z]*\n([\s\S]*?)\n```/g;
+// בaddFile:
+if (!VALID_EXTENSIONS.test(filePath)) return;
+
+בעיה 10 — growWithMeSuggestion — fire-and-forget בלי error capture
+קובץ: artifacts/api-server/src/routes/projects/index.ts
+מה קורה בפועל:
+typescriptgenerateGrowWithMeSuggestion(...).then(suggestion => {
+  if (suggestion) growWithMeSuggestion = suggestion;
+}).catch(() => {}); // ← נבלע
+אם הפונקציה זורקת שגיאה, הlogs לא מקבלים כלום. בנוסף, growWithMeSuggestion משתנה מ-outer scope — ה-closure assignment קורה אחרי ש-sendEvent({ done: true }) כבר נשלח, כי הפונקציה היא async ולא מחכים לה.
+תיקון: לחכות לה לפני ה-done event, עם timeout:
+typescriptconst growWithMeSuggestion = await Promise.race([
+  generateGrowWithMeSuggestion(...).catch(() => null),
+  new Promise<null>(r => setTimeout(() => r(null), 2000))
+]);
+sendEvent({ done: true, ..., growWithMeSuggestion });
+
+בעיה 11 — Snapshot restore לא שולח broadcast
+קובץ: artifacts/api-server/src/routes/projects/index.ts
+מה קורה בפועל:
+typescriptrouter.post("/:id/snapshots/restore/:snapshotId", async (req, res) => {
+  // ...
+  await db.update(projectsTable).set({ previewHtml: restoredHtml, ... });
+  await db.insert(projectFilesTable).values({ ... }).onConflictDoUpdate(...);
+  res.json({ ok: true });
+  // ← אין broadcastProjectUpdate!
+});
+PreviewPanel.tsx מגדיר setRefreshKey(k => k + 1) כשהrestore מצליח — שזה refetch של ה-iframe. אבל אם יש tab אחר פתוח (collabחat, או אותו פרויקט בטאב שני), הוא לא מקבל עדכון.
+תיקון:
+typescriptres.json({ ok: true });
+broadcastProjectUpdate(String(projectId), { previewUpdated: true, restored: true });
+
+בעיה 12 — Multi-agent analysis רץ על כל הודעה
+קובץ: artifacts/api-server/src/routes/projects/index.ts
+מה קורה בפועל:
+typescriptconst agentContext = await runMultiAgentAnalysis(body.content, ...);
+ה-runMultiAgentAnalysis מריץ 4 Haiku API calls במקביל (architecture, UI, security, performance) לפני כל הודעת משתמש. עבור "תוסיף כפתור אדום" זה בזבוז מוחלט של ~400ms ו-~2000 tokens.
+CHANGELOG אומר שנוסף throttle — אבל בקוד לא נמצא תנאי כזה.
+תיקון:
+typescriptconst shouldRunMultiAgent = isFirstMessage 
+  || (body.content.length > 200 && body.content.split(' ').length > 15);
+const agentContext = shouldRunMultiAgent 
+  ? await runMultiAgentAnalysis(body.content, ...) 
+  : "";
+
+בעיה 21 — DNA extraction ללא retry
+קובץ: artifacts/api-server/src/routes/projects/index.ts
+מה קורה בפועל:
+typescriptextractAndSaveDNA(params.id, body.content, fullResponse, currentMode).catch(() => {});
+אם Anthropic API מחזיר 429 (rate limit) ב-Haiku call של DNA extraction, הכל נבלע. ה-CHANGELOG מציין שנוסף retry עם backoff — אבל בקוד הנוכחי אין retry.
+תיקון:
+typescriptasync function extractWithRetry(fn: () => Promise<void>, retries = 3) {
+  for (let i = 0; i < retries; i++) {
+    try { await fn(); return; }
+    catch (e) { if (i < retries-1) await new Promise(r => setTimeout(r, 1000 * (i+1))); }
+  }
+}
+extractWithRetry(() => extractAndSaveDNA(...)).catch(() => {});
+
+בעיה 22 — Mode auto-change משנה system prompt באמצע שיחה
+קובץ: artifacts/api-server/src/routes/projects/index.ts
+מה קורה בפועל:
+typescriptif (isFirstMessage || userMessageCount % 5 === 0) {
+  const detectedMode = detectUserMode(body.content);
+  if (detectedMode !== currentMode) {
+    currentMode = detectedMode;
+    await db.update(projectsTable).set({ userMode: currentMode, ... });
+  }
+}
+בהודעה ה-10 בשיחה, אם המשתמש כותב "תכתוב לי קוד TypeScript" — detectUserMode יחזיר developer ו-system prompt ישתנה לחלוטין. ה-AI יתחיל לענות כ-Senior Engineer בשיחה שהתחילה כ-Entrepreneur.
+תיקון: לא לשנות mode אחרי ה-5 ההודעה הראשונה, או לפחות לשלוח notification למשתמש לפני:
+typescriptconst canAutoDetect = userMessageCount <= 1; // רק בהודעה הראשונה
+if (canAutoDetect) { ... }
+
+בעיה 23 — Cache key לא כולל project state
+קובץ: artifacts/api-server/src/routes/projects/index.ts
+מה קורה בפועל:
+typescriptconst cacheKey = createHash("sha256")
+  .update(body.content.slice(0, 500) + currentMode)
+  .digest("hex");
+const cached = await db.select()...where(eq(promptCacheTable.hash, cacheKey))...
+if (cached?.response) {
+  // החזר cache
+}
+אם פרויקט A ופרויקט B שולחים אותה הודעה ("בנה לי דף הבית") עם אותו mode, הם יקבלו אותה תשובה cached — גם אם לפרויקט A יש קוד קיים ולB אין, גם אם ה-stack שלהם שונה.
+תיקון:
+typescriptconst stateFingerprint = [
+  body.content.slice(0, 500),
+  currentMode,
+  project.stack ?? "html",
+  isFirstMessage ? "new" : "existing",
+].join("|");
+const cacheKey = createHash("sha256").update(stateFingerprint).digest("hex");
+
+בעיה 24 — saas-generator מחזיר output לא validated
+קובץ: artifacts/api-server/src/routes/projects/saas-generator.ts
+מה קורה בפועל:
+typescriptconst rawBlock = fullCode.includes("<!DOCTYPE") 
+  ? fullCode.slice(fullCode.indexOf("<!DOCTYPE")) 
+  : fullCode;
+await db.update(projectsTable).set({ previewHtml: rawBlock, ... });
+ה-rawBlock נשמר ישירות בלי לבדוק שהוא HTML שלם ועובד. אם ה-AI החזיר explanation text עם קוד חלקי (קורה לפעמים), המשתמש יקבל SaaS "app" שהוא בעצם HTML שבור.
+תיקון:
+typescriptif (!rawBlock.includes("</html>") || rawBlock.length < 1000) {
+  sendEvent({ type: "error", content: "הקוד שנוצר לא שלם, נסה שוב" });
+  res.end(); return;
+}
+
+בעיה 26 — iframe sandbox כולל allow-same-origin — חור אבטחה
+קובץ: artifacts/app-builder/src/pages/ShareView.tsx
+מה קורה בפועל:
+typescriptsandbox="allow-scripts allow-same-origin allow-forms allow-popups"
+allow-same-origin + allow-scripts ביחד מבטלים את ה-sandbox לחלוטין. קוד שרץ ב-iframe יכול לגשת לcookies של ה-parent page, לקרוא את ה-DOM, לבצע fetch עם credentials — הכל. זה בדיוק מה ש-CHANGELOG מציין כ-"fixed" — אבל ב-ShareView.tsx זה עדיין קיים.
+CHANGELOG מציין:
+
+allow-same-origin removed from iframe sandbox (security hardening)
+
+אבל השינוי לא בוצע ב-ShareView.tsx.
+תיקון:
+typescriptsandbox="allow-scripts allow-forms allow-popups allow-modals"
+// ← הסר allow-same-origin לחלוטין
+
+טבלת סיכום מלאה
+#בעיהחומרהקובץתיקון1React files לא אטומיים עם projectsTable🔴routes/projects/index.tsdb.transaction2done event לא מדווח previewUpdated לReact🔴routes/projects/index.tsתיקון condition3previewHtml + projectFiles לא אטומיים🔴routes/projects/index.tsdb.transaction4Snapshot נשמר עם HTML חלקי/שבור🔴routes/projects/index.tsisHtmlUsable()5autoFix regex שונה מextraction ראשי🔴routes/projects/index.tsextractFencedHtml() משותף6Share של React project — bundle auth שבור🟠routes/projects/index.tsbundle route ללא auth7zipBase64 לא validated לפני deploy🟠routes/projects/index.tsmagic bytes check8inCode counting שגוי על chunks חלוקים🟠routes/projects/index.tscount על accumulated buffer9fallback2Regex תופס false positives🟡routes/projects/index.tsextension whitelist10growWithMeSuggestion arrives after done🟡routes/projects/index.tsawait עם timeout11Snapshot restore לא מ-broadcast🟡routes/projects/index.tsbroadcastProjectUpdate12Multi-agent רץ על כל הודעה🟡routes/projects/index.tsthrottle condition13SHARED_LIBRARIES ארוכה מדי🟡routes/projects/index.tsקיצור14Authorization חסר על כל routes🔴כל routesrequireProjectOwner middleware15אין rate limiting על AI calls🔴app.ts/index.tsexpress-rate-limit16אין CSRF protection🔴app.tsSameSite=Strict17שתי מערכות plan limits לא מסונכרנות🟠planLimits.ts + index.tsמערכת אחת18WhatsApp sessions אבודים בrestart🟠routes/whatsapp/index.tsrestoreActiveSessions()19esbuild: entrypoint fallback לfiles[0]🟠routes/projects/bundle.tsvalidation + ברור isEntrypoint20Collab WebSocket: Bearer token מתעלם🟠routes/collab.tsתמיכה בBearer21DNA extraction ללא retry🟡routes/projects/index.tsextractWithRetry()22Mode auto-change באמצע שיחה🟡routes/projects/index.tsרק בהודעה ראשונה23Cache key לא כולל project state🟡routes/projects/index.tsfingerprint מלא24saas-generator ללא output validation🟡routes/saas-generator.tslength + structure check25SSE stream לא נעצר אחרי disconnect🟠routes/projects/index.tsreq.on('close') + abort26iframe sandbox עם allow-same-origin🟠pages/ShareView.tsxהסר allow-same-origin
