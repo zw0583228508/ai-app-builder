@@ -228,6 +228,7 @@ export const SendProjectMessageBody = zod.object({
       }),
     )
     .optional(),
+  userLang: zod.string().optional(),
 });
 
 /**

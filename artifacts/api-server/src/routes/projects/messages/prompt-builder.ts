@@ -75,6 +75,7 @@ export interface PromptBuildArgs {
   dnaContext: string;
   memoryChunkContext: string;
   agentContext: string;
+  userLang?: string;
 }
 
 /**
@@ -94,6 +95,7 @@ export function buildSystemPrompt(args: PromptBuildArgs): string {
     dnaContext,
     memoryChunkContext,
     agentContext,
+    userLang,
   } = args;
 
   const isEditOrFix =
@@ -110,6 +112,7 @@ export function buildSystemPrompt(args: PromptBuildArgs): string {
         projectType ?? undefined,
         stack,
         detectedIntent.intent,
+        userLang,
       );
 
   const needsLandingPageFallback =

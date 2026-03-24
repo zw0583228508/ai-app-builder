@@ -11,7 +11,6 @@
  * If credentials appear in a prompt produced here, it is a critical security bug.
  */
 import {
-  HEBREW_LANGUAGE_INSTRUCTION,
   ENTREPRENEUR_SYSTEM_PROMPT,
   BUILDER_SYSTEM_PROMPT,
   DEVELOPER_SYSTEM_PROMPT,
@@ -22,6 +21,30 @@ import {
   DJANGO_STACK_RULES,
   SHARED_LIBRARIES,
 } from "./prompts/index";
+
+const LANGUAGE_NAMES: Record<string, string> = {
+  en: "English",
+  he: "Hebrew (עברית)",
+  ar: "Arabic (العربية)",
+  fr: "French (Français)",
+  es: "Spanish (Español)",
+  de: "German (Deutsch)",
+  ru: "Russian (Русский)",
+  zh: "Chinese (中文)",
+  pt: "Portuguese (Português)",
+  ja: "Japanese (日本語)",
+};
+
+function buildLanguageInstruction(userLang?: string): string {
+  const lang = userLang || "he";
+  const langName = LANGUAGE_NAMES[lang] ?? "Hebrew (עברית)";
+  return `══════════════════════════════════════════════════════════════
+שפת תגובה / LANGUAGE INSTRUCTION — MANDATORY
+══════════════════════════════════════════════════════════════
+Always respond in ${langName}. All explanations, descriptions, chat messages, section names, and any text sent to the user MUST be in ${langName}.
+Exception: code (HTML, CSS, JavaScript), variable names, CSS class names, library names, and technical identifiers stay in English.
+`;
+}
 
 // Intents that don't create new code — no need for CDN library list.
 const SKIP_LIBRARIES_INTENTS = new Set(["fix", "edit", "inspect"]);
@@ -373,6 +396,7 @@ export function getSystemPrompt(
   projectType?: string,
   stack?: string,
   intent?: string,
+  userLang?: string,
 ): string {
   let base: string;
 
@@ -452,5 +476,5 @@ REMEMBER: This should look indistinguishable from a real iOS/Android app!
   const capabilityBlock = capabilities
     ? buildCapabilityBlock(capabilities)
     : "";
-  return HEBREW_LANGUAGE_INSTRUCTION + "\n" + base + capabilityBlock;
+  return buildLanguageInstruction(userLang) + "\n" + base + capabilityBlock;
 }

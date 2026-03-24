@@ -3,6 +3,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { getGetProjectQueryKey } from "@workspace/api-client-react";
 import type { ChangeSummary } from "@/components/TrustCard";
 import { trackStreamError, trackRetry } from "@/lib/telemetry";
+import { useLang } from "@/lib/i18n";
 
 export interface Attachment {
   name: string;
@@ -62,6 +63,7 @@ export function useChatStream({
   onError,
   onActionResult,
 }: UseChatStreamOptions) {
+  const { lang } = useLang();
   const [isStreaming, setIsStreaming] = useState(false);
   const [streamedText, setStreamedText] = useState("");
   const [isGeneratingCode, setIsGeneratingCode] = useState(false);
@@ -140,7 +142,7 @@ export function useChatStream({
         // SECURITY: credentials are NEVER included in the chat request body.
         // The backend derives integration capabilities server-side from the
         // encrypted vault using the authenticated session's userId.
-        const body: Record<string, unknown> = { content };
+        const body: Record<string, unknown> = { content, userLang: lang };
         if (attachments && attachments.length > 0) {
           body.attachments = attachments.map((a) => ({
             name: a.name,

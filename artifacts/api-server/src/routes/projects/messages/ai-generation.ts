@@ -44,6 +44,7 @@ export interface AiGenerationCtx {
   body: {
     content: string;
     attachments?: { name: string }[];
+    userLang?: string;
   };
   project: {
     id: number;
@@ -129,6 +130,7 @@ export async function runAiGeneration(ctx: AiGenerationCtx): Promise<void> {
     dnaContext,
     memoryChunkContext,
     agentContext,
+    userLang: body.userLang,
   });
 
   // ══════════════════════════════════════════════════════════════════════════

@@ -23,53 +23,168 @@ import { useLocation } from "wouter";
 import { useListProjects } from "@workspace/api-client-react";
 import { cn } from "@/lib/utils";
 import { format } from "date-fns";
-import { useLang } from "@/lib/i18n";
+import { useLang, type LangCode } from "@/lib/i18n";
+import { LanguageSelector } from "@/components/LanguageSelector";
 
 const OnboardingPanel = lazy(() => import("@/components/OnboardingPanel"));
 
 const PRIMARY = "hsl(191,90%,42%)";
 
-const ROTATING_PLACEHOLDERS_HE = [
-  "צור אפליקציית קריוקי עם ניקוד ולוח תוצאות",
-  "בנה לי SaaS לניהול לקוחות ופרויקטים",
-  "עשה כלי AI ויראלי שאנשים ישתפו",
-  "בנה חנות אונליין עם סל קניות ותשלום",
-  "צור דשבורד אנליטיקס עם גרפים בזמן אמת",
-];
+const ROTATING_PLACEHOLDERS: Record<string, string[]> = {
+  en: [
+    "Create a karaoke app with scoring and leaderboards",
+    "Build me a SaaS for managing clients and projects",
+    "Make a viral AI tool people will share",
+    "Build an online store with cart and checkout",
+    "Create an analytics dashboard with real-time charts",
+  ],
+  he: [
+    "צור אפליקציית קריוקי עם ניקוד ולוח תוצאות",
+    "בנה לי SaaS לניהול לקוחות ופרויקטים",
+    "עשה כלי AI ויראלי שאנשים ישתפו",
+    "בנה חנות אונליין עם סל קניות ותשלום",
+    "צור דשבורד אנליטיקס עם גרפים בזמן אמת",
+  ],
+  ar: [
+    "أنشئ تطبيق كاريوكي مع تسجيل النقاط ولوحة المتصدرين",
+    "ابنِ نظام SaaS لإدارة العملاء والمشاريع",
+    "اصنع أداة ذكاء اصطناعي يمكن مشاركتها",
+    "ابنِ متجرًا إلكترونيًا مع سلة تسوق ودفع",
+    "أنشئ لوحة تحكم تحليلية مع رسوم بيانية حية",
+  ],
+  fr: [
+    "Crée une app karaoké avec scoring et classement",
+    "Construis un SaaS de gestion clients et projets",
+    "Fais un outil IA viral que les gens vont partager",
+    "Construis une boutique en ligne avec panier et paiement",
+    "Crée un tableau de bord analytique en temps réel",
+  ],
+  es: [
+    "Crea una app de karaoke con puntuación y ranking",
+    "Construye un SaaS para gestionar clientes y proyectos",
+    "Haz una herramienta de IA viral que la gente comparta",
+    "Construye una tienda online con carrito y pago",
+    "Crea un panel analítico con gráficos en tiempo real",
+  ],
+  de: [
+    "Erstelle eine Karaoke-App mit Punkten und Bestenliste",
+    "Baue ein SaaS zur Kunden- und Projektverwaltung",
+    "Mache ein virales KI-Tool, das geteilt wird",
+    "Baue einen Online-Shop mit Warenkorb und Zahlung",
+    "Erstelle ein Analytics-Dashboard mit Echtzeit-Diagrammen",
+  ],
+  ru: [
+    "Создай приложение для караоке с очками и рейтингом",
+    "Построй SaaS для управления клиентами и проектами",
+    "Сделай вирусный AI-инструмент, которым все делятся",
+    "Построй интернет-магазин с корзиной и оплатой",
+    "Создай аналитический дашборд с графиками в реальном времени",
+  ],
+  zh: [
+    "创建一个带评分和排行榜的卡拉OK应用",
+    "构建一个客户和项目管理SaaS",
+    "做一个人们会分享的病毒式AI工具",
+    "构建一个带购物车和支付的在线商店",
+    "创建一个实时图表的分析仪表板",
+  ],
+  pt: [
+    "Crie um app de karaokê com pontuação e ranking",
+    "Construa um SaaS de gestão de clientes e projetos",
+    "Faça uma ferramenta de IA viral que todos compartilhem",
+    "Construa uma loja online com carrinho e pagamento",
+    "Crie um painel analítico com gráficos em tempo real",
+  ],
+  ja: [
+    "スコアとリーダーボード付きのカラオケアプリを作る",
+    "顧客・プロジェクト管理SaaSを構築する",
+    "みんながシェアするバイラルAIツールを作る",
+    "カートと決済付きのオンラインショップを構築する",
+    "リアルタイムチャート付きの分析ダッシュボードを作る",
+  ],
+};
 
-const ROTATING_PLACEHOLDERS_EN = [
-  "Create a karaoke app with scoring and leaderboards",
-  "Build me a SaaS for managing clients",
-  "Make a viral AI tool people will share",
-  "Build an online store with cart and checkout",
-  "Create an analytics dashboard with real-time charts",
-];
-
-const QUICK_CHIPS_HE = [
-  { label: "רעיון AI", prompt: "בנה כלי AI חכם שעוזר למשתמשים לפתור בעיות יומיומיות" },
-  { label: "אפליקציית מובייל", prompt: "בנה אפליקציית מובייל חברתית עם פרופיל, פיד ודחיפות" },
-  { label: "מוצר SaaS", prompt: "בנה פלטפורמת SaaS עם הרשמה, תשלום ולוח ניהול" },
-  { label: "מרקטפלייס", prompt: "בנה מרקטפלייס עם מוכרים, קונים, ביקורות ותשלומים" },
-  { label: "דשבורד", prompt: "בנה דשבורד ניהולי עם טבלאות, גרפים ומסנני נתונים" },
-];
-
-const QUICK_CHIPS_EN = [
-  { label: "AI startup idea", prompt: "Build a smart AI tool that helps users solve everyday problems" },
-  { label: "Mobile app", prompt: "Build a social mobile app with profiles, feed and push notifications" },
-  { label: "SaaS product", prompt: "Build a SaaS platform with signup, payment and management dashboard" },
-  { label: "Marketplace", prompt: "Build a marketplace with sellers, buyers, reviews and payments" },
-  { label: "Dashboard", prompt: "Build an admin dashboard with tables, charts and data filters" },
-];
+const QUICK_CHIPS: Record<string, { label: string; prompt: string }[]> = {
+  en: [
+    { label: "AI idea", prompt: "Build a smart AI tool that helps users solve everyday problems" },
+    { label: "Mobile app", prompt: "Build a social mobile app with profiles, feed and push notifications" },
+    { label: "SaaS product", prompt: "Build a SaaS platform with signup, payment and management dashboard" },
+    { label: "Marketplace", prompt: "Build a marketplace with sellers, buyers, reviews and payments" },
+    { label: "Dashboard", prompt: "Build an admin dashboard with tables, charts and data filters" },
+  ],
+  he: [
+    { label: "רעיון AI", prompt: "בנה כלי AI חכם שעוזר למשתמשים לפתור בעיות יומיומיות" },
+    { label: "אפליקציית מובייל", prompt: "בנה אפליקציית מובייל חברתית עם פרופיל, פיד ודחיפות" },
+    { label: "מוצר SaaS", prompt: "בנה פלטפורמת SaaS עם הרשמה, תשלום ולוח ניהול" },
+    { label: "מרקטפלייס", prompt: "בנה מרקטפלייס עם מוכרים, קונים, ביקורות ותשלומים" },
+    { label: "דשבורד", prompt: "בנה דשבורד ניהולי עם טבלאות, גרפים ומסנני נתונים" },
+  ],
+  ar: [
+    { label: "فكرة ذكاء اصطناعي", prompt: "ابنِ أداة ذكاء اصطناعي ذكية تساعد في حل المشكلات اليومية" },
+    { label: "تطبيق جوال", prompt: "ابنِ تطبيق جوال اجتماعي مع ملفات شخصية وموجز وإشعارات" },
+    { label: "منتج SaaS", prompt: "ابنِ منصة SaaS مع تسجيل ودفع ولوحة إدارة" },
+    { label: "سوق إلكتروني", prompt: "ابنِ سوقاً إلكترونياً مع بائعين ومشترين ومراجعات" },
+    { label: "لوحة تحكم", prompt: "ابنِ لوحة تحكم إدارية مع جداول وخرائط ومرشحات" },
+  ],
+  fr: [
+    { label: "Idée IA", prompt: "Construis un outil IA intelligent pour résoudre des problèmes quotidiens" },
+    { label: "App mobile", prompt: "Construis une app mobile sociale avec profils, fil et notifications" },
+    { label: "Produit SaaS", prompt: "Construis une plateforme SaaS avec inscription, paiement et tableau de bord" },
+    { label: "Marketplace", prompt: "Construis une marketplace avec vendeurs, acheteurs, avis et paiements" },
+    { label: "Dashboard", prompt: "Construis un tableau de bord avec tables, graphiques et filtres" },
+  ],
+  es: [
+    { label: "Idea IA", prompt: "Construye una herramienta de IA inteligente para resolver problemas cotidianos" },
+    { label: "App móvil", prompt: "Construye una app móvil social con perfiles, feed y notificaciones" },
+    { label: "Producto SaaS", prompt: "Construye una plataforma SaaS con registro, pago y panel de gestión" },
+    { label: "Marketplace", prompt: "Construye un marketplace con vendedores, compradores, reseñas y pagos" },
+    { label: "Dashboard", prompt: "Construye un panel de admin con tablas, gráficos y filtros de datos" },
+  ],
+  de: [
+    { label: "KI-Idee", prompt: "Baue ein intelligentes KI-Tool, das Nutzern bei alltäglichen Problemen hilft" },
+    { label: "Mobile App", prompt: "Baue eine soziale Mobile-App mit Profilen, Feed und Push-Benachrichtigungen" },
+    { label: "SaaS-Produkt", prompt: "Baue eine SaaS-Plattform mit Registrierung, Zahlung und Dashboard" },
+    { label: "Marketplace", prompt: "Baue einen Marketplace mit Verkäufern, Käufern, Bewertungen und Zahlungen" },
+    { label: "Dashboard", prompt: "Baue ein Admin-Dashboard mit Tabellen, Charts und Datenfiltern" },
+  ],
+  ru: [
+    { label: "Идея AI", prompt: "Создай умный AI-инструмент, который помогает решать повседневные проблемы" },
+    { label: "Мобильное приложение", prompt: "Создай социальное мобильное приложение с профилями, лентой и уведомлениями" },
+    { label: "SaaS-продукт", prompt: "Создай SaaS-платформу с регистрацией, оплатой и панелью управления" },
+    { label: "Маркетплейс", prompt: "Создай маркетплейс с продавцами, покупателями, отзывами и оплатой" },
+    { label: "Дашборд", prompt: "Создай административный дашборд с таблицами, графиками и фильтрами" },
+  ],
+  zh: [
+    { label: "AI创意", prompt: "构建一个帮助用户解决日常问题的智能AI工具" },
+    { label: "移动应用", prompt: "构建一个有个人资料、动态和推送通知的社交移动应用" },
+    { label: "SaaS产品", prompt: "构建一个有注册、支付和管理面板的SaaS平台" },
+    { label: "市场平台", prompt: "构建一个有卖家、买家、评论和支付的市场平台" },
+    { label: "仪表板", prompt: "构建一个有表格、图表和数据过滤器的管理仪表板" },
+  ],
+  pt: [
+    { label: "Ideia de IA", prompt: "Construa uma ferramenta de IA inteligente que ajuda a resolver problemas diários" },
+    { label: "App móvel", prompt: "Construa um app móvel social com perfis, feed e notificações push" },
+    { label: "Produto SaaS", prompt: "Construa uma plataforma SaaS com cadastro, pagamento e painel de gestão" },
+    { label: "Marketplace", prompt: "Construa um marketplace com vendedores, compradores, avaliações e pagamentos" },
+    { label: "Dashboard", prompt: "Construa um painel administrativo com tabelas, gráficos e filtros" },
+  ],
+  ja: [
+    { label: "AIアイデア", prompt: "日常の問題解決を助けるスマートなAIツールを構築する" },
+    { label: "モバイルアプリ", prompt: "プロフィール、フィード、プッシュ通知付きのソーシャルモバイルアプリを構築する" },
+    { label: "SaaSプロダクト", prompt: "登録、支払い、管理ダッシュボード付きのSaaSプラットフォームを構築する" },
+    { label: "マーケットプレイス", prompt: "売り手、買い手、レビュー、支払い付きのマーケットプレイスを構築する" },
+    { label: "ダッシュボード", prompt: "テーブル、グラフ、データフィルター付きの管理ダッシュボードを構築する" },
+  ],
+};
 
 const USER_MODES = [
-  { id: "entrepreneur", icon: "🏢", labelHe: "יזם", labelEn: "Entrepreneur" },
-  { id: "builder", icon: "🔧", labelHe: "בונה", labelEn: "Builder" },
-  { id: "developer", icon: "💻", labelHe: "מפתח", labelEn: "Developer" },
-  { id: "maker", icon: "🎨", labelHe: "מייקר", labelEn: "Maker" },
+  { id: "entrepreneur", icon: "🏢" },
+  { id: "builder", icon: "🔧" },
+  { id: "developer", icon: "💻" },
+  { id: "maker", icon: "🎨" },
 ];
 
 export default function Home() {
-  const { meta, lang } = useLang();
+  const { meta, lang, t } = useLang();
   const isRTL = meta.rtl;
   const { user, isAuthenticated, login, logout } = useAuth();
 
@@ -88,8 +203,8 @@ export default function Home() {
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const modeDropdownRef = useRef<HTMLDivElement>(null);
 
-  const PLACEHOLDERS = isRTL ? ROTATING_PLACEHOLDERS_HE : ROTATING_PLACEHOLDERS_EN;
-  const CHIPS = isRTL ? QUICK_CHIPS_HE : QUICK_CHIPS_EN;
+  const PLACEHOLDERS = ROTATING_PLACEHOLDERS[lang as LangCode] ?? ROTATING_PLACEHOLDERS.en;
+  const CHIPS = QUICK_CHIPS[lang as LangCode] ?? QUICK_CHIPS.en;
 
   // Auto-grow textarea
   useEffect(() => {
@@ -134,7 +249,7 @@ export default function Home() {
   }, [projectsLoading, projects]);
 
   const currentModeObj = USER_MODES.find((m) => m.id === selectedMode) || USER_MODES[0];
-  const modeLabel = isRTL ? currentModeObj.labelHe : currentModeObj.labelEn;
+  const modeLabel = t(`mode${currentModeObj.id.charAt(0).toUpperCase() + currentModeObj.id.slice(1)}` as Parameters<typeof t>[0]);
 
   const handleProjectCreateError = async (res: Response) => {
     setIsTransitioning(false);
@@ -247,23 +362,24 @@ export default function Home() {
           </div>
           {/* Nav actions */}
           <div className={cn("flex items-center gap-2", isRTL && "flex-row-reverse")}>
+            <LanguageSelector compact />
             {isAuthenticated && (
               <button
                 onClick={() => navigate("/gallery")}
                 className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[12px] text-white/40 hover:text-white/75 hover:bg-white/[0.05] transition-all"
               >
                 <FolderOpen className="w-3.5 h-3.5" />
-                {isRTL ? "הפרויקטים שלי" : "My projects"}
+                {t("gallery")}
               </button>
             )}
             {isAuthenticated ? (
               <button
                 onClick={() => logout()}
                 className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[12px] text-white/35 hover:text-white/65 hover:bg-white/[0.05] transition-all"
-                title={isRTL ? "יציאה" : "Sign out"}
+                title={t("logout")}
               >
                 <User className="w-3.5 h-3.5" />
-                <span className="max-w-[100px] truncate">{user?.firstName || user?.email || (isRTL ? "חשבון" : "Account")}</span>
+                <span className="max-w-[100px] truncate">{user?.firstName || user?.email || t("logout")}</span>
               </button>
             ) : (
               <button
@@ -271,7 +387,7 @@ export default function Home() {
                 className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg text-[12px] font-medium bg-white/[0.07] border border-white/[0.1] text-white/65 hover:text-white hover:bg-white/[0.1] hover:border-white/[0.18] transition-all"
               >
                 <LogIn className="w-3.5 h-3.5" />
-                {isRTL ? "התחבר" : "Sign in"}
+                {t("login")}
               </button>
             )}
           </div>
@@ -287,16 +403,10 @@ export default function Home() {
             className="text-center mb-8 max-w-2xl"
           >
             <h1 className="text-4xl sm:text-5xl md:text-[3.2rem] font-black text-white leading-[1.1] mb-4 tracking-tight">
-              {isRTL ? (
-                <>בנה אפליקציה אמיתית<br /><span style={{ color: PRIMARY }}>רק בלתרמד אותה</span></>
-              ) : (
-                <>Build a full app<br /><span style={{ color: PRIMARY }}>just by describing it</span></>
-              )}
+              {t("heroTitle1")}<br /><span style={{ color: PRIMARY }}>{t("heroTitle2")}</span>
             </h1>
             <p className="text-base text-white/38 leading-relaxed">
-              {isRTL
-                ? "התחל להקליד. אני אבנה את זה איתך מיד."
-                : "Start typing. I'll build it with you instantly."}
+              {t("heroSubtitle")}
             </p>
           </motion.div>
 
@@ -386,14 +496,14 @@ export default function Home() {
                     className="flex items-center gap-1.5 text-xs text-white/30 hover:text-white/60 transition-colors"
                   >
                     <LayoutTemplate className="w-3.5 h-3.5" />
-                    {isRTL ? "תבניות" : "Templates"}
+                    {t("readyTemplates")}
                   </button>
                   <button
                     onClick={() => navigate("/gallery")}
                     className="flex items-center gap-1.5 text-xs text-white/30 hover:text-white/60 transition-colors"
                   >
                     <Layers className="w-3.5 h-3.5" />
-                    {isRTL ? "גלריה" : "Gallery"}
+                    {t("gallery")}
                   </button>
                 </div>
 
@@ -414,7 +524,7 @@ export default function Home() {
                   ) : (
                     <ArrowRight className={cn("w-4 h-4", isRTL && "rotate-180")} />
                   )}
-                  {isRTL ? "התחל לבנות" : "Start building"}
+                  {isTransitioning ? t("buildingBtn") : t("buildBtn")}
                 </button>
               </div>
             </div>
@@ -447,9 +557,7 @@ export default function Home() {
               className="flex items-center gap-1.5 text-[11px] text-white/25 hover:text-white/50 transition-colors"
             >
               <span>{currentModeObj.icon}</span>
-              <span>{isRTL ? `מצב ${modeLabel}` : `${modeLabel} mode`}</span>
-              <span className="text-white/15">·</span>
-              <span className="underline underline-offset-2 decoration-white/15">{isRTL ? "שנה" : "Change"}</span>
+              <span>{t("modeLabel")} {modeLabel}</span>
               <ChevronDown className="w-3 h-3" />
             </button>
             <AnimatePresence>
@@ -467,7 +575,8 @@ export default function Home() {
                       onClick={() => { setSelectedMode(m.id); setShowModeDropdown(false); }}
                       className={cn("w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs transition-colors text-left", selectedMode === m.id ? "bg-white/[0.06] text-white" : "text-white/50 hover:text-white/80 hover:bg-white/[0.04]")}
                     >
-                      <span>{m.icon}</span><span>{isRTL ? m.labelHe : m.labelEn}</span>
+                      <span>{m.icon}</span>
+                      <span>{t(`mode${m.id.charAt(0).toUpperCase() + m.id.slice(1)}` as Parameters<typeof t>[0])}</span>
                     </button>
                   ))}
                 </motion.div>
@@ -531,7 +640,7 @@ export default function Home() {
                 <div className="flex items-center gap-2">
                   <Clock className="w-3.5 h-3.5 text-white/20" />
                   <span className="text-[10px] text-white/20 font-medium uppercase tracking-wider">
-                    {isRTL ? "פרויקטים אחרונים" : "Recent projects"}
+                    {t("recentProjects")}
                   </span>
                 </div>
                 <button onClick={() => navigate("/gallery")} className="text-[10px] text-white/20 hover:text-white/45 transition-colors flex items-center gap-0.5">
