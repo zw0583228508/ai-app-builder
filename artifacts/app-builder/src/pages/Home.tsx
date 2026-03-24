@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, lazy, Suspense } from "react";
 import { Layout } from "@/components/Layout";
 import {
   ArrowRight,
@@ -24,6 +24,8 @@ import { useListProjects } from "@workspace/api-client-react";
 import { cn } from "@/lib/utils";
 import { format } from "date-fns";
 import { useLang } from "@/lib/i18n";
+
+const OnboardingPanel = lazy(() => import("@/components/OnboardingPanel"));
 
 const PRIMARY = "hsl(191,90%,42%)";
 
@@ -80,6 +82,7 @@ export default function Home() {
   const [selectedMode, setSelectedMode] = useState("entrepreneur");
   const [placeholderIdx, setPlaceholderIdx] = useState(0);
   const [phVisible, setPhVisible] = useState(true);
+  const [showOnboarding, setShowOnboarding] = useState(false);
   const [, navigate] = useLocation();
   const { data: projects, isLoading: projectsLoading } = useListProjects();
   const textareaRef = useRef<HTMLTextAreaElement>(null);
@@ -119,6 +122,17 @@ export default function Home() {
     return () => document.removeEventListener("mousedown", handle);
   }, []);
 
+  // Show onboarding wizard on first visit when user has no projects
+  useEffect(() => {
+    if (projectsLoading) return undefined;
+    const done = localStorage.getItem("onboarding_done");
+    if (!done && projects && projects.length === 0) {
+      const timer = setTimeout(() => setShowOnboarding(true), 600);
+      return () => clearTimeout(timer);
+    }
+    return undefined;
+  }, [projectsLoading, projects]);
+
   const currentModeObj = USER_MODES.find((m) => m.id === selectedMode) || USER_MODES[0];
   const modeLabel = isRTL ? currentModeObj.labelHe : currentModeObj.labelEn;
 
@@ -150,7 +164,7 @@ export default function Home() {
       if (!res.ok) { await handleProjectCreateError(res); return; }
       const project = await res.json();
       sessionStorage.setItem("builder_pending_prompt", text);
-      setTimeout(() => navigate(`/project/${project.id}`), 700);
+      setTimeout(() => navigate(`/project/${project.id}`), 2200);
     } catch {
       setIsTransitioning(false);
       setCreateError(isRTL ? "שגיאת רשת. בדוק חיבור ונסה שוב." : "Network error. Check connection and try again.");
@@ -170,7 +184,7 @@ export default function Home() {
       if (!res.ok) { await handleProjectCreateError(res); return; }
       const project = await res.json();
       sessionStorage.setItem("builder_pending_prompt", prompt);
-      setTimeout(() => navigate(`/project/${project.id}`), 700);
+      setTimeout(() => navigate(`/project/${project.id}`), 2200);
     } catch { setIsTransitioning(false); }
   };
 
@@ -180,6 +194,34 @@ export default function Home() {
     <Layout hideSidebar>
       <AnimatePresence>
         {isTransitioning && <BuildingTransition isRTL={isRTL} />}
+      </AnimatePresence>
+
+      {/* Onboarding wizard — shown once to first-time users with no projects */}
+      <AnimatePresence>
+        {showOnboarding && (
+          <motion.div
+            key="onboarding-overlay"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-50"
+          >
+            <Suspense fallback={null}>
+              <OnboardingPanel
+                onComplete={({ userMode }) => {
+                  setSelectedMode(userMode);
+                  localStorage.setItem("onboarding_done", "1");
+                  setShowOnboarding(false);
+                  setTimeout(() => textareaRef.current?.focus(), 300);
+                }}
+                onSkip={() => {
+                  localStorage.setItem("onboarding_done", "1");
+                  setShowOnboarding(false);
+                }}
+              />
+            </Suspense>
+          </motion.div>
+        )}
       </AnimatePresence>
 
       <div
@@ -253,8 +295,8 @@ export default function Home() {
             </h1>
             <p className="text-base text-white/38 leading-relaxed">
               {isRTL
-                ? "בלי קוד. בלי הגדרות. פשוט תגיד לי מה אתה רוצה."
-                : "No coding. No setup. Describe your idea and I'll turn it into a real product."}
+                ? "התחל להקליד. אני אבנה את זה איתך מיד."
+                : "Start typing. I'll build it with you instantly."}
             </p>
           </motion.div>
 
@@ -445,9 +487,9 @@ export default function Home() {
                 key={chip.label}
                 whileHover={{ scale: 1.03 }}
                 whileTap={{ scale: 0.97 }}
-                onClick={() => { setInput(chip.prompt); textareaRef.current?.focus(); }}
+                onClick={() => handleCreate(chip.prompt)}
                 disabled={isTransitioning}
-                className="px-3.5 py-1.5 bg-white/[0.04] border border-white/[0.08] rounded-full text-[12px] text-white/45 hover:text-white/85 hover:border-[hsl(191,90%,42%)]/35 hover:bg-[hsl(191,90%,42%)]/6 transition-all"
+                className="px-3.5 py-1.5 bg-white/[0.04] border border-white/[0.08] rounded-full text-[12px] text-white/45 hover:text-white/85 hover:border-[hsl(191,90%,42%)]/35 hover:bg-[hsl(191,90%,42%)]/6 transition-all active:scale-95"
               >
                 {chip.label}
               </motion.button>

@@ -624,16 +624,20 @@ Emojis: 🏗️ for layout/structure, 🎨 for styling/design, ⚡ for functiona
   }
 
   // ── Telemetry ─────────────────────────────────────────────────────────────
+  let lastInputTokens = 0;
+  let lastOutputTokens = 0;
   try {
     const finalMsg = await stream.finalMessage();
     const latencyMs = getLatencyMs();
+    lastInputTokens = finalMsg.usage?.input_tokens ?? 0;
+    lastOutputTokens = finalMsg.usage?.output_tokens ?? 0;
     await recordAiCall({
       projectId: params.id,
       userId,
       type: "ai_message",
       model: "claude-sonnet-4-5-20251001",
-      inputTokens: finalMsg.usage?.input_tokens ?? 0,
-      outputTokens: finalMsg.usage?.output_tokens ?? 0,
+      inputTokens: lastInputTokens,
+      outputTokens: lastOutputTokens,
       latencyMs,
       promptVersion: PROMPT_VERSION,
       intentType: detectedIntent.intent,
@@ -884,5 +888,7 @@ Emojis: 🏗️ for layout/structure, 🎨 for styling/design, ⚡ for functiona
     skillScore: newSkillScore,
     growWithMeSuggestion,
     changeSummary,
+    inputTokens: lastInputTokens,
+    outputTokens: lastOutputTokens,
   });
 }

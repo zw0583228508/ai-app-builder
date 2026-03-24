@@ -91,6 +91,7 @@ export function useChatStream({
     useState<ChangeSummary | null>(null);
   const [streamError, setStreamError] = useState<string | null>(null);
   const [nextStep, setNextStep] = useState<string | null>(null);
+  const [lastMessageTokens, setLastMessageTokens] = useState<{ input: number; output: number } | null>(null);
 
   const queryClient = useQueryClient();
   const abortControllerRef = useRef<AbortController | null>(null);
@@ -320,6 +321,11 @@ export function useChatStream({
                   );
                 if (data.changeSummary)
                   setLastChangeSummary(data.changeSummary as ChangeSummary);
+                if (data.inputTokens !== undefined || data.outputTokens !== undefined)
+                  setLastMessageTokens({
+                    input: (data.inputTokens as number) ?? 0,
+                    output: (data.outputTokens as number) ?? 0,
+                  });
 
                 // ── Streaming content ──────────────────────────────────────────
               } else if (data.content !== undefined) {
@@ -464,5 +470,8 @@ export function useChatStream({
     // Next-step momentum engine
     nextStep,
     clearNextStep: () => setNextStep(null),
+    // Token cost display
+    lastMessageTokens,
+    clearLastMessageTokens: () => setLastMessageTokens(null),
   };
 }

@@ -29,6 +29,8 @@ import {
   FIRST_RESPONSE_GROUPS_HE,
   FIRST_RESPONSE_GROUPS_EN,
 } from "./chat/QuickReplyGroup";
+import { BuildStartCard } from "./chat/BuildStartCard";
+import { TokenCostBadge } from "./chat/TokenCostBadge";
 import { useLang } from "@/lib/i18n";
 
 const HE = "'Rubik', sans-serif";
@@ -55,6 +57,7 @@ export function ChatPanel({
   const { meta } = useLang();
   const isRTL = meta.rtl;
   const [input, setInput] = useState("");
+  const [firstBuildPrompt, setFirstBuildPrompt] = useState<string | null>(null);
   const [pendingMessage, setPendingMessage] = useState<string | null>(null);
   const [growWithMeSuggestion, setGrowWithMeSuggestion] = useState<
     string | null
@@ -137,6 +140,7 @@ export function ChatPanel({
     retryLastMessage,
     nextStep,
     clearNextStep,
+    lastMessageTokens,
   } = useChatStream({
     projectId: project.id,
     onModeDetected: handleModeDetected,
@@ -200,11 +204,12 @@ export function ChatPanel({
     }
   }, [isStreaming]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  // Auto-send pending template prompt
+  // Auto-send pending template prompt + capture first build prompt for BuildStartCard
   useEffect(() => {
     const pending = sessionStorage.getItem("builder_pending_prompt");
     if (pending && project.messages.length === 0 && !isStreaming) {
       sessionStorage.removeItem("builder_pending_prompt");
+      setFirstBuildPrompt(pending);
       setPendingMessage(pending);
       sendMessage(pending);
     }
@@ -572,6 +577,18 @@ export function ChatPanel({
           />
         ) : null}
 
+        {/* Build Start Card — instant WOW moment during first generation */}
+        <AnimatePresence>
+          {firstBuildPrompt && (isStreaming || project.messages.length <= 2) && (
+            <BuildStartCard
+              key="build-start"
+              prompt={firstBuildPrompt}
+              isRTL={isRTL}
+              isDone={!isStreaming && project.messages.length > 0}
+            />
+          )}
+        </AnimatePresence>
+
         <AnimatePresence initial={false}>
           {project.messages.map((msg, idx) => (
             <MessageBubble key={msg.id || `msg-${idx}`} message={msg} />
@@ -686,6 +703,17 @@ export function ChatPanel({
             />
           )}
         </AnimatePresence>
+
+        {/* Token cost badge — subtle, shown after each AI response */}
+        {!isStreaming && lastMessageTokens && lastMessageTokens.output > 0 && (
+          <div className={`flex ${isRTL ? "justify-end" : "justify-start"} px-4 pb-1`}>
+            <TokenCostBadge
+              inputTokens={lastMessageTokens.input}
+              outputTokens={lastMessageTokens.output}
+              isRTL={isRTL}
+            />
+          </div>
+        )}
 
         {/* Scroll anchor */}
         <div ref={scrollAnchorRef} aria-hidden="true" />

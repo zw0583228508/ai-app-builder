@@ -1,0 +1,315 @@
+You are upgrading this product into a MAXIMUM-LEVEL addictive AI experience.
+
+This is NOT a UI tweak.
+This is a full redesign of the first 10 seconds, chat dynamics, and momentum engine.
+
+Your goal:
+Create a product that immediately pulls the user in, builds momentum automatically, and delivers a WOW moment within seconds.
+
+==================================================
+CORE PRINCIPLE (DO NOT BREAK THIS)
+==================================================
+
+The user must feel:
+
+“I already started building — without effort.”
+
+NOT:
+“I need to think what to do next.”
+
+The system must:
+- lead aggressively
+- reduce user thinking to near zero
+- create instant momentum
+- show visible progress immediately
+- feel alive and proactive
+
+==================================================
+PART 1 — REBUILD THE FIRST 10 SECONDS (CRITICAL)
+==================================================
+
+The first 10 seconds determine everything.
+
+You MUST implement this exact flow:
+
+STEP 1 — USER LANDS
+
+Hero must be extremely focused:
+
+Headline:
+Build a real app in minutes — just by describing it
+
+Subheadline:
+Start typing. I’ll build it with you instantly.
+
+Input (centered, large, dominant)
+
+Dynamic placeholder (rotate every 2–3 seconds with fade):
+- “Create a karaoke app with scoring and leaderboard”
+- “Build a SaaS for managing clients”
+- “Make a viral AI tool people will share”
+
+Below input:
+Clickable suggestions (auto-submit on click):
+- Karaoke app
+- SaaS dashboard
+- AI startup
+- Marketplace
+- Mobile app
+
+IMPORTANT:
+There must be ONLY ONE clear action: start typing or click suggestion.
+
+Remove ALL distractions.
+
+==================================================
+STEP 2 — USER SUBMITS INPUT
+==================================================
+
+Immediately trigger a BUILD START SEQUENCE.
+
+DO NOT go straight to chat.
+
+Show animated sequence (1.5–2.5 seconds total):
+
+Stage 1 (0.5s):
+“Understanding your idea…”
+
+Stage 2 (0.7s):
+“Designing your app structure…”
+
+Stage 3 (0.7s):
+“Generating your first version…”
+
+Use subtle animation (dots / shimmer / progress pulse).
+
+This creates anticipation and momentum.
+
+==================================================
+STEP 3 — INSTANT WOW MOMENT (MANDATORY)
+==================================================
+
+After the animation:
+
+DO NOT start with chat.
+
+FIRST SHOW RESULT.
+
+Display a generated preview immediately:
+
+- basic UI mockup
+OR
+- app structure
+OR
+- feature layout
+
+Title above it:
+“Your first version is ready”
+
+This must appear within ~5 seconds from user input.
+
+This is NON-NEGOTIABLE.
+
+==================================================
+PART 2 — REDEFINE THE FIRST AI RESPONSE
+==================================================
+
+Only AFTER showing preview → start chat.
+
+First message MUST follow this structure:
+
+1. Strong confidence:
+“This is already a solid start.”
+
+2. Momentum:
+“I’ve created the first version for you.”
+
+3. Control the direction with choices:
+
+Example:
+
+Let’s refine it quickly:
+
+What level do you want?
+[Simple MVP] [Advanced product] [Viral product]
+
+Who is it for?
+[Creators] [Businesses] [General users]
+
+Where should it run?
+[Web] [Mobile] [Both]
+
+IMPORTANT:
+Always use buttons, not just text.
+
+==================================================
+PART 3 — FORCE MOMENTUM (NO DEAD AIR)
+==================================================
+
+The system must NEVER wait passively.
+
+If user does nothing:
+- suggest next action
+- highlight options
+- keep flow alive
+
+Every AI step must end with:
+A clear action or selection.
+
+==================================================
+PART 4 — ACCELERATED BUILD LOOP
+==================================================
+
+Implement this exact loop:
+
+Loop:
+1. Small user choice
+2. Immediate system action
+3. Visible update (UI / structure / preview)
+4. Next guided choice
+
+Repeat continuously.
+
+NEVER:
+- long explanations
+- static conversation
+- empty steps
+
+==================================================
+PART 5 — MAKE THE AI FEEL ALIVE
+==================================================
+
+During generation, show progressive activity:
+
+- Updating layout…
+- Adding features…
+- Connecting backend…
+- Preparing interface…
+
+Stream updates gradually.
+
+The system should feel like it is building LIVE.
+
+==================================================
+PART 6 — PROGRESS ENGINE (VISIBLE MOMENTUM)
+==================================================
+
+Add a persistent progress indicator:
+
+Example:
+
+[ Idea ✓ ] → [ Structure ✓ ] → [ UI ✓ ] → [ Backend … ] → [ Launch ]
+
+Update in real-time.
+
+User must feel:
+“I am moving forward.”
+
+==================================================
+PART 7 — EARLY ADDICTION TRIGGER
+==================================================
+
+Within first 10–20 seconds:
+
+User must experience:
+- something built
+- something visual
+- something evolving
+
+If not:
+The UX fails.
+
+==================================================
+PART 8 — REMOVE ALL FRICTION
+==================================================
+
+Eliminate:
+- unnecessary decisions at start
+- multiple competing UI blocks
+- heavy dashboards
+- long text paragraphs
+- empty states
+
+Everything must:
+- guide
+- move
+- progress
+
+==================================================
+PART 9 — MICRO-INTERACTIONS (PREMIUM FEEL)
+==================================================
+
+Implement:
+
+- smooth transitions between states
+- typing indicators
+- streaming text
+- hover feedback
+- focus clarity
+- soft motion (not flashy)
+
+Everything must feel:
+clean, fast, high-end.
+
+==================================================
+PART 10 — COPY STYLE
+==================================================
+
+Use:
+- short sentences
+- confident tone
+- active voice
+
+Avoid:
+- technical explanations
+- long paragraphs
+- passive tone
+
+The system should sound:
+decisive, helpful, and in control.
+
+==================================================
+FINAL SUCCESS TEST
+==================================================
+
+The system is correct ONLY IF:
+
+Within 5 seconds:
+User sees something built
+
+Within 10 seconds:
+User feels progress
+
+Within 20 seconds:
+User feels impressed
+
+If this is not achieved:
+Continue improving.
+
+==================================================
+DELIVERABLES
+==================================================
+
+Provide:
+
+1. Updated Home layout
+2. Build-start animation logic
+3. Instant preview component
+4. Refactored chat flow
+5. Quick-reply system
+6. Live progress indicator
+7. Streaming / activity system
+8. Updated UX copy
+9. Clean component architecture
+
+Focus on real behavior, not just visuals.
+
+==================================================
+MANDATORY RULE
+==================================================
+
+DO NOT create a “nice UI”.
+
+Create a system that:
+pulls the user forward automatically
+and builds before they even realize it.
