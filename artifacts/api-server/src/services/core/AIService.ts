@@ -43,8 +43,8 @@ type AnthropicMessage = Awaited<
 // ─────────────────────────────────────────────────────────────
 
 export const AI_MODELS = {
-  haiku: "claude-haiku-4-5-20251001",
-  sonnet: "claude-sonnet-4-5-20251001",
+  haiku: "claude-haiku-4-5",
+  sonnet: "claude-sonnet-4-5",
 } as const;
 
 export type AIModel = (typeof AI_MODELS)[keyof typeof AI_MODELS];

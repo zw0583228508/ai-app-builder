@@ -186,7 +186,7 @@ export async function runArchitectAgent(
 ): Promise<ArchitecturePlan> {
   try {
     const res = await anthropic.messages.create({
-      model: "claude-sonnet-4-5-20251001",
+      model: "claude-sonnet-4-5",
       max_tokens: 2500,
       system: SYSTEM_PROMPT,
       messages: [{ role: "user", content: buildUserMessage(input) }],

@@ -159,7 +159,7 @@ export async function diagnoseError(
 
   try {
     const res = await anthropic.messages.create({
-      model: "claude-haiku-4-5-20251001",
+      model: "claude-haiku-4-5",
       max_tokens: 500,
       system: DIAGNOSIS_SYSTEM,
       messages: [
@@ -281,7 +281,7 @@ export class DebugEngine {
 
       try {
         const fixRes = await anthropic.messages.create({
-          model: "claude-haiku-4-5-20251001",
+          model: "claude-haiku-4-5",
           max_tokens: 8000,
           system: buildFixSystemPrompt(diagnosis.category),
           messages: [
@@ -309,7 +309,7 @@ Fix this code. Return the complete fixed HTML.`,
         }
 
         const validRes = await anthropic.messages.create({
-          model: "claude-haiku-4-5-20251001",
+          model: "claude-haiku-4-5",
           max_tokens: 400,
           system: FIX_VALIDATION_SYSTEM,
           messages: [
@@ -376,7 +376,7 @@ Fix this code. Return the complete fixed HTML.`,
 
     try {
       const res = await anthropic.messages.create({
-        model: "claude-haiku-4-5-20251001",
+        model: "claude-haiku-4-5",
         max_tokens: 8000,
         system: buildFixSystemPrompt(category),
         messages: [

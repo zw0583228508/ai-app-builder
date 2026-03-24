@@ -6,8 +6,8 @@
  */
 
 export const MODELS = {
-  generation: "claude-sonnet-4-5-20251001",
-  fast: "claude-haiku-4-5-20251001",
+  generation: "claude-sonnet-4-5",
+  fast: "claude-haiku-4-5",
 } as const;
 
 export type ModelKey = keyof typeof MODELS;

@@ -153,7 +153,7 @@ export async function runAiGeneration(ctx: AiGenerationCtx): Promise<void> {
     };
     try {
       const planRes = await anthropic.messages.create({
-        model: "claude-haiku-4-5-20251001",
+        model: "claude-haiku-4-5",
         max_tokens: 1000,
         system: `You are a task planner for an AI app builder. Break the user's task into 3-5 focused implementation steps.
 Return ONLY valid JSON with no other text: {"steps":[{"id":1,"emoji":"🏗️","title":"Hebrew title max 30 chars","prompt":"Detailed English implementation instruction for Claude Sonnet"}]}
@@ -234,7 +234,7 @@ Emojis: 🏗️ for layout/structure, 🎨 for styling/design, ⚡ for functiona
       }
 
       const stepStream = anthropic.messages.stream({
-        model: "claude-sonnet-4-5-20251001",
+        model: "claude-sonnet-4-5",
         max_tokens: 8192,
         system: systemPrompt,
         messages: stepHistory,
@@ -280,7 +280,7 @@ Emojis: 🏗️ for layout/structure, 🎨 for styling/design, ⚡ for functiona
       });
       try {
         const fixRes = await anthropic.messages.create({
-          model: "claude-haiku-4-5-20251001",
+          model: "claude-haiku-4-5",
           max_tokens: 4096,
           system:
             "You are a code reviewer. Fix any obvious bugs, missing closing tags, or broken JavaScript in this HTML app. Return the complete fixed HTML. If nothing needs fixing, return the HTML unchanged.",
@@ -446,7 +446,7 @@ Emojis: 🏗️ for layout/structure, 🎨 for styling/design, ⚡ for functiona
   // consecutive requests, reducing latency by ~85% on cache hits.
   const getLatencyMs = startTimer();
   const stream = anthropic.messages.stream({
-    model: "claude-sonnet-4-5-20251001",
+    model: "claude-sonnet-4-5",
     max_tokens: 8192,
     system: [
       {
@@ -510,7 +510,7 @@ Emojis: 🏗️ for layout/structure, 🎨 for styling/design, ⚡ for functiona
         ];
 
         const continuationStream = anthropic.messages.stream({
-          model: "claude-sonnet-4-5-20251001",
+          model: "claude-sonnet-4-5",
           max_tokens: 8192,
           system: systemPrompt,
           messages: continuationMessages,
@@ -635,7 +635,7 @@ Emojis: 🏗️ for layout/structure, 🎨 for styling/design, ⚡ for functiona
       projectId: params.id,
       userId,
       type: "ai_message",
-      model: "claude-sonnet-4-5-20251001",
+      model: "claude-sonnet-4-5",
       inputTokens: lastInputTokens,
       outputTokens: lastOutputTokens,
       latencyMs,
@@ -843,7 +843,7 @@ Emojis: 🏗️ for layout/structure, 🎨 for styling/design, ⚡ for functiona
       try {
         const code = extractedHtml.slice(0, 8000);
         const msg = await anthropic.messages.create({
-          model: "claude-haiku-4-5-20251001",
+          model: "claude-haiku-4-5",
           max_tokens: 800,
           messages: [
             {

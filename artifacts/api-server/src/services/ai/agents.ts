@@ -31,7 +31,7 @@ export async function runArchitectureAgent(
   mode: string,
 ): Promise<AgentAnalysis["architecture"]> {
   const res = await anthropic.messages.create({
-    model: "claude-haiku-4-5-20251001",
+    model: "claude-haiku-4-5",
     max_tokens: 600,
     system: `You are an expert architect. Analyze this app-building request and decide what to build.
 Return ONLY valid JSON:
@@ -65,7 +65,7 @@ export async function runUiAgent(
   mode: string,
 ): Promise<AgentAnalysis["ui"]> {
   const res = await anthropic.messages.create({
-    model: "claude-haiku-4-5-20251001",
+    model: "claude-haiku-4-5",
     max_tokens: 400,
     system: `You are a UI/UX expert. Decide design direction for this app request.
 Return ONLY valid JSON:
@@ -98,7 +98,7 @@ export async function runSecurityAgent(
   userMessage: string,
 ): Promise<AgentAnalysis["security"]> {
   const res = await anthropic.messages.create({
-    model: "claude-haiku-4-5-20251001",
+    model: "claude-haiku-4-5",
     max_tokens: 300,
     system: `You are a security expert. Identify security risks and mitigations for this web app request.
 Return ONLY valid JSON:
@@ -121,7 +121,7 @@ export async function runPerformanceAgent(
   userMessage: string,
 ): Promise<AgentAnalysis["performance"]> {
   const res = await anthropic.messages.create({
-    model: "claude-haiku-4-5-20251001",
+    model: "claude-haiku-4-5",
     max_tokens: 300,
     system: `You are a performance expert for web apps. Identify performance patterns to use or avoid.
 Return ONLY valid JSON:

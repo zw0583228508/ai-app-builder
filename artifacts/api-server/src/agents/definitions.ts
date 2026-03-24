@@ -234,7 +234,7 @@ export async function classifyIntentWithAI(task: string): Promise<AgentType> {
 
   try {
     const res = await anthropic.messages.create({
-      model: "claude-haiku-4-5-20251001",
+      model: "claude-haiku-4-5",
       max_tokens: 10,
       system: `Classify this development request into exactly one category.
 Return ONLY one word: frontend | backend | architect | debug | devops | qa

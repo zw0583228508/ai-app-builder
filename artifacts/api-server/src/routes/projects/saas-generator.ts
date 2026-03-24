@@ -109,7 +109,7 @@ router.post("/", async (req: Request, res: Response) => {
 
   try {
     const stream = await anthropic.messages.stream({
-      model: "claude-sonnet-4-5-20251001",
+      model: "claude-sonnet-4-5",
       max_tokens: 8192,
       messages: [{
         role: "user",

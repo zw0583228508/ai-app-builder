@@ -96,7 +96,7 @@ Return ONLY the JSON, no markdown.`;
 
     try {
       const planMsg = await anthropic.messages.create({
-        model: "claude-haiku-4-5-20251001",
+        model: "claude-haiku-4-5",
         max_tokens: 600,
         messages: [{ role: "user", content: entrepreneurPlanPrompt }],
       });
@@ -466,7 +466,7 @@ Return ONLY the JSON, no markdown.`;
       .join("\n");
 
     const inspectStream = anthropic.messages.stream({
-      model: "claude-haiku-4-5-20251001",
+      model: "claude-haiku-4-5",
       max_tokens: 600,
       system:
         "You are helping a user understand their current project state. Be concise, friendly, and use bullet points. Always answer in Hebrew. Include the GitHub and deploy status in your summary.",
@@ -506,7 +506,7 @@ Return ONLY the JSON, no markdown.`;
     });
 
     const planningStream = anthropic.messages.stream({
-      model: "claude-haiku-4-5-20251001",
+      model: "claude-haiku-4-5",
       max_tokens: 800,
       system: PLANNING_SYSTEM_PROMPT,
       messages: [{ role: "user", content: body.content }],
@@ -542,7 +542,7 @@ Return ONLY the JSON, no markdown.`;
     });
 
     const specStream = anthropic.messages.stream({
-      model: "claude-haiku-4-5-20251001",
+      model: "claude-haiku-4-5",
       max_tokens: 1400,
       system: PRODUCT_SPEC_SYSTEM_PROMPT,
       messages: [

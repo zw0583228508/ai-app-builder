@@ -264,7 +264,7 @@ For businessModel, use: "SaaS|eCommerce|Lead Gen|Portfolio|Blog|Service|Other".
 
     const extraction = await withRetry(() =>
       anthropic.messages.create({
-        model: "claude-haiku-4-5-20251001",
+        model: "claude-haiku-4-5",
         max_tokens: 400,
         system: systemPrompt,
         messages: [
@@ -374,7 +374,7 @@ export async function extractAndSaveMemoryChunks(
 If no meaningful decision was made, return {"chunk": null}.`;
 
     const res = await anthropic.messages.create({
-      model: "claude-haiku-4-5-20251001",
+      model: "claude-haiku-4-5",
       max_tokens: 200,
       system: prompt,
       messages: [

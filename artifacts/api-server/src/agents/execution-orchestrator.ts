@@ -350,7 +350,7 @@ async function chooseNextAction(
   const userMessage = buildStateMessage(state, dnaContext, existingPlan);
 
   const response = await anthropic.messages.create({
-    model: "claude-haiku-4-5-20251001",
+    model: "claude-haiku-4-5",
     max_tokens: 1024,
     system: systemPrompt,
     messages: [{ role: "user", content: userMessage }],
@@ -409,7 +409,7 @@ async function attemptRepair(
   let repairAction: unknown;
   try {
     const response = await anthropic.messages.create({
-      model: "claude-haiku-4-5-20251001",
+      model: "claude-haiku-4-5",
       max_tokens: 512,
       system: systemPrompt,
       messages: [{ role: "user", content: userMessage }],
