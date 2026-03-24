@@ -23,7 +23,7 @@ export type Plan = typeof plansTable.$inferSelect;
 export type UserSubscription = typeof userSubscriptionsTable.$inferSelect;
 
 export const PLANS: Record<string, { maxProjects: number; maxMessagesPerDay: number; name: string }> = {
-  free: { name: "Free", maxProjects: 3, maxMessagesPerDay: 50 },
-  pro: { name: "Pro", maxProjects: 10, maxMessagesPerDay: 200 },
+  free: { name: "Free", maxProjects: 999, maxMessagesPerDay: 999 },
+  pro: { name: "Pro", maxProjects: 999, maxMessagesPerDay: 999 },
   studio: { name: "Studio", maxProjects: 999, maxMessagesPerDay: 2000 },
 };
