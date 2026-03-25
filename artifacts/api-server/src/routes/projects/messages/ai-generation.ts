@@ -555,11 +555,59 @@ Emojis: 🏗️ for layout/structure, 🎨 for styling/design, ⚡ for functiona
     ? extractReactFiles(fullResponse)
     : [];
 
+  // ── Patch-failure fallback: silently retry with full HTML via Haiku ────────
+  // When the primary response contained patch blocks that all failed to apply,
+  // make one more (non-streaming) call asking for the complete updated HTML.
+  // If that succeeds we can save without [PATCH_FAILED] and the preview still
+  // updates — the user never sees an error at all.
+  const hasPatch = fullResponse.includes("<<<REPLACE>>>");
+  let patchFailed = hasPatch && !extractedHtml;
+
+  if (patchFailed && project.previewHtml && !isReactStack) {
+    logger.info({ projectId: params.id }, "[PatchFallback] Trying full-HTML fallback via Haiku");
+    try {
+      const fallbackResult = await anthropic.messages.create({
+        model: "claude-haiku-4-5",
+        max_tokens: 8192,
+        system:
+          "You are a precise code editor. The user wants to modify their HTML web app. " +
+          "Output ONLY the complete, valid, updated HTML file — no explanation, no markdown fences, " +
+          "no preamble. Start directly with <!DOCTYPE html>.",
+        messages: [
+          {
+            role: "user",
+            content:
+              `CURRENT HTML:\n${project.previewHtml}\n\n` +
+              `CHANGE TO APPLY: ${body.content}\n\n` +
+              "Output the complete updated HTML file only.",
+          },
+        ],
+      });
+      const fallbackText =
+        fallbackResult.content[0].type === "text"
+          ? fallbackResult.content[0].text
+          : "";
+      // Use intent "create" so extractHtml skips patch-mode and looks for raw HTML
+      const fallbackHtml = extractHtml(fallbackText, {
+        isReactStack: false,
+        previewHtml: null,
+        intent: "create",
+      });
+      if (fallbackHtml) {
+        extractedHtml = sanitizeImageUrls(fallbackHtml);
+        patchFailed = false;
+        logger.info({ projectId: params.id }, "[PatchFallback] Fallback succeeded — preview will be updated");
+      } else {
+        logger.warn({ projectId: params.id }, "[PatchFallback] Fallback returned no extractable HTML");
+      }
+    } catch (err) {
+      logger.warn({ err, projectId: params.id }, "[PatchFallback] Fallback call failed");
+    }
+  }
+
   // ── Save AI response to DB ────────────────────────────────────────────────
   // If the response contained patch blocks but none were applied (patch failed),
   // mark it so the UI can show an error instead of a false "✅ הקוד עודכן".
-  const hasPatch = fullResponse.includes("<<<REPLACE>>>");
-  const patchFailed = hasPatch && !extractedHtml;
   const contentToSave = patchFailed
     ? fullResponse + "\n[PATCH_FAILED]"
     : fullResponse;
