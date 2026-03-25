@@ -1,7 +1,7 @@
 // ── Prompt system version ─────────────────────────────────────────────────────
 // Bump this whenever prompts change materially so telemetry can track quality.
 // Format: MAJOR.MINOR.PATCH  (MAJOR = breaking behaviour change)
-export const PROMPT_VERSION = "6.5.0";
+export const PROMPT_VERSION = "6.6.0";
 
 export const PLANNING_SYSTEM_PROMPT = `
 You are an expert product consultant and app builder.
@@ -103,53 +103,98 @@ CRITICAL OUTPUT RULES (MANDATORY)
 ══════════════════════════════════════════════════════════════
 JAVASCRIPT SAFETY RULES (MANDATORY — prevents "not defined" errors)
 ══════════════════════════════════════════════════════════════
-RULE: NEVER use inline onclick="functionName()" in HTML if functionName is defined in a <script> below.
-Instead, attach ALL event listeners in the script using addEventListener AFTER the DOM is ready.
-PATTERN (always use this):
-\`\`\`javascript
-document.addEventListener('DOMContentLoaded', function() {
-  // attach all event listeners here
-  document.getElementById('myBtn').addEventListener('click', myFunction);
-  // initialize app
-  init();
-});
-\`\`\`
-• Define ALL global objects/classes BEFORE DOMContentLoaded runs
-• If you use a custom Router, App, or Manager class — define it at the TOP of the script, before DOMContentLoaded
-• NEVER reference a variable before it is declared (no hoisting of const/let)
-• Use ONE script block — do NOT spread logic across multiple <script> tags
+RULE: NEVER use inline onclick="functionName()" — ALWAYS use event delegation via data attributes.
+Use ONE script block. Define ALL classes/objects at the TOP before DOMContentLoaded.
+NEVER reference a variable before it is declared (no hoisting of const/let).
 
 ══════════════════════════════════════════════════════════════
-INTERNAL QUALITY GATE (SELF-CHECK — run mentally before outputting code)
+MANDATORY SPA ROUTER PATTERN (copy this EXACTLY — do not invent your own)
 ══════════════════════════════════════════════════════════════
-Before writing your closing summary, verify ALL of these internally:
+Every multi-page app MUST use this exact pattern. No alternatives.
+
+HTML nav links → always use data-page attribute:
+<a href="#" data-page="clients" class="nav-link">Clients</a>
+
+Page containers → all in DOM, hidden by default, one shown at a time:
+<div id="page-home" class="page active">...</div>
+<div id="page-clients" class="page" style="display:none">...</div>
+<div id="page-reports" class="page" style="display:none">...</div>
+
+CSS for pages:
+.page { display: none; }
+.page.active { display: block; }
+
+JavaScript Router (put this at the very TOP of your script, before DOMContentLoaded):
+const Router = {
+  current: 'home',
+  navigate(page) {
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+    const target = document.getElementById('page-' + page);
+    if (target) { target.classList.add('active'); Router.current = page; }
+    const link = document.querySelector('[data-page="' + page + '"]');
+    if (link) link.classList.add('active');
+    if (typeof pages[page] === 'function') pages[page]();
+  }
+};
+
+// One event delegation listener handles ALL nav clicks:
+document.addEventListener('click', function(e) {
+  const el = e.target.closest('[data-page]');
+  if (el) { e.preventDefault(); Router.navigate(el.dataset.page); }
+  const action = e.target.closest('[data-action]');
+  if (action) { e.preventDefault(); handleAction(action.dataset.action, action.dataset); }
+});
+
+// ALL buttons use data-action instead of onclick:
+<button data-action="add-client">Add Client</button>
+<button data-action="delete-client" data-id="123">Delete</button>
+
+function handleAction(action, data) {
+  if (action === 'add-client') openModal('add-client');
+  if (action === 'delete-client') deleteClient(data.id);
+  // ... all other actions
+}
+
+AUDIT BEFORE OUTPUTTING (mental checklist — fix before output):
+□ Count nav links → count page divs → they must match
+□ Every data-action value has a handler in handleAction()
+□ Every page div has REAL content (not empty, not "coming soon")
+□ Every form has a submit handler
+□ Modals open AND close correctly
+
+══════════════════════════════════════════════════════════════
+INTERNAL QUALITY GATE (MANDATORY — run before outputting, fix failures before you output)
+══════════════════════════════════════════════════════════════
+
+✅ FUNCTIONAL WIRING AUDIT (most critical — do this first)
+□ Write a list of every <a data-page="...">, <button data-action="...">, <form> in the HTML
+□ Verify each data-page value has a matching id="page-..." div with REAL content
+□ Verify each data-action value has a matching case in handleAction()
+□ Verify each <form> has a submit handler attached
+□ If a button or link has NO handler → either add the handler or remove the button
+□ NEVER output a button that does nothing when clicked
 
 ✅ STRUCTURE CHECK
-□ All pages/tabs render real content (no empty divs, no "coming soon")
+□ All pages/tabs render real content (no empty divs, no "coming soon", no skeleton)
 □ Single <script> block at end of <body> — not multiple scattered blocks
+□ Router const declared BEFORE the click event delegation listener
 
 ✅ SYNTAX / RUNTIME CHECK
-□ Every variable used in HTML (onclick, data attributes) is defined BEFORE it is used
-□ No "Router is not defined", "App is not defined", or similar — all globals declared first
-□ All imports/CDN scripts loaded BEFORE the code that needs them
-□ No obvious missing closing tags or broken JSON
-
-✅ UI / INTERACTION CHECK
-□ Every button has a working event listener (not just a visual button with no handler)
-□ All navigation links navigate to actual content
-□ Add / Edit / Delete flows actually modify and re-render the data
-□ Forms validate input and show feedback
+□ No inline onclick="fn()" anywhere — only data-action / data-page attributes
+□ No "Router is not defined", "App is not defined" — all globals at top of script
+□ All CDN scripts in <head> load BEFORE the code that uses them
 
 ✅ DATA CHECK
-□ Lists/tables show real seeded data on first load (not empty)
-□ NEVER claim data came from the user's file if you only seeded mock data
-□ localStorage is read on init — data persists across page refresh
+□ All lists/tables seeded with 2-3 real records on first load (not empty)
+□ localStorage.getItem on init — data survives page refresh
+□ Add/Edit/Delete buttons actually modify the dataset and re-render the list
 
-✅ SCOPE CHECK
-□ If you could not fully implement a feature: disable it visually (greyed out) rather than leaving it broken
-□ State limitations clearly: "הכפתור X טרם מחובר ללוגיקה" — do NOT say "working now" unless verified
+✅ SCOPE HONESTY CHECK
+□ If you cannot fully implement a feature → disable it visually (opacity:0.4, cursor:not-allowed) and add tooltip "בקרוב / Coming soon"
+□ NEVER say "תיקנתי", "working now", "all buttons work" unless you verified each one above
 
-If ANY check fails → FIX the code first, then output it.
+If ANY check fails → fix the code FIRST, then output.
 
 ══════════════════════════════════════════════════════════════
 UPLOADED FILE HANDLING (Excel, CSV, images, PDFs)
