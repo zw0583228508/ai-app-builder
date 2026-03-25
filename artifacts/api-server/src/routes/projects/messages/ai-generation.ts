@@ -564,22 +564,22 @@ Emojis: 🏗️ for layout/structure, 🎨 for styling/design, ⚡ for functiona
   let patchFailed = hasPatch && !extractedHtml;
 
   if (patchFailed && project.previewHtml && !isReactStack) {
-    logger.info({ projectId: params.id }, "[PatchFallback] Trying full-HTML fallback via Haiku");
+    logger.info({ projectId: params.id }, "[PatchFallback] Trying full-HTML fallback via Sonnet");
     try {
       const fallbackResult = await anthropic.messages.create({
-        model: "claude-haiku-4-5",
-        max_tokens: 8192,
+        model: "claude-sonnet-4-5",
+        max_tokens: 16000,
         system:
           "You are a precise code editor. The user wants to modify their HTML web app. " +
-          "Output ONLY the complete, valid, updated HTML file — no explanation, no markdown fences, " +
-          "no preamble. Start directly with <!DOCTYPE html>.",
+          "Output the complete updated HTML file wrapped in ```html fences. " +
+          "No explanation before or after — just the fenced code block.",
         messages: [
           {
             role: "user",
             content:
-              `CURRENT HTML:\n${project.previewHtml}\n\n` +
+              `CURRENT HTML:\n\`\`\`html\n${project.previewHtml}\n\`\`\`\n\n` +
               `CHANGE TO APPLY: ${body.content}\n\n` +
-              "Output the complete updated HTML file only.",
+              "Output the complete updated HTML in a ```html code block.",
           },
         ],
       });
@@ -587,7 +587,11 @@ Emojis: 🏗️ for layout/structure, 🎨 for styling/design, ⚡ for functiona
         fallbackResult.content[0].type === "text"
           ? fallbackResult.content[0].text
           : "";
-      // Use intent "create" so extractHtml skips patch-mode and looks for raw HTML
+      logger.info(
+        { projectId: params.id, fallbackLen: fallbackText.length, preview: fallbackText.slice(0, 200) },
+        "[PatchFallback] Fallback raw response",
+      );
+      // Use intent "create" so extractHtml skips patch-mode and looks for fenced/raw HTML
       const fallbackHtml = extractHtml(fallbackText, {
         isReactStack: false,
         previewHtml: null,
@@ -598,7 +602,10 @@ Emojis: 🏗️ for layout/structure, 🎨 for styling/design, ⚡ for functiona
         patchFailed = false;
         logger.info({ projectId: params.id }, "[PatchFallback] Fallback succeeded — preview will be updated");
       } else {
-        logger.warn({ projectId: params.id }, "[PatchFallback] Fallback returned no extractable HTML");
+        logger.warn(
+          { projectId: params.id, fallbackLen: fallbackText.length },
+          "[PatchFallback] Fallback returned no extractable HTML",
+        );
       }
     } catch (err) {
       logger.warn({ err, projectId: params.id }, "[PatchFallback] Fallback call failed");
