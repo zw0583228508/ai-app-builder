@@ -17,6 +17,7 @@ import {
   COMPONENT_VARIATION_RULES,
   LAYOUT_INTELLIGENCE_RULES,
   MOTION_ENGINE_RULES,
+  AUDIENCE_ADAPTATION_RULES,
 } from "../../../services/ai/prompts/design-system";
 import { getSystemPrompt } from "../../../services/ai/system-prompt";
 import { assertPromptSafe } from "../../../lib/prompt-sanity-check";
@@ -144,6 +145,7 @@ export function buildSystemPrompt(args: PromptBuildArgs): string {
     (isBuildIntent ? "\n" + COMPONENT_VARIATION_RULES : "") +
     (isBuildIntent ? "\n" + LAYOUT_INTELLIGENCE_RULES : "") +
     (isBuildIntent ? "\n" + MOTION_ENGINE_RULES : "") +
+    (isBuildIntent ? "\n" + AUDIENCE_ADAPTATION_RULES : "") +
     (needsLandingPageFallback ? "\n" + LANDING_PAGE_DESIGN_RULES : "") +
     (!isEditOrFix && userDnaContext ? "\n" + userDnaContext : "") +
     (!isEditOrFix && dnaContext ? "\n" + dnaContext : "") +

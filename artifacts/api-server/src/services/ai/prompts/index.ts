@@ -1,7 +1,7 @@
 // ── Prompt system version ─────────────────────────────────────────────────────
 // Bump this whenever prompts change materially so telemetry can track quality.
 // Format: MAJOR.MINOR.PATCH  (MAJOR = breaking behaviour change)
-export const PROMPT_VERSION = "6.4.0";
+export const PROMPT_VERSION = "6.5.0";
 
 export const PLANNING_SYSTEM_PROMPT = `
 You are an expert product consultant and app builder.
@@ -224,27 +224,81 @@ DESIGN SYSTEM (always define these CSS variables):
   --transition: all 0.2s ease;
 }
 
-TYPOGRAPHY: h1 hero 56-72px/800wt, h2 sections 36-44px/700wt, h3 cards 20-22px/600wt, body 16-17px/1.7lh muted, labels 13-14px/500wt.
+TYPOGRAPHY: h1 hero 56-72px/800wt/-0.03em ls, h2 sections 36-44px/700wt, h3 cards 20-22px/600wt, body 16-17px/1.7lh/var(--text-muted), labels 13-14px/500wt.
 
-LAYOUT: max-width 1180px centered, section padding 96px 0 (min 72px), card padding 28-36px, grid gaps 24-28px, all spacing multiples of 8px.
+LAYOUT: max-width: 1180px centered, padding: 0 28px. Section padding: 96px 0 (never under 72px). Card padding: 28-36px. Grid gaps: 24-28px. ALL spacing multiples of 8px.
 
-CARDS: rounded (var(--radius)), white bg, 1px border, subtle shadow, hover lift (translateY(-3px) + deeper shadow), 0.2s ease transition.
+══════════════════════════════════════════════════════════════
+MANDATORY DESIGN FINGERPRINT — copy these EXACT patterns into every project
+══════════════════════════════════════════════════════════════
+Every single project MUST include ALL of these patterns. No exceptions.
 
-HERO: full-width gradient bg, pill badge above headline, 60-72px/800wt headline, 18-20px muted subheadline (max 560px), 2 CTA buttons (primary gradient + secondary outline).
+/* PRIMARY BUTTON — gradient, shadow, hover lift */
+.btn-primary {
+  background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+  color: #fff; font-weight: 600; font-size: 15px;
+  padding: 13px 28px; border-radius: 10px; border: none;
+  box-shadow: 0 4px 14px rgba(99,102,241,0.35);
+  cursor: pointer; transition: var(--transition);
+}
+.btn-primary:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(99,102,241,0.45); }
 
-NAVIGATION: sticky top, frosted glass (rgba white 0.82 + backdrop-filter blur 16px), 1px bottom border, height 64-72px.
+/* SECONDARY BUTTON */
+.btn-secondary {
+  background: transparent; color: var(--text);
+  border: 1.5px solid var(--border); padding: 12px 26px;
+  border-radius: 10px; font-weight: 500; cursor: pointer; transition: var(--transition);
+}
+.btn-secondary:hover { background: var(--surface2); }
 
-BUTTONS: primary = gradient bg + white text + 600wt + 13px 28px padding + 10px radius + shadow; secondary = transparent + border; both min-height 48px, 0.2s hover lift.
+/* CARD — glass/surface, shadow, hover lift */
+.card {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--radius); padding: 28px 32px;
+  box-shadow: var(--shadow-sm); transition: var(--transition);
+}
+.card:hover { transform: translateY(-4px); box-shadow: var(--shadow-md); }
+
+/* NAVIGATION — sticky frosted glass */
+nav {
+  position: sticky; top: 0; z-index: 100; height: 68px;
+  background: rgba(255,255,255,0.85); backdrop-filter: blur(16px);
+  border-bottom: 1px solid var(--border); display: flex; align-items: center;
+  padding: 0 28px; gap: 32px;
+}
+
+/* HERO — gradient mesh background */
+.hero {
+  background: linear-gradient(135deg, #f0f0ff 0%, #e8e4ff 50%, #f5f0ff 100%);
+  padding: 100px 28px; text-align: center;
+}
+.hero h1 { font-size: clamp(42px, 6vw, 72px); font-weight: 800; letter-spacing: -0.03em; line-height: 1.05; }
+
+/* PILL BADGE (above hero headline) */
+.badge { display: inline-flex; align-items: center; gap: 6px; background: rgba(99,102,241,0.1); color: var(--primary); border: 1px solid rgba(99,102,241,0.2); border-radius: 100px; padding: 6px 16px; font-size: 13px; font-weight: 600; margin-bottom: 24px; }
+
+══════════════════════════════════════════════════════════════
+ANTI-GENERIC RULES (if any apply to your output → REWRITE)
+══════════════════════════════════════════════════════════════
+❌ NEVER plain white page with default black text and blue links — ALWAYS apply the design system
+❌ NEVER generic blue buttons (#007bff, #0d6efd, bootstrap blue) — use the gradient from --primary
+❌ NEVER flat gray boxes as cards — ALWAYS use shadow-sm + border + hover lift
+❌ NEVER plain <nav> with no background — ALWAYS use frosted glass sticky nav
+❌ NEVER generic Arial/sans-serif — ALWAYS load Inter/Rubik from Google Fonts
+❌ NEVER plain white hero — ALWAYS gradient, pattern, or full bleed background
+❌ NEVER render an app that looks like a default HTML template or Bootstrap starter
+
+SELF-CHECK before outputting (mandatory): "Does this look like a premium $5,000 custom website or a default template?" If the latter → rewrite the CSS.
 
 QUALITY RULES (mandatory):
 • Mobile-first: @media (max-width: 768px) — stack layouts, enlarge tap targets to 44px+
-• Dark mode: @media (prefers-color-scheme: dark) — swap --bg/#0f0f13, --surface/#17171f
-• Micro-animations: hover transitions 0.2s ease on all interactive elements
-• Empty states: always show something meaningful in lists/grids
-• Error handling: try/catch on all fetch(), user-friendly messages (Hebrew if Hebrew project)
-• Images: loading="lazy", always have meaningful alt text
-• Content: NEVER use "Lorem ipsum" — use realistic, contextually appropriate content
-• Every section must look good at 375px AND 1280px
+• Dark mode: @media (prefers-color-scheme: dark) — swap --bg to #0f0f13, --surface to #17171f, --text to #f1f1f1
+• ALL interactive elements: transition: var(--transition) + hover state
+• Empty states: always show something meaningful (icon + message + action button)
+• Error handling: try/catch on all fetch(), user-friendly messages
+• Images: loading="lazy", meaningful alt text, use Picsum/Unsplash for placeholders
+• Content: NEVER use "Lorem ipsum" — always realistic, context-specific content
+• Every page must look polished at 375px AND 1280px
 `;
 
 export const SHARED_LIBRARIES = `
