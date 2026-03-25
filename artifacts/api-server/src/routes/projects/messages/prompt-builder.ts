@@ -12,6 +12,7 @@ import {
   LANDING_PAGE_DESIGN_RULES,
   isMarketingPageRequest,
 } from "../../../services/ai/prompts/index";
+import { HTML_APP_BOILERPLATE } from "../../../services/ai/prompts/html-boilerplate";
 import {
   COPY_BRAIN_RULES,
   COMPONENT_VARIATION_RULES,
@@ -138,6 +139,12 @@ export function buildSystemPrompt(args: PromptBuildArgs): string {
     isMarketingPageRequest(userContent) &&
     stack === "html";
 
+  // Inject the pre-built HTML boilerplate for new HTML apps (not landing pages, not React/Vue)
+  const needsHtmlBoilerplate =
+    isCreateIntent &&
+    (stack === "html" || !stack) &&
+    !isMarketingPageRequest(userContent);
+
   const systemPrompt =
     baseSystemPrompt +
     (designBriefBlock ? "\n" + designBriefBlock : "") +
@@ -146,6 +153,7 @@ export function buildSystemPrompt(args: PromptBuildArgs): string {
     (isBuildIntent ? "\n" + LAYOUT_INTELLIGENCE_RULES : "") +
     (isBuildIntent ? "\n" + MOTION_ENGINE_RULES : "") +
     (isBuildIntent ? "\n" + AUDIENCE_ADAPTATION_RULES : "") +
+    (needsHtmlBoilerplate ? "\n" + HTML_APP_BOILERPLATE : "") +
     (needsLandingPageFallback ? "\n" + LANDING_PAGE_DESIGN_RULES : "") +
     (!isEditOrFix && userDnaContext ? "\n" + userDnaContext : "") +
     (!isEditOrFix && dnaContext ? "\n" + dnaContext : "") +

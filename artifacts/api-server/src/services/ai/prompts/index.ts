@@ -1,7 +1,7 @@
 // ── Prompt system version ─────────────────────────────────────────────────────
 // Bump this whenever prompts change materially so telemetry can track quality.
 // Format: MAJOR.MINOR.PATCH  (MAJOR = breaking behaviour change)
-export const PROMPT_VERSION = "6.6.0";
+export const PROMPT_VERSION = "6.7.0";
 
 export const PLANNING_SYSTEM_PROMPT = `
 You are an expert product consultant and app builder.
