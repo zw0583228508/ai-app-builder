@@ -437,7 +437,7 @@ export function ChatPanel({
       if (msg.role === "assistant") {
         const { text, code, lang } = extractCodeAndText(msg.content);
         if (text) lines.push(text);
-        if (code && code !== "patch-applied") {
+        if (code && code !== "patch-applied" && code !== "patch-failed") {
           const lineCount = code.split("\n").length;
           const langLabel = lang ? lang.toUpperCase() : "קוד";
           lines.push(
@@ -445,6 +445,8 @@ export function ChatPanel({
           );
         } else if (code === "patch-applied") {
           lines.push(`\n> ✅ **הקוד עודכן** — השינויים הוחלו על האתר`);
+        } else if (code === "patch-failed") {
+          lines.push(`\n> ⚠️ **השינוי לא הוחל** — נסה לנסח מחדש את הבקשה`);
         }
       } else {
         lines.push(msg.content);

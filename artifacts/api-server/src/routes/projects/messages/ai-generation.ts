@@ -556,10 +556,18 @@ Emojis: 🏗️ for layout/structure, 🎨 for styling/design, ⚡ for functiona
     : [];
 
   // ── Save AI response to DB ────────────────────────────────────────────────
+  // If the response contained patch blocks but none were applied (patch failed),
+  // mark it so the UI can show an error instead of a false "✅ הקוד עודכן".
+  const hasPatch = fullResponse.includes("<<<REPLACE>>>");
+  const patchFailed = hasPatch && !extractedHtml;
+  const contentToSave = patchFailed
+    ? fullResponse + "\n[PATCH_FAILED]"
+    : fullResponse;
+
   await db.insert(projectMessagesTable).values({
     projectId: params.id,
     role: "assistant",
-    content: fullResponse,
+    content: contentToSave,
   });
 
   // ── DNA + memory (fire-and-forget) ────────────────────────────────────────

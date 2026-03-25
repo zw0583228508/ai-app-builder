@@ -30,20 +30,51 @@ export function applyHtmlPatches(
   }
   if (patches.length === 0) return null;
   let result = baseHtml;
+  let anyApplied = false;
+
   for (const { from, to } of patches) {
-    if (!result.includes(from)) {
-      const normalized = from.replace(/[ \t]+/g, " ").trim();
-      const normResult = result.replace(/[ \t]+/g, " ");
-      if (!normResult.includes(normalized)) continue;
+    // Strategy 1: exact match
+    if (result.includes(from)) {
+      result = result.replace(from, to);
+      anyApplied = true;
+      continue;
+    }
+
+    // Strategy 2: normalize horizontal whitespace only (tabs/spaces → single space)
+    const normFrom2 = from.replace(/[ \t]+/g, " ").trim();
+    const normResult2 = result.replace(/[ \t]+/g, " ");
+    if (normResult2.includes(normFrom2)) {
       result = result.replace(
-        new RegExp(normalized.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")),
+        new RegExp(normFrom2.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")),
         to,
       );
-    } else {
-      result = result.replace(from, to);
+      anyApplied = true;
+      continue;
+    }
+
+    // Strategy 3: normalize ALL whitespace (handles \r\n vs \n, indentation diffs)
+    // Only try if the "from" block is not too large to avoid regex catastrophe
+    if (from.length < 800) {
+      try {
+        const escapedTokens = from
+          .split(/\s+/)
+          .filter((t) => t.length > 0)
+          .map((t) => t.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"));
+        if (escapedTokens.length > 1) {
+          const flexRegex = new RegExp(escapedTokens.join("\\s+"));
+          if (flexRegex.test(result)) {
+            result = result.replace(flexRegex, to);
+            anyApplied = true;
+            continue;
+          }
+        }
+      } catch {
+        // regex compilation failed — fall through
+      }
     }
   }
-  return result !== baseHtml ? result : null;
+
+  return anyApplied ? result : null;
 }
 
 export function extractHtml(
@@ -57,7 +88,11 @@ export function extractHtml(
   if (opts.isReactStack) return null;
 
   const existingBase = opts.previewHtml ?? "";
-  if (existingBase && (opts.intent === "fix" || opts.intent === "edit")) {
+  const isPatchIntent =
+    opts.intent === "fix" ||
+    opts.intent === "edit" ||
+    opts.intent === "add_feature";
+  if (existingBase && isPatchIntent) {
     const patched = applyHtmlPatches(fullResponse, existingBase);
     if (patched) return patched;
   }

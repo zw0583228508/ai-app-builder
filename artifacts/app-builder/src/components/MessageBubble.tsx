@@ -32,6 +32,14 @@ export function extractCodeAndText(content: string): {
   code: string | null;
   lang: string | null;
 } {
+  if (content.includes("[PATCH_FAILED]")) {
+    return {
+      text: stripPatchMarkers(content.replace("[PATCH_FAILED]", "")).trim(),
+      code: "patch-failed",
+      lang: null,
+    };
+  }
+
   if (content.includes("[PATCH_APPLIED]")) {
     return {
       text: stripPatchMarkers(content.replace("[PATCH_APPLIED]", "")).trim(),
@@ -224,11 +232,12 @@ export function MessageBubble({ message }: { message: ProjectMessage }) {
     : extractCodeAndText(rawContent);
 
   const isPatch = extractedCode === "patch-applied";
+  const isPatchFailed = extractedCode === "patch-failed";
   const hasCode = !!extractedCode;
-  const hasViewableCode = hasCode && !isPatch;
+  const hasViewableCode = hasCode && !isPatch && !isPatchFailed;
 
   const handleCopy = () => {
-    if (extractedCode && !isPatch) {
+    if (extractedCode && !isPatch && !isPatchFailed) {
       navigator.clipboard.writeText(extractedCode);
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
@@ -297,18 +306,26 @@ export function MessageBubble({ message }: { message: ProjectMessage }) {
               <div
                 className={cn(
                   "flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs flex-1",
-                  isPatch
+                  isPatchFailed
+                    ? "bg-red-500/10 border border-red-500/25 text-red-400"
+                    : isPatch
                     ? "bg-emerald-500/8 border border-emerald-500/20 text-emerald-400"
                     : "bg-indigo-500/8 border border-indigo-500/20 text-indigo-400",
                 )}
               >
-                <span className="text-sm">{isPatch ? "✏️" : "✅"}</span>
+                <span className="text-sm">{isPatchFailed ? "⚠️" : isPatch ? "✏️" : "✅"}</span>
                 <span style={{ fontFamily: HE }}>
-                  {isPatch ? "הקוד עודכן בהצלחה" : "תצוגה מקדימה מוכנה"}
+                  {isPatchFailed
+                    ? "השינוי לא הוחל — נסה לנסח מחדש את הבקשה"
+                    : isPatch
+                    ? "הקוד עודכן בהצלחה"
+                    : "תצוגה מקדימה מוכנה"}
                 </span>
-                <span className="text-slate-600 mr-auto text-[10px]" style={{ fontFamily: HE }}>
-                  מוצג בצד ימין
-                </span>
+                {!isPatchFailed && (
+                  <span className="text-slate-600 mr-auto text-[10px]" style={{ fontFamily: HE }}>
+                    מוצג בצד ימין
+                  </span>
+                )}
               </div>
               {hasViewableCode && (
                 <button
