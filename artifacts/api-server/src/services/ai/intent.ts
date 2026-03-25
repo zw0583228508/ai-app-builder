@@ -54,6 +54,17 @@ export function detectChatIntent(
   if (isGreeting(content))
     return { intent: "greeting", label: "שיחה", emoji: "💬" };
 
+  // retry / try again — must be checked before all other intents
+  if (
+    hasExistingCode &&
+    matchesIntent(
+      lower,
+      /\b(try again|retry|once more|one more time|same thing again|do it again)\b/,
+      /נסה שוב|תנסה שוב|פעם אחרונה|עוד פעם|אותו דבר|נסה שוב|לנסות שוב|שוב על אותו/,
+    )
+  )
+    return { intent: "fix", label: "מנסה שוב", emoji: "🔄" };
+
   // deploy
   if (
     matchesIntent(

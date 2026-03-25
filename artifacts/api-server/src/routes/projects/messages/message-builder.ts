@@ -96,12 +96,12 @@ export function buildFinalUserContent(
     enrichedText = `[CURRENT PROJECT FILES — START]\nThese are the current React files. ONLY output files that need to change.\n\n${filesBlock}\n[CURRENT PROJECT FILES — END]\n\nUSER REQUEST: ${text}`;
   } else if (!ctx.isFirstMessage && ctx.previewHtml) {
     const isPatchIntent = ctx.intent === "fix" || ctx.intent === "edit";
-    const MAX_PATCH_HTML_CHARS = 18_000;
+    const MAX_PATCH_HTML_CHARS = 32_000;
     let htmlForContext = ctx.previewHtml;
     if (isPatchIntent && htmlForContext.length > MAX_PATCH_HTML_CHARS) {
-      const head = htmlForContext.slice(0, 15_000);
-      const tail = htmlForContext.slice(-3_000);
-      htmlForContext = `${head}\n\n<!-- ... [${Math.round((htmlForContext.length - 18_000) / 1000)}KB truncated] ... -->\n\n${tail}`;
+      const head = htmlForContext.slice(0, 24_000);
+      const tail = htmlForContext.slice(-8_000);
+      htmlForContext = `${head}\n\n<!-- ... [${Math.round((htmlForContext.length - 32_000) / 1000)}KB truncated] ... -->\n\n${tail}`;
     }
     enrichedText = `[CURRENT APP CODE — START]\nThe app currently has the following complete HTML. ${isPatchIntent ? "Use the PATCH FORMAT (<<<REPLACE>>>...<<<WITH>>>...<<<END>>>) to return ONLY the changed sections — do NOT rewrite the full file." : "You MUST use this as your exact base. Return the complete updated HTML."}\n\n\`\`\`html\n${htmlForContext}\n\`\`\`\n[CURRENT APP CODE — END]\n\nUSER REQUEST: ${text}`;
   }

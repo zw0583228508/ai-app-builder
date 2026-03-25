@@ -1,7 +1,7 @@
 // ── Prompt system version ─────────────────────────────────────────────────────
 // Bump this whenever prompts change materially so telemetry can track quality.
 // Format: MAJOR.MINOR.PATCH  (MAJOR = breaking behaviour change)
-export const PROMPT_VERSION = "6.3.0";
+export const PROMPT_VERSION = "6.4.0";
 
 export const PLANNING_SYSTEM_PROMPT = `
 You are an expert product consultant and app builder.
@@ -224,49 +224,17 @@ DESIGN SYSTEM (always define these CSS variables):
   --transition: all 0.2s ease;
 }
 
-TYPOGRAPHY SCALE (strictly follow):
-• Hero h1: 56-72px / font-weight: 800 / line-height: 1.05 / letter-spacing: -0.03em
-• Section h2: 36-44px / font-weight: 700 / line-height: 1.15
-• Card h3: 20-22px / font-weight: 600
-• Body: 16-17px / line-height: 1.7 / color: var(--text-muted)
-• Small/label: 13-14px / font-weight: 500
+TYPOGRAPHY: h1 hero 56-72px/800wt, h2 sections 36-44px/700wt, h3 cards 20-22px/600wt, body 16-17px/1.7lh muted, labels 13-14px/500wt.
 
-LAYOUT RULES:
-• Max content width: 1180px centered (max-width: 1180px; margin: 0 auto; padding: 0 28px)
-• Section padding: padding: 96px 0 (never less than 72px)
-• Card padding: 28-36px
-• Grid gaps: 24-28px
-• Never use margin/padding less than 8px; prefer multiples of 8px
+LAYOUT: max-width 1180px centered, section padding 96px 0 (min 72px), card padding 28-36px, grid gaps 24-28px, all spacing multiples of 8px.
 
-CARDS (every card must look polished):
-• border-radius: var(--radius)
-• background: var(--surface)
-• border: 1px solid var(--border)
-• box-shadow: var(--shadow-sm)
-• transition: var(--transition)
-• On hover: transform: translateY(-3px); box-shadow: var(--shadow-md)
+CARDS: rounded (var(--radius)), white bg, 1px border, subtle shadow, hover lift (translateY(-3px) + deeper shadow), 0.2s ease transition.
 
-HERO SECTION (first thing user sees — make it striking):
-• Full-width, gradient or image background
-• Pill badge above headline: pill with branded color + icon
-• Headline: 60-72px, weight 800, tight letter-spacing, high contrast
-• Subheadline: 18-20px, muted, max-width 560px, line-height 1.6
-• 2 CTA buttons side-by-side: primary (gradient) + secondary (outline)
-• Primary button gradient: background: linear-gradient(135deg, var(--primary), var(--primary-dark))
-• Subtle background: gradient mesh or geometric pattern, never plain white/gray
+HERO: full-width gradient bg, pill badge above headline, 60-72px/800wt headline, 18-20px muted subheadline (max 560px), 2 CTA buttons (primary gradient + secondary outline).
 
-NAVIGATION (sticky, frosted glass):
-• position: sticky; top: 0; z-index: 100
-• background: rgba(255,255,255,0.82); backdrop-filter: blur(16px)
-• border-bottom: 1px solid var(--border)
-• Height: 64-72px; padding: 0 28px
+NAVIGATION: sticky top, frosted glass (rgba white 0.82 + backdrop-filter blur 16px), 1px bottom border, height 64-72px.
 
-BUTTONS (never plain — always polished):
-• Primary: gradient bg, color: white, font-weight: 600, padding: 13px 28px, border-radius: 10px
-• Primary box-shadow: 0 4px 14px rgba(var(--primary-rgb, 99,102,241), 0.35)
-• Primary hover: transform: translateY(-1px); box-shadow deepens
-• Secondary: border: 1.5px solid var(--border); background: transparent; hover: bg: var(--surface2)
-• Min height: 48px; font-size: 15px; cursor: pointer
+BUTTONS: primary = gradient bg + white text + 600wt + 13px 28px padding + 10px radius + shadow; secondary = transparent + border; both min-height 48px, 0.2s hover lift.
 
 QUALITY RULES (mandatory):
 • Mobile-first: @media (max-width: 768px) — stack layouts, enlarge tap targets to 44px+

@@ -1,0 +1,247 @@
+מדריך תיקון מלא — AI App Builder
+
+כל הבעיות, הסיבות, והתיקונים המדויקים
+
+
+בעיה 1 — Patch נכשל בשקט (סיבה לבאג WhatsApp)
+מה קורה
+כשהמשתמש מבקש לתקן משהו, Claude מחזיר בלוקים מהצורה:
+<<<REPLACE>>>
+טקסט ישן
+<<<WITH>>>
+טקסט חדש
+<<<END>>>
+הפונקציה applyHtmlPatches מנסה למצוא את "טקסט ישן" בקוד הנוכחי. אם היא לא מוצאת אותו היא עוברת הלאה בשקט (continue) — בלי להחזיר שגיאה. המשתמש רואה "עדכנתי" אבל שום דבר לא השתנה.
+קובץ לתיקון
+artifacts/api-server/src/services/ai/code-extractor.ts
+תיקון מדויק
+לפני (שורות 28-37):
+typescriptfor (const { from, to } of patches) {
+  if (!result.includes(from)) {
+    const normalized = from.replace(/[ \t]+/g, " ").trim();
+    const normResult = result.replace(/[ \t]+/g, " ");
+    if (!normResult.includes(normalized)) continue;  // ← הבעיה!
+    result = result.replace(
+      new RegExp(normalized.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")),
+      to,
+    );
+  } else {
+    result = result.replace(from, to);
+  }
+}
+return result !== baseHtml ? result : null;
+אחרי:
+typescriptlet patchFailed = false;
+
+for (const { from, to } of patches) {
+  if (!result.includes(from)) {
+    const normalized = from.replace(/[ \t]+/g, " ").trim();
+    const normResult = result.replace(/[ \t]+/g, " ");
+    if (!normResult.includes(normalized)) {
+      patchFailed = true;  // ← סמן כישלון במקום לדלג
+      continue;
+    }
+    result = result.replace(
+      new RegExp(normalized.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")),
+      to,
+    );
+  } else {
+    result = result.replace(from, to);
+  }
+}
+
+// אם אף patch לא הצליח — החזר null כדי לאלץ full rebuild
+if (patchFailed && result === baseHtml) return null;
+return result !== baseHtml ? result : null;
+
+בעיה 2 — כשה-patch נכשל, אין fallback לבנייה מחדש
+מה קורה
+כשה-patch נכשל ו-extractHtml מחזיר null, הקוד ממשיך הלאה כאילו הכל בסדר. הסנאפשוט לא מתעדכן, המשתמש רואה את הקוד הישן, ו-Claude לא מקבל שום פידבק על הכישלון.
+קובץ לתיקון
+artifacts/api-server/src/routes/projects/messages/ai-generation.ts
+תיקון — אחרי שורה 615 (לאחר extractHtml)
+מצא את הקוד:
+typescriptlet extractedHtml = extractHtml(fullResponse, {
+  isReactStack,
+  previewHtml: project.previewHtml,
+  intent: detectedIntent.intent,
+});
+הוסף מיד אחריו:
+typescript// ── Patch fallback: אם patch נכשל, נסה full rebuild עם Sonnet ──────────────
+const wasPatchIntent = detectedIntent.intent === "fix" || detectedIntent.intent === "edit";
+if (!extractedHtml && wasPatchIntent && project.previewHtml) {
+  try {
+    const fallbackRes = await anthropic.messages.create({
+      model: "claude-sonnet-4-5-20251001",
+      max_tokens: 8192,
+      system: `You are an expert web developer. The user wants to modify their app.
+IMPORTANT: The patch format failed. You MUST return the COMPLETE updated HTML file.
+Wrap it in \`\`\`html ... \`\`\``,
+      messages: [
+        {
+          role: "user",
+          content: `[CURRENT CODE]\n\`\`\`html\n${project.previewHtml}\n\`\`\`\n\nUSER REQUEST: ${body.content}\n\nReturn the COMPLETE updated HTML file.`,
+        },
+      ],
+    });
+    const fallbackText =
+      fallbackRes.content[0].type === "text" ? fallbackRes.content[0].text : "";
+    extractedHtml = extractHtml(fallbackText, {
+      isReactStack,
+      previewHtml: null,
+      intent: "create",
+    });
+  } catch {
+    /* non-critical */
+  }
+}
+
+בעיה 3 — קיצוץ קוד HTML גורם ל-patches שגויים
+מה קורה
+ב-message-builder.ts יש קיצוץ של ה-HTML ל-18,000 תווים לפני שהוא נשלח ל-Claude:
+typescriptconst MAX_PATCH_HTML_CHARS = 18_000;
+כשהקוד ארוך יותר, Claude רואה גרסה חתוכה ומייצר patch עם טקסט שלא קיים בקוד האמיתי → הפאץ' נכשל.
+קובץ לתיקון
+artifacts/api-server/src/routes/projects/messages/message-builder.ts
+תיקון
+typescript// לפני:
+const MAX_PATCH_HTML_CHARS = 18_000;
+
+// אחרי:
+const MAX_PATCH_HTML_CHARS = 32_000;  // הגדל ל-32K
+וגם, שנה את לוגיקת החיתוך כדי שתשמור יותר מהסוף:
+typescript// לפני:
+const head = htmlForContext.slice(0, 15_000);
+const tail = htmlForContext.slice(-3_000);
+
+// אחרי:
+const head = htmlForContext.slice(0, 24_000);
+const tail = htmlForContext.slice(-8_000);
+
+בעיה 4 — המודל לא מקבל את הקוד בתוך ה-system prompt בעת edit/fix
+מה קורה
+בעת edit/fix, ה-system prompt אומר ל-Claude להשתמש ב-patch format — אבל הקוד הנוכחי נשלח רק כהודעת user, לא כחלק מה-system prompt. כשהיסטוריית השיחה ארוכה, Claude עשוי להתבלבל בין גרסאות שונות של הקוד.
+קובץ לתיקון
+artifacts/api-server/src/routes/projects/messages/ai-generation.ts
+תיקון — בתוך בניית ה-system prompt
+מצא:
+typescriptconst baseSystemPrompt = isEditOrFix
+  ? `You are an expert web developer making targeted edits...`
+שנה את הסיום של ה-system prompt לעריכה, הוסף הבהרה:
+typescriptconst baseSystemPrompt = isEditOrFix
+  ? `You are an expert web developer making targeted edits to an existing project.
+RESPOND IN THE SAME LANGUAGE AS THE USER (Hebrew → Hebrew, English → English).
+
+⚠️ CRITICAL: The current code will be provided in the user message inside [CURRENT APP CODE — START/END] tags.
+READ IT CAREFULLY before making any changes. Your patches must match the EXACT text in that code.
+
+EDITING RULES (MANDATORY):
+- Read the [CURRENT APP CODE] carefully before touching anything
+- Change ONLY what the user explicitly asked to change
+- Preserve ALL existing features, styles, content, and structure
+- Never remove or restructure things that were not mentioned
+- For HTML projects: use the patch format (<<<REPLACE>>>...<<<WITH>>>...<<<END>>>) for surgical changes
+  - The text inside <<<REPLACE>>> must be COPIED EXACTLY from the current code — character for character
+  - Include enough surrounding context (3-5 lines) to make it unique
+  - If you're not 100% sure of the exact text, return the COMPLETE updated HTML instead
+- For React/multi-file projects: output ONLY the changed files
+
+[... שאר הכללים כמו שהם ...]`
+
+בעיה 5 — גרסת Haiku במקום Sonnet לסוכנים
+מה קורה
+ב-agent_orchestrator.ts, כל 5 הסוכנים (architect, frontend, backend, devops, qa) רצים על claude-haiku-4-5-20251001 עם max_tokens: 1500. זה מהיר אבל מייצר תוכניות שטחיות ולא מדויקות.
+קובץ לתיקון
+artifacts/api-server/src/agents/agent_orchestrator.ts
+תיקון
+typescript// לפני:
+const res = await anthropic.messages.create({
+  model: "claude-haiku-4-5-20251001",
+  max_tokens: 1500,
+
+// אחרי:
+const res = await anthropic.messages.create({
+  model: "claude-haiku-4-5-20251001",  // אפשר להשאיר haiku לתכנון
+  max_tokens: 3000,  // ← הכפל את max_tokens לפחות
+ולאחר מכן, ב-agent flow בתוך ai-generation.ts, מצא את שלב התכנון:
+typescript// לפני:
+const planRes = await anthropic.messages.create({
+  model: "claude-haiku-4-5-20251001",
+  max_tokens: 1000,
+
+// אחרי:
+const planRes = await anthropic.messages.create({
+  model: "claude-haiku-4-5-20251001",
+  max_tokens: 2000,  // ← יותר מקום לתכנון מפורט
+
+בעיה 6 — היסטוריית שיחה חתוכה ל-6,000 תווים
+מה קורה
+ב-send.ts, כל הודעת assistant נחתכת ל-6,000 תווים:
+typescriptconst MAX_HIST_MSG_CHARS = 6_000;
+HTML מלא הוא בדרך כלל 15,000-40,000 תווים. כלומר Claude לעולם לא רואה את הקוד המלא שהוא בנה בהיסטוריה — הוא רואה רק שבר ממנו. זה גורם לאי-עקביות בין iterations.
+קובץ לתיקון
+artifacts/api-server/src/routes/projects/messages/send.ts
+תיקון
+typescript// לפני:
+const MAX_HIST_MSG_CHARS = 6_000;
+
+// אחרי — הגדל משמעותית, אבל רק לכמה הודעות אחרונות:
+const MAX_HIST_MSG_CHARS = 4_000;  // שמור קטן להיסטוריה ישנה
+
+// ובמקום זה, שנה את לוגיקת הקיצוץ:
+const trimmedHistory = trimMessagesToTokenBudget(
+  existingMessages.map((m, idx) => {
+    const isRecent = idx >= existingMessages.length - 4;  // 4 הודעות אחרונות מלאות
+    const maxChars = isRecent ? 40_000 : MAX_HIST_MSG_CHARS;
+    return {
+      role: m.role as "user" | "assistant",
+      content:
+        m.role === "assistant" && m.content.length > maxChars
+          ? m.content.slice(0, maxChars) +
+            "\n\n[... content truncated for context ...]"
+          : m.content,
+    };
+  }),
+  60_000,
+);
+
+בעיה 7 — Intent Detection שגוי בעברית
+מה קורה
+כשמשתמש כותב "תנסה פעם אחרונה" — זה מזוהה כ-edit כי יש "תנ" שדומה לדפוסים. אבל "תנסה שוב" זה בעצם fix. המערכת לא מבחינה בין "נסה שוב על אותו דבר" לבין "שנה משהו".
+קובץ לתיקון
+artifacts/api-server/src/services/ai/intent.ts
+תיקון — הוסף בתחילת הפונקציה detectChatIntent:
+typescript// retry / try again — חייב להיות לפני שאר הבדיקות
+if (
+  matchesIntent(
+    lower,
+    /\b(try again|retry|once more|one more time|same thing|again)\b/,
+    /נסה שוב|תנסה שוב|פעם אחרונה|עוד פעם|אותו דבר|שוב/,
+  )
+)
+  return { intent: "fix", label: "מנסה שוב", emoji: "🔄" };
+
+בעיה 8 — System prompt ענק מדי
+מה קורה
+ה-system prompt הבסיסי כולל כללי עיצוב, CSS variables, typography scale, layout rules, card styles, hero section specs ועוד — יותר מ-4,000 tokens רק להוראות עיצוב. זה "גוזל" מקום מ-Claude לחשוב על הלוגיקה האמיתית של הבקשה.
+קובץ לתיקון
+artifacts/api-server/src/services/ai/prompts/index.ts
+תיקון
+ב-SHARED_OUTPUT_RULES, הסר או קצר את החלקים הבאים:
+
+את כל ה-CSS variables המדויקות (שמור רק את העקרון, לא את הערכים)
+את ה-TYPOGRAPHY SCALE המפורטת (שמור רק את הגדלים)
+את ה-CARDS spec המפורטת
+את ה-HERO SECTION spec המפורטת
+
+לדוגמה, לפני (כ-800 תווים):
+CARDS (every card must look polished):
+- border-radius: var(--radius)
+- background: var(--surface)
+- border: 1px solid var(--border)
+- box-shadow: var(--shadow-sm)
+- transition: var(--transition)
+- On hover: transform: translateY(-3px); box-shadow: var(--shadow-md)
+אחרי (כ-100 תווים):
+CARDS: rounded corners, subtle border, shadow, hover lift effect.
+יעד: לצמצם את SHARED_OUTPUT_RULES מ~4,000 תווים ל~1,500 תווים.

@@ -181,16 +181,22 @@ router.post("/:id/messages", async (req, res) => {
           .orderBy(asc(projectFilesTable.path))
       : [];
 
-  const MAX_HIST_MSG_CHARS = 6_000;
+  const MAX_HIST_MSG_CHARS_OLD = 4_000;
+  const MAX_HIST_MSG_CHARS_RECENT = 40_000;
+  const RECENT_COUNT = 4;
   const trimmedHistory = trimMessagesToTokenBudget(
-    existingMessages.map((m) => ({
-      role: m.role as "user" | "assistant",
-      content:
-        m.role === "assistant" && m.content.length > MAX_HIST_MSG_CHARS
-          ? m.content.slice(0, MAX_HIST_MSG_CHARS) +
-            "\n\n[... content truncated for context ...]"
-          : m.content,
-    })),
+    existingMessages.map((m, idx) => {
+      const isRecent = idx >= existingMessages.length - RECENT_COUNT;
+      const maxChars = isRecent ? MAX_HIST_MSG_CHARS_RECENT : MAX_HIST_MSG_CHARS_OLD;
+      return {
+        role: m.role as "user" | "assistant",
+        content:
+          m.role === "assistant" && m.content.length > maxChars
+            ? m.content.slice(0, maxChars) +
+              "\n\n[... content truncated for context ...]"
+            : m.content,
+      };
+    }),
     60_000,
   );
 
